@@ -1,0 +1,1466 @@
+---
+title: "Lab 01. Exploring Data Representations"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+A dataset does not have only one useful representation.
+
+In this lab, we examine how the same underlying data can be represented as
+records, sequences, matrices, vectors, and graphs.
+
+> **Before choosing an algorithm, choose a representation.**
+
+```{python}
+#| label: setup
+#| include: false
+
+import sys
+from pathlib import Path
+
+# execute-dir: project → cwd is the repo root, so helper .py files
+# are not on sys.path. If Jupyter was opened in this folder, use ".".
+_lab_dir = Path("exercises/lab01")
+if not (_lab_dir / "lab01_record.py").exists():
+    _lab_dir = Path(".")
+sys.path.insert(0, str(_lab_dir.resolve()))
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+# Part 1. Record Data
+We use the **Titanic dataset** to examine how the same collection of passenger
+records changes when we represent it differently.
+
+```{python}
+#| label: setup-record
+#| include: false
+
+from lab01_record import (
+    load_titanic,
+    build_numeric_matrix,
+    build_transactions,
+    build_binary_item_matrix,
+    build_bipartite_graph,
+)
+```
+
+## 1.1 Load the Data
+
+```{python}
+
+
+titanic = load_titanic()
+
+type(titanic), titanic.shape
+```
+
+```{python}
+titanic.head()
+```
+
+```{python}
+titanic["survived"].value_counts()
+```
+
+## 1.2 Representation 1: Numerical Feature Matrix
+
+The same passenger records can be represented as numerical vectors.
+
+Categorical values such as `sex`, `pclass`, and `embarked` are converted into
+0/1 indicators, while numerical values such as `age` and `fare` remain as
+numbers.
+
+Each passenger is now represented by one row of numbers.
+
+```{python}
+X_numeric = build_numeric_matrix(
+    titanic
+)
+
+type(X_numeric), X_numeric.shape
+```
+
+```{python}
+X_numeric.head()
+```
+
+**Think:** Is this a different dataset?  
+No. The passengers are the same. Only their representation has changed from
+mixed data types to numerical values.
+
+## 1.3 Representation 2: Transaction Representation
+
+The same passenger can also be represented as a **set of attribute-value
+items**.
+
+Continuous values such as `age` and `fare` are first discretized into
+categories.
+
+```{python}
+transactions = build_transactions(
+    titanic
+)
+
+type(transactions), type(transactions.iloc[0])
+```
+
+```{python}
+for i, items in transactions.head().items():
+    print(i, ":", items)
+```
+
+**Think:** What changed in this representation?  
+The same passenger is now represented as a set of attribute-value items instead
+of one row containing mixed numerical and categorical values.
+
+## 1.4 Representation 3: Binary Item Matrix
+
+The transaction representation can be converted into a binary matrix.
+
+Each column corresponds to one possible item, and the value is `1` when the
+passenger has that item.
+
+```{python}
+item_matrix = build_binary_item_matrix(
+    transactions
+)
+
+type(item_matrix), item_matrix.shape
+```
+
+```{python}
+item_matrix.head()
+```
+
+The matrix has the following meaning:
+
+- Row = passenger
+- Column = attribute-value item
+- Value = 1 if the passenger has that item
+- Zero = the passenger does not have that item
+
+**Think:** Is the information different from the transaction representation?  
+No. The item set and the binary matrix encode the same attribute-value
+information in two different forms.
+
+## 1.5 Representation 4: Passenger-Attribute Bipartite Graph
+
+The same transaction data can also be represented as a **bipartite graph**.
+
+We create two kinds of nodes:
+
+- Passenger nodes
+- Attribute-value nodes
+
+An edge connects a passenger to an attribute-value item that belongs to that
+passenger.
+
+```{python}
+G = build_bipartite_graph(
+    transactions,
+    n_show=6,
+)
+
+type(G)
+```
+
+```{python}
+G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+list(G.edges())[:10]
+```
+
+```{python}
+#| fig-cap: "Passenger-attribute bipartite graph"
+#| fig-width: 7
+#| fig-height: 5.5
+
+passenger_nodes = [
+    node
+    for node, data in G.nodes(data=True)
+    if data["node_type"] == "passenger"
+]
+
+attribute_nodes = [
+    node
+    for node, data in G.nodes(data=True)
+    if data["node_type"] == "attribute"
+]
+
+attribute_order = [
+    "pclass",
+    "sex",
+    "embarked",
+    "alone",
+    "age_group",
+    "fare_group",
+]
+
+
+def attribute_key(node):
+    prefix = node.split("=")[0]
+
+    if prefix in attribute_order:
+        group = attribute_order.index(prefix)
+    else:
+        group = len(attribute_order)
+
+    return (group, node)
+
+
+attribute_nodes = sorted(
+    attribute_nodes,
+    key=attribute_key,
+)
+
+pos = {}
+
+passenger_y = np.linspace(
+    0.9,
+    -0.9,
+    len(passenger_nodes),
+)
+
+for y, node in zip(
+    passenger_y,
+    passenger_nodes,
+):
+    pos[node] = (-0.5, y)
+
+attribute_y = np.linspace(
+    0.95,
+    -0.95,
+    len(attribute_nodes),
+)
+
+for y, node in zip(
+    attribute_y,
+    attribute_nodes,
+):
+    pos[node] = (0.5, y)
+
+fig, ax = plt.subplots(
+    figsize=(7, 5.5)
+)
+
+nx.draw_networkx_edges(
+    G,
+    pos,
+    edge_color="lightgray",
+    alpha=0.6,
+    ax=ax,
+)
+
+nx.draw_networkx_nodes(
+    G,
+    pos,
+    nodelist=passenger_nodes,
+    node_size=340,
+    node_color="skyblue",
+    ax=ax,
+)
+
+nx.draw_networkx_nodes(
+    G,
+    pos,
+    nodelist=attribute_nodes,
+    node_size=340,
+    node_color="salmon",
+    node_shape="s",
+    ax=ax,
+)
+
+passenger_label_pos = {
+    node: (-0.44, pos[node][1])
+    for node in passenger_nodes
+}
+
+attribute_label_pos = {
+    node: (0.44, pos[node][1])
+    for node in attribute_nodes
+}
+
+nx.draw_networkx_labels(
+    G,
+    passenger_label_pos,
+    labels={node: node for node in passenger_nodes},
+    font_size=7,
+    horizontalalignment="left",
+    ax=ax,
+)
+
+nx.draw_networkx_labels(
+    G,
+    attribute_label_pos,
+    labels={node: node for node in attribute_nodes},
+    font_size=7,
+    horizontalalignment="right",
+    ax=ax,
+)
+
+ax.text(
+    -0.5,
+    1.05,
+    "Passengers",
+    ha="center",
+    fontsize=9,
+)
+
+ax.text(
+    0.5,
+    1.05,
+    "Attribute-value items",
+    ha="center",
+    fontsize=9,
+)
+
+ax.set_xlim(-0.78, 0.78)
+ax.set_ylim(-1.05, 1.1)
+ax.axis("off")
+
+plt.tight_layout()
+plt.show()
+```
+
+# Part 2. Text Data
+
+We use **20 Newsgroups** to examine how the same text collection changes
+when we represent it differently.
+
+```{python}
+#| label: setup-text
+#| include: false
+
+from lab01_text import (
+    RANDOM_STATE,
+    build_count_matrix,
+    build_similarity_graph,
+    build_tfidf_matrix,
+    compute_cosine_similarity,
+    load_20newsgroups,
+    tokenize_documents,
+)
+```
+
+## 2.1 Load the Data
+
+```{python}
+news = load_20newsgroups(
+    n_per_class=100,
+    random_state=RANDOM_STATE,
+)
+
+type(news), news.shape
+```
+
+```{python}
+news.head()
+```
+
+```{python}
+news["label"].value_counts()
+```
+
+## 2.2 Inspect Raw Text
+
+```{python}
+print(news.loc[0, "text"][:1200])
+```
+
+**Think:** What is one object in this dataset?  
+Each row corresponds to one document. The same object can therefore be viewed
+as both a record and a document.
+
+## 2.3 Representation 1: Token Sequence
+
+```{python}
+tokens = tokenize_documents(news["text"])
+
+type(tokens), type(tokens[0])
+```
+
+```{python}
+tokens[0][:30]
+```
+
+**Think:** What information is preserved in a token-sequence representation?  
+The order of tokens is preserved, so we can still distinguish which words
+appear before or after others.
+
+## 2.4 Representation 2: Document-Term Count Matrix
+
+```{python}
+X_count, count_vectorizer = build_count_matrix(
+    news["text"],
+    max_features=3000,
+)
+
+type(X_count), X_count.shape
+```
+
+```{python}
+X_count.nnz
+```
+
+The matrix has the following meaning:
+
+- Row = document
+- Column = term
+- Value = term count
+- Zero = the term does not occur in the document
+
+```{python}
+terms = count_vectorizer.get_feature_names_out()
+
+term_counts = np.asarray(X_count.sum(axis=0)).ravel()
+top_terms = term_counts.argsort()[-10:][::-1]
+
+pd.DataFrame(
+    X_count[:6, top_terms].toarray(),
+    index=news.loc[:5, "doc_id"],
+    columns=terms[top_terms],
+)
+```
+
+```{python}
+#| fig-cap: "Sparse document-term count matrix"
+
+plt.figure(figsize=(8, 4))
+plt.spy(X_count[:100, :500], markersize=1)
+plt.xlabel("terms")
+plt.ylabel("documents")
+plt.show()
+```
+
+**Think:** Why is this matrix sparse?  
+Each document contains only a small subset of the entire vocabulary. Therefore,
+most document-term entries are zero.
+
+## 2.5 Representation 3: TF-IDF Vector Space
+
+```{python}
+X_tfidf, tfidf_vectorizer = build_tfidf_matrix(
+    news["text"],
+    max_features=3000,
+)
+
+type(X_tfidf), X_tfidf.shape, X_tfidf.nnz
+```
+
+The shape is similar to the count matrix, but the values now have a different
+meaning: each row is a TF-IDF document vector.
+
+**Think:** Can the representation change even when the matrix shape stays the same?  
+Yes. The rows and columns can remain the same while the meaning of each value
+changes from a raw count to a TF-IDF weight.
+
+## 2.6 Cosine Similarity
+
+```{python}
+scores = compute_cosine_similarity(
+    X_tfidf,
+    query_index=0,
+)
+
+scores.shape
+```
+
+```{python}
+scores[0] = -1
+top_idx = scores.argsort()[-5:][::-1]
+
+news.loc[top_idx, ["doc_id", "label"]].assign(
+    cosine_similarity=scores[top_idx]
+)
+```
+
+```{python}
+i = top_idx[0]
+
+print("similarity:", round(float(scores[i]), 3))
+print("label:", news.loc[i, "label"])
+print(news.loc[i, "text"][:600])
+```
+
+**Think:** Was this similarity stored in the original dataset?  
+No. It is a derived quantity created by representing documents with TF-IDF
+vectors and comparing them with cosine similarity.
+
+## 2.7 Representation 4: Document Similarity Graph
+
+We connect each document to its **k most similar documents** in the TF-IDF
+space.
+
+```{python}
+G = build_similarity_graph(
+    X_tfidf,
+    doc_ids=news["doc_id"],
+    labels=news["label"],
+    k=3,
+    max_docs=80,
+)
+
+type(G)
+```
+
+```{python}
+G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+list(G.edges(data=True))[:10]
+```
+
+```{python}
+pos = nx.spring_layout(
+    G,
+    seed=RANDOM_STATE,
+)
+
+labels = [G.nodes[node]["label"] for node in G.nodes]
+node_colors = pd.Categorical(labels).codes
+
+plt.figure(figsize=(8, 6))
+nx.draw_networkx_edges(G, pos, alpha=0.25)
+nx.draw_networkx_nodes(
+    G,
+    pos,
+    node_size=70,
+    node_color=node_colors,
+    cmap="tab10",
+)
+plt.axis("off")
+plt.show()
+```
+
+**Think:** Were these edges present in the original 20 Newsgroups dataset?  
+No. They are derived edges. We created them by choosing a TF-IDF
+representation, cosine similarity, and a k-nearest-neighbor rule.
+
+
+# Part 3. Graph Data
+
+We use **Zachary's Karate Club** to examine how the same graph changes
+when we represent it differently.
+
+```{python}
+#| label: setup-graph
+#| include: false
+
+from lab01_graph import (
+    load_karate,
+    build_edge_list,
+    build_adjacency_list,
+    adjacency,
+)
+```
+
+## 3.1 Load the Data
+
+```{python}
+G = load_karate()
+
+type(G), G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+list(G.nodes(data=True))[:10]
+```
+
+```{python}
+list(G.edges())[:10]
+```
+
+## 3.2 Inspect Basic Graph Structure
+
+```{python}
+print("number of nodes:", G.number_of_nodes())
+print("number of edges:", G.number_of_edges())
+```
+
+```{python}
+G.nodes[0]
+```
+
+```{python}
+list(G.neighbors(0))
+```
+
+**Think:** How is a graph object described?  
+A node can have its own attributes, but graph data also explicitly represents
+connections between nodes through edges.
+
+## 3.3 Representation 1: Graph Visualization
+
+The graph can be visualized using nodes and edges.
+
+Each node represents a club member, and each edge represents a relationship
+between two members.
+
+```{python}
+#| fig-cap: "Karate Club graph visualization"
+
+colors = [
+    "skyblue" if G.nodes[n]["club"] == "Mr. Hi" else "salmon"
+    for n in G.nodes()
+]
+
+pos = nx.spring_layout(
+    G,
+    seed=RANDOM_STATE,
+)
+
+plt.figure(figsize=(8, 6))
+
+nx.draw(
+    G,
+    pos,
+    node_color=colors,
+    with_labels=True,
+    node_size=500,
+    edge_color="gray",
+)
+
+plt.show()
+```
+
+**Think:** What information is easy to see in a graph visualization?  
+We can visually inspect neighborhoods, highly connected nodes, and groups of
+nodes that appear close together.
+
+## 3.4 Representation 2: Edge List
+
+The same graph can be represented as a list of connected node pairs.
+
+```{python}
+edge_list = build_edge_list(G)
+
+type(edge_list), edge_list.shape
+```
+
+```{python}
+edge_list.head(10)
+```
+
+The table has the following meaning:
+
+- Row = edge
+- `source` = one endpoint
+- `target` = the other endpoint
+
+```{python}
+list(G.edges(31))
+```
+
+**Think:** Does the edge list contain different graph information from the
+graph visualization?  
+No. The same connections are represented differently: a line in the
+visualization becomes a `(source, target)` pair in the table.
+
+## 3.5 Representation 3: Adjacency List
+
+The same graph can also be represented by listing the neighbors of each node.
+
+```{python}
+adjacency_list = build_adjacency_list(G)
+
+type(adjacency_list), len(adjacency_list)
+```
+
+```{python}
+for node in list(adjacency_list)[:10]:
+    print(node, ":", adjacency_list[node])
+```
+
+Each node is associated with the list of nodes directly connected to it.
+
+**Think:** How is the same connection represented here?  
+If node `1` appears in the neighbor list of node `0`, then nodes `0` and `1`
+are connected by an edge.
+
+## 3.6 Representation 4: Adjacency Matrix
+
+The same graph can also be represented as a **nodes × nodes matrix**.
+
+```{python}
+A = adjacency(G)
+
+A_numeric = pd.DataFrame(
+    A,
+    index=[f"N{i}" for i in range(A.shape[0])],
+    columns=[f"N{i}" for i in range(A.shape[1])],
+)
+
+type(A), A.shape
+```
+
+```{python}
+A_numeric.iloc[:10, :10]
+```
+
+A value of `1` indicates that two nodes are connected, while `0` indicates
+that there is no direct edge.
+
+The same matrix can also be visualized using color.
+
+```{python}
+#| fig-cap: "Karate Club binary adjacency matrix"
+
+from matplotlib.colors import ListedColormap
+
+n = 12
+A_small = A[:n, :n]
+
+cmap = ListedColormap([
+    "#F7F7F7",
+    "#87CEEB",
+])
+
+fig, ax = plt.subplots(
+    figsize=(7, 7)
+)
+
+ax.imshow(
+    A_small,
+    cmap=cmap,
+    vmin=0,
+    vmax=1,
+    interpolation="nearest",
+)
+
+for i in range(n):
+    for j in range(n):
+        ax.text(
+            j,
+            i,
+            str(A_small[i, j]),
+            ha="center",
+            va="center",
+            fontsize=8,
+        )
+
+ax.set_xticks(range(n))
+ax.set_yticks(range(n))
+
+ax.set_xticklabels(
+    [f"N{i}" for i in range(n)]
+)
+
+ax.set_yticklabels(
+    [f"N{i}" for i in range(n)]
+)
+
+ax.set_xticks(
+    np.arange(-0.5, n, 1),
+    minor=True,
+)
+
+ax.set_yticks(
+    np.arange(-0.5, n, 1),
+    minor=True,
+)
+
+ax.grid(
+    which="minor",
+    color="#D9D9D9",
+    linewidth=0.6,
+)
+
+ax.tick_params(
+    which="minor",
+    bottom=False,
+    left=False,
+)
+
+ax.set_xlabel("Node")
+ax.set_ylabel("Node")
+
+plt.tight_layout()
+plt.show()
+```
+
+**Think:** Is this different information from the graph visualization, edge list,
+or adjacency list?  
+No. The same connections are represented in matrix form.
+
+# Part 4. Interaction Data
+
+We use **MovieLens 100K** to examine how the same set of user-item interactions
+changes when we represent it differently.
+
+An interaction dataset records *which users engaged with which items*. It is
+observed only for events that actually happened, so the absence of an entry is
+ambiguous: it may mean dislike, or simply not yet seen.
+
+::: {.callout-important}
+## Before you start: download the data
+
+The dataset is **not** included with this lab. Download it once from
+GroupLens and place it under the shared project `data/` folder
+(`data/interaction/Movielens/`).
+
+**Source**: <https://grouplens.org/datasets/movielens/100k/>
+
+1. Download `ml-100k.zip` (about 5 MB). If the browser shows a security
+   warning, choose **Advanced → Proceed**.
+2. Unzip it and put the files into `data/interaction/Movielens/`:
+
+```
+data/
+└── interaction/
+    └── Movielens/
+        ├── u.data
+        ├── u.item
+        └── u.user
+```
+
+`u.data`, `u.item` and `u.user` must be **directly** inside `Movielens`
+(not nested as `data/interaction/Movielens/ml-100k/u.data`).
+
+If the data is missing, `load_movielens_100k()` prints these instructions.
+
+MovieLens is free for research and educational use, but redistribution
+requires separate permission — which is why you download it yourself.
+:::
+
+```{python}
+#| label: setup-interaction
+#| include: false
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+
+from lab01_interaction import (
+    RANDOM_STATE,
+    biadjacency_matrix,
+    binarize_utility_matrix,
+    build_bipartite_graph,
+    build_item_knn_graph,
+    build_utility_matrix,
+    compute_item_similarity,
+    load_movielens_100k,
+    load_movies,
+    load_users,
+    matrix_density,
+    project_onto_users,
+    sample_interactions,
+)
+```
+
+## 4.1 Load the Data
+
+```{python}
+ratings = load_movielens_100k()
+
+type(ratings), ratings.shape
+```
+
+```{python}
+ratings.head()
+```
+
+Each row is **one interaction**: a `(user, item)` pair with a rating attached.
+This long format is often called a *triple*.
+
+```{python}
+movies = load_movies()
+titles = movies.set_index("item_id")["title"]
+
+movies.head()
+```
+
+```{python}
+users = load_users()
+
+users.head()
+```
+
+## 4.2 Inspect the Raw Log
+
+```{python}
+pd.DataFrame(
+    {
+        "n_interactions": [len(ratings)],
+        "n_users": [ratings["user_id"].nunique()],
+        "n_items": [ratings["item_id"].nunique()],
+        "rating_values": [sorted(ratings["rating"].unique())],
+    }
+)
+```
+
+```{python}
+ratings["rating"].value_counts().sort_index()
+```
+
+**Think:** What is one object in this dataset?
+Not a user, and not a movie. One row is one *interaction* — a pair of two
+different kinds of object. This is why interaction data does not fit the
+"one row = one object" assumption of record data.
+
+## 4.3 Representation 1: User-Item Utility Matrix
+
+We pivot the triples into a matrix whose rows are users and columns are items.
+
+Let us first take a small block that we can print in full.
+
+```{python}
+small = sample_interactions(
+    ratings,
+    n_items=12,
+    n_users=10,
+    random_state=RANDOM_STATE,
+)
+
+X_small, small_users, small_items = build_utility_matrix(small)
+
+X_small.shape
+```
+
+```{python}
+pd.DataFrame(
+    X_small.toarray(),
+    index=[f"u{u}" for u in small_users],
+    columns=[titles[i][:16] for i in small_items],
+).replace(0.0, np.nan)
+```
+
+Every NaN is a pair we never observed. Now the full matrix:
+
+```{python}
+X, user_ids, item_ids = build_utility_matrix(ratings)
+
+type(X), X.shape, X.nnz
+```
+
+```{python}
+f"density = {matrix_density(X):.4%}"
+```
+
+The matrix has the following meaning:
+
+- Row = user
+- Column = item
+- Value = rating (1-5)
+- Missing = the user has not rated the item
+
+**Think:** Why is this matrix sparse?
+Each user rates only a small subset of the 1,682 movies. Only 6.3% of the
+user-item pairs are observed, so more than 93% of the matrix is missing.
+
+**Think:** Did we lose anything by pivoting?
+Yes. The timestamp of each interaction is no longer visible in the matrix. The
+same triples could instead be represented as a sequence ordered by time.
+
+## 4.4 Representation 2: Binary Interaction Matrix
+
+Often we only know *that* an interaction happened, not how much the user liked
+the item. We can convert the ratings into a binary "positive interaction" view.
+
+```{python}
+X_binary = binarize_utility_matrix(X, threshold=4.0)
+
+X_binary.shape, X_binary.nnz
+```
+
+```{python}
+f"density = {matrix_density(X_binary):.4%}"
+```
+
+```{python}
+pd.DataFrame(
+    {
+        "representation": ["rating (1-5)", "binary (>= 4)"],
+        "observed_entries": [X.nnz, X_binary.nnz],
+        "density": [matrix_density(X), matrix_density(X_binary)],
+    }
+)
+```
+
+**Think:** In the binary matrix, is a 0 the same as a low rating?
+No. A 0 means "no positive interaction observed", which mixes together *disliked*,
+*not yet seen*, and *seen but not rated*. A 1 is a statement by the
+user; a 0 is the absence of a statement.
+
+## 4.5 Representation 3: Bipartite Graph
+
+The same interactions can be viewed as a graph with two kinds of node — users
+and items — where an edge exists whenever a user rated an item.
+
+```{python}
+G = build_bipartite_graph(
+    small,
+    titles=titles,
+    n_users=None,
+)
+
+type(G), G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+nx.is_bipartite(G)
+```
+
+```{python}
+list(G.edges(data=True))[:5]
+```
+
+```{python}
+#| fig-cap: "Bipartite user-item graph"
+
+user_nodes = [n for n, d in G.nodes(data=True) if d["bipartite"] == 0]
+item_nodes = [n for n, d in G.nodes(data=True) if d["bipartite"] == 1]
+
+pos = nx.bipartite_layout(G, user_nodes)
+
+fig, ax = plt.subplots(figsize=(11, 8))
+
+nx.draw_networkx_edges(G, pos, alpha=0.25, edge_color="#AAAAAA", width=1.0, ax=ax)
+nx.draw_networkx_nodes(G, pos, nodelist=user_nodes, node_color="tab:blue",
+                       node_size=900, label="user", ax=ax)
+nx.draw_networkx_nodes(G, pos, nodelist=item_nodes, node_color="tab:orange",
+                       node_size=900, node_shape="s", label="item", ax=ax)
+
+nx.draw_networkx_labels(
+    G, pos,
+    labels={n: G.nodes[n]["label"] for n in user_nodes},
+    font_size=9, font_color="white", font_weight="bold", ax=ax,
+)
+
+for node in item_nodes:
+    x, y = pos[node]
+    ax.text(x + 0.10, y, G.nodes[node]["label"][:24],
+            fontsize=10, va="center", ha="left")
+
+ax.legend(scatterpoints=1, fontsize=11, frameon=False, ncol=2, markerscale=0.7,
+          loc="lower center", bbox_to_anchor=(0.5, 1.01),
+          handletextpad=0.8, columnspacing=2.5)
+ax.set_xlim(-1.25, 1.45)
+ax.axis("off")
+plt.show()
+```
+
+The graph and the matrix are two views of the *same* object. The users x items
+block of the adjacency matrix is called the **biadjacency matrix**:
+
+```{python}
+B, row_nodes, col_nodes = biadjacency_matrix(G)
+
+B.shape, B.nnz
+```
+
+```{python}
+B.nnz == G.number_of_edges()
+```
+
+```{python}
+pd.DataFrame(
+    B.toarray(),
+    index=row_nodes,
+    columns=[c[:10] for c in col_nodes],
+).replace(0.0, np.nan)
+```
+
+**Think:** Is the bipartite graph a different dataset from the utility matrix?
+No. The biadjacency matrix of the graph is the utility matrix, up to the
+ordering of rows and columns. Choosing "graph" or "matrix" changes which tools
+we can apply, not what the data contains.
+
+**Think:** What could a bipartite graph *not* store?
+An edge connects one user to one item. If each rating also carried a tag, we
+would need a three-column relation `(user, item, tag)`, because an edge cannot
+by itself record which tag was used on which pair.
+
+## 4.6 Representation 4: User-User Projection
+
+We can fold the bipartite graph onto one side: connect two users when they
+rated the same item, weighted by how many items they share. Here we keep only
+pairs that share at least four items, so that the strongest links stand out.
+
+```{python}
+P = project_onto_users(G, min_shared=4)
+
+P.number_of_nodes(), P.number_of_edges()
+```
+
+```{python}
+sorted(
+    P.edges(data=True),
+    key=lambda e: e[2]["weight"],
+    reverse=True,
+)[:5]
+```
+
+```{python}
+#| fig-cap: "User-user projection weighted by shared items"
+
+pos = nx.circular_layout(P)
+
+plt.figure(figsize=(10, 9))
+nx.draw_networkx_edges(P, pos, width=1.3, alpha=0.4, edge_color="#AAAAAA")
+nx.draw_networkx_nodes(P, pos, node_color="tab:blue", node_size=1700)
+nx.draw_networkx_labels(P, pos, font_size=11, font_color="white",
+                        font_weight="bold")
+nx.draw_networkx_edge_labels(
+    P, pos,
+    edge_labels={(u, v): d["weight"] for u, v, d in P.edges(data=True)},
+    font_size=9, label_pos=0.28, rotate=False,
+)
+plt.margins(0.14)
+plt.axis("off")
+plt.show()
+```
+
+**Think:** What was lost in the projection?
+The items. We can see that two users are similar, but the graph no longer tells
+us *which* movies they shared. Projection also destroys the bipartite structure:
+this graph has only one kind of node.
+
+## 4.7 Representation 5: Item-Item Similarity Graph
+
+Instead of folding by counting shared users, we can compare item columns of the
+binary matrix with cosine similarity.
+
+```{python}
+query_item = 50
+query_index = int(np.where(item_ids == query_item)[0][0])
+
+titles[query_item]
+```
+
+```{python}
+scores = compute_item_similarity(X_binary, query_index=query_index)
+
+scores.shape
+```
+
+```{python}
+scores[query_index] = -1
+top_idx = scores.argsort()[-8:][::-1]
+
+pd.DataFrame(
+    {
+        "title": [titles[item_ids[i]] for i in top_idx],
+        "cosine_similarity": scores[top_idx].round(3),
+    }
+)
+```
+
+We connect each item to its **k most similar items**, restricted to the 25
+most-rated movies so that every column has enough observations to compare:
+
+```{python}
+G_items = build_item_knn_graph(
+    X_binary,
+    item_ids=item_ids,
+    titles=titles,
+    k=2,
+    max_items=25,
+)
+
+G_items.number_of_nodes(), G_items.number_of_edges()
+```
+
+```{python}
+#| fig-cap: "k-nearest-neighbor item similarity graph"
+
+def short_title(title):
+    title = title.split(" (")[0]
+    return title if len(title) <= 17 else title[:16] + "."
+
+pos = nx.kamada_kawai_layout(G_items)
+
+plt.figure(figsize=(10, 7))
+nx.draw_networkx_edges(G_items, pos, width=1.0, alpha=0.5, edge_color="#AAAAAA")
+nx.draw_networkx_nodes(G_items, pos, node_size=700, node_color="tab:orange")
+
+nx.draw_networkx_labels(
+    G_items, pos,
+    labels={n: short_title(G_items.nodes[n]["title"]) for n in G_items.nodes},
+    font_size=8,
+)
+nx.draw_networkx_edge_labels(
+    G_items, pos,
+    edge_labels={(u, v): f"{d['weight']:.2f}" for u, v, d in G_items.edges(data=True)},
+    font_size=6.5, label_pos=0.5, rotate=False,
+)
+plt.margins(0.14)
+plt.axis("off")
+plt.show()
+```
+
+**Think:** Were these edges present in the original MovieLens data?
+No. MovieLens contains only user-item ratings. The item-item edges are derived:
+we chose a binary representation, cosine similarity, and a k-nearest-neighbor
+rule. A different threshold or metric would produce a different graph.
+
+
+# Part 5. Transaction Data
+
+We use the **Groceries transaction dataset** to examine how one collection
+of shopping baskets can be represented in several different ways.
+
+The dataset contains grocery transactions, where each row represents one
+shopping basket and contains the items purchased together.
+
+**Dataset:** [Groceries CSV](https://github.com/stedy/Machine-Learning-with-R-datasets/blob/master/groceries.csv)
+
+For market basket analysis, transactions are commonly represented as a
+binary transaction-item matrix, where `1` means that an item appears in a
+transaction and `0` means that it does not.
+
+```{python}
+#| label: setup-transaction
+#| include: false
+
+from lab01_transaction import (
+    build_item_cooccurrence_graph,
+    build_transaction_item_matrix,
+    compute_item_support,
+    load_groceries,
+    to_long_table,
+)
+```
+
+## 5.1 Load the Data
+
+Place the downloaded Groceries CSV file at `data/transaction/groceries.csv`.
+
+```{python}
+groceries = load_groceries()
+
+type(groceries), groceries.shape
+```
+
+```{python}
+groceries.head()
+```
+
+Inspect one basket directly.
+
+```{python}
+groceries.loc[0, "items"]
+```
+
+**Think:** What is one object in this dataset?  
+One object is a transaction (basket), represented as a collection of items
+purchased together.
+
+## 5.2 Representation 1: Basket / Item-Set View
+
+Each transaction can be viewed directly as a variable-length collection of
+items.
+
+```{python}
+for i in range(3):
+    print(
+        groceries.loc[i, "transaction_id"],
+        "->",
+        groceries.loc[i, "items"],
+    )
+```
+
+**Think:** How is this different from ordinary record data?  
+Different transactions can contain different numbers of items, so there is no
+fixed set of attribute columns in the raw basket representation.
+
+## 5.3 Representation 2: Long Table
+
+The same baskets can be expanded into a table with one row for each
+transaction-item occurrence.
+
+```{python}
+groceries_long = to_long_table(groceries)
+
+type(groceries_long), groceries_long.shape
+```
+
+```{python}
+groceries_long.head(12)
+```
+
+The same `transaction_id` now appears repeatedly because one transaction can
+contain several items.
+
+**Think:** Did the underlying purchases change?  
+No. Only the representation changed from one row per basket to one row per
+transaction-item occurrence.
+
+## 5.4 Representation 3: Transaction-Item Binary Matrix
+
+```{python}
+X_transaction, item_names = build_transaction_item_matrix(groceries)
+
+type(X_transaction), X_transaction.shape
+```
+
+```{python}
+X_transaction.nnz
+```
+
+The matrix has the following meaning:
+
+- Row = transaction
+- Column = item
+- Value = `1` if the item is in the transaction
+- Zero = the item is not in the transaction
+
+View a small part of the matrix using the most frequent items.
+
+```{python}
+item_counts = np.asarray(X_transaction.sum(axis=0)).ravel()
+top_item_idx = item_counts.argsort()[-10:][::-1]
+
+pd.DataFrame(
+    X_transaction[:8, top_item_idx].toarray(),
+    index=groceries.loc[:7, "transaction_id"],
+    columns=item_names[top_item_idx],
+)
+```
+
+Now inspect the sparse structure visually.
+
+```{python}
+#| fig-cap: "Sparse transaction-item binary matrix"
+
+plt.figure(figsize=(8, 4))
+plt.spy(X_transaction[:120, :120], markersize=1)
+plt.xlabel("items")
+plt.ylabel("transactions")
+plt.show()
+```
+
+**Think:** Why is this matrix sparse?  
+Each basket contains only a small subset of all available items. Therefore,
+most transaction-item entries are zero.
+
+## 5.5 Item Support
+
+Once we have a binary transaction-item matrix, the support of an item becomes
+a simple summary of how frequently that item appears across transactions.
+
+```{python}
+item_support = compute_item_support(
+    X_transaction,
+    item_names,
+)
+
+item_support.head(10)
+```
+
+**Think:** What does a support of `0.10` mean for an item?  
+It means that the item appears in 10% of all transactions.
+
+This is the same basic notion of support used later in frequent itemset and
+association-rule mining. In this first lab, we stop at the representation and
+simple summary rather than running Apriori.
+
+## 5.6 Representation 4: Item Co-occurrence Graph
+
+We can also represent items as a graph.
+
+- Node = item
+- Edge = strong co-occurrence relationship between two items
+- Edge weight = Jaccard similarity (It measures how often two items occur together relative to how often either item occurs.)
+
+For visualization, we use the most frequent items and connect each item to
+its strongest co-occurring neighbors.
+
+```{python}
+G_items = build_item_cooccurrence_graph(
+    X_transaction,
+    item_names,
+    top_n_items=15,
+    k=2,
+)
+
+type(G_items)
+```
+
+Inspect the graph before drawing it.
+
+```{python}
+G_items.number_of_nodes(), G_items.number_of_edges()
+```
+
+```{python}
+list(G_items.edges(data=True))[:10]
+```
+
+```{python}
+pos = nx.spring_layout(
+    G_items,
+    seed=RANDOM_STATE,
+    k=1.2,
+    iterations=200,
+    weight=None,
+)
+
+node_labels = {
+    node: G_items.nodes[node]["item"]
+    for node in G_items.nodes
+}
+
+edge_labels = {
+    (u, v): f"{data['weight']:.2f}"
+    for u, v, data in G_items.edges(data=True)
+}
+
+plt.figure(figsize=(10, 7))
+
+# Draw edges
+nx.draw_networkx_edges(
+    G_items,
+    pos,
+    width=1.0,
+    alpha=0.35,
+)
+
+# Draw nodes
+nx.draw_networkx_nodes(
+    G_items,
+    pos,
+    node_size=1100,
+)
+
+# Draw node labels
+nx.draw_networkx_labels(
+    G_items,
+    pos,
+    labels=node_labels,
+    font_size=8,
+)
+
+# Draw Jaccard similarity on each edge
+nx.draw_networkx_edge_labels(
+    G_items,
+    pos,
+    edge_labels=edge_labels,
+    font_size=7,
+    rotate=False,
+)
+
+plt.axis("off")
+plt.show()
+```
+
+**Think:** Were these item-item edges explicitly stored in the original data?  
+No. The original data only records which items occurred in each transaction.
+The item-item graph is a derived representation created by aggregating
+co-occurrence across transactions.

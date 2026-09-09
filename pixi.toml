@@ -1,45 +1,27 @@
 [workspace]
 authors = ["GLI-Lab <glilab509@gmail.com>"]
 channels = ["conda-forge"]
-name = "machine-learning-course"
-platforms = ["linux-64", "osx-arm64"]
+name = "data-mining-course"
+platforms = ["linux-64", "osx-arm64", "win-64"]
 version = "0.1.0"
 
-# https://pixi.prefix.dev/v0.43.0/python/pytorch/
 [dependencies]
 python = "3.12.*"
-numpy = "*"              # numerical computing
-pandas = "*"             # data manipulation
-scikit-learn = "*"       # machine learning
-matplotlib = "*"         # visualization
-seaborn = "*"            # visualization
-plotly = "*"             # visualization (interactive)
-tqdm = "*"               # utils
-jupyterlab = "*"         # notebook
 
-[pypi-dependencies]  # linux-64: CUDA 활용
-torch = { version = "==2.10.*", index = "https://download.pytorch.org/whl/cu128" }
-torchvision = { version = "*", index = "https://download.pytorch.org/whl/cu128" }
-torchinfo = "*"
-datasets = "*"
-
-[target.osx-arm64.pypi-dependencies]  # osx-arm64: CUDA 없음
-torch = { version = "==2.10.*", index = "https://download.pytorch.org/whl/cpu" }
-torchvision = { version = "*", index = "https://download.pytorch.org/whl/cpu" }
-torchinfo = "*"
-datasets = "*"
+numpy = "*"                  # W2-W15
+scipy = "*"                  # W3 distance, W5 sparse matrix, W9 dendrogram
+pandas = "*"                 # W2
+scikit-learn = "*"           # W3, W4 TF-IDF, W6 PCA/SVD, W9-W11, W13
+matplotlib = "*"             # W2-
+seaborn = "*"                # W2 EDA, W3 correlation heatmap
+nltk = "*"                   # W4 tokenization, stopwords, stemming
+networkx = ">=3.1"           # W5, W10 Louvain, W12 PageRank/HITS, W15
+mlxtend = "*"                # W7 apriori, fpgrowth, association_rules
+gensim = ">=4.3.3"           # W14 Word2Vec, W15 DeepWalk/Node2Vec
+jupyterlab = "*"             # notebooks, and Quarto executes .qmd cells through it
 
 [tasks]
-jupyter = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"
-gpu-test = 'python -c "import torch; print(torch.__version__); print(torch.cuda.is_available())"'
-gpu-info = 'python -c "import torch; [print(f\"GPU {i}: {torch.cuda.get_device_name(i)}, {torch.cuda.get_device_properties(i).total_memory // 1024**3}GB\") for i in range(torch.cuda.device_count())]"'
-
-[target.osx-arm64.activation.env]
-KMP_DUPLICATE_LIB_OK = "TRUE"
-
-[target.osx-arm64.tasks]
-gpu-test = 'python -c "import torch; print(torch.__version__); print(torch.backends.mps.is_available())"'
-gpu-info = 'python -c "import subprocess, torch; mem=int(subprocess.check_output([\"sysctl\",\"-n\",\"hw.memsize\"])); print(f\"MPS available: {torch.backends.mps.is_available()}\"); print(f\"Unified Memory: {mem // 1024**3}GB (CPU+GPU shared)\")"'
+lab = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"
 
 [environments]
 default = []

@@ -1,5 +1,6 @@
 project:
   type: website
+  execute-dir: project  # 모든 .qmd가 프로젝트 루트에서 실행되어, 여러 랩이 같은 data/ 폴더를 공유
   output-dir: _site
 
 metadata:
@@ -28,9 +29,9 @@ format:
       margin-width: 300px
 
 website:
-  title: "Machine Learning"
+  title: "Data Mining"
   # Quarto 빌드 시 canonical URL, sitemap 등의 base URL을 gli.konkuk.ac.kr 기준으로 생성하도록 설정
-  site-url: https://gli.konkuk.ac.kr/board/lectures/machine-learning
+  site-url: https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall
   navbar:
     left:
       - href: index.qmd
@@ -44,8 +45,8 @@ website:
         text: GLI Lab
     tools:
       - icon: github
-        href: https://github.com/GLI-Lab/machine-learning-course
-        text: Machine Learning Course GitHub
+        href: https://github.com/GLI-Lab/dm-2026-fall
+        text: Data Mining 2026-fall GitHub
 
   sidebar:
     - id: exercises
@@ -57,48 +58,20 @@ website:
           href: exercises/index.qmd
           contents:
             - exercises/environment-setup.qmd
-            - section: "Lab1. Introduction to ML"
+            - section: "Lab0. Python Prerequisites"
               contents:
                 - text: "Python Basics (⭐)"
-                  href: exercises/lab01/python-basics.qmd
-                - text: "Numpy Basics (⭐⭐)"
-                  href: exercises/lab01/numpy-basics.qmd
+                  href: exercises/lab00/python-basics.qmd
+                - text: "NumPy Basics (⭐⭐)"
+                  href: exercises/lab00/numpy-basics.qmd
                 - text: "Matplotlib Basics"
-                  href: exercises/lab01/matplotlib-basics.qmd
+                  href: exercises/lab00/matplotlib-basics.qmd
                 - text: "Pandas Basics"
-                  href: exercises/lab01/pandas-basics.qmd
-            - section: "Lab2. Linear Models"
+                  href: exercises/lab00/pandas-basics.qmd
+            - section: "Lab1. Data Representations"
               contents:
-                - text: "Linear Regression"
-                  href: exercises/lab02/linear-regression.qmd
-                - text: "Logistic Regression"
-                  href: exercises/lab02/logistic-regression.qmd
-                - text: "Classification Metrics"
-                  href: exercises/lab02/classification-metrics.qmd
-                - text: "Softmax Regression"
-                  href: exercises/lab02/softmax-regression.qmd
-            - section: "Lab3. Multi-Layer Perceptron"
-              contents:
-                - text: "Linear Regression (Scratch)"
-                  href: exercises/lab03/linear-regression-scratch.qmd
-                - text: "Logistic Regression (Scratch)"
-                  href: exercises/lab03/logistic-regression-scratch.qmd
-                - text: "Softmax Regression (Scratch)"
-                  href: exercises/lab03/softmax-regression-scratch.qmd
-            - section: "Lab4. Model Selection and Generalization"
-              contents:
-                - text: "MLP Regression (Scratch)"
-                  href: exercises/lab04/mlp-regression-scratch.qmd
-                - text: "MLP Regression-Improved (Scratch)"
-                  href: exercises/lab04/mlp-regression-scratch2.qmd
-            - section: "Lab5. Convolutional NNs"
-              contents:
-                - text: "CNN Architecture"
-                  href: exercises/lab05/cnn-architecture.qmd
-            - section: "Lab6. Recurrent NNs"
-              contents:
-                - text: "RNN Architecture"
-                  href: exercises/lab06/rnn-architecture.qmd
+                - text: "Exploring Data Representations"
+                  href: exercises/lab01/lab01.qmd
     - id: assignments
       title: "Assignments"
       collapse-level: 1

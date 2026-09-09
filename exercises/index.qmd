@@ -4,7 +4,13 @@ title: "Exercises Guide"
 
 ## Labs
 
-Labs are **not graded** and are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for the theoretical concepts introduced in class by working directly with code. You will run, visualize, and experiment with the ideas so that by the time you reach a homework assignment, the underlying mechanics feel familiar.
+Labs are **not graded**. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.
+
+::: {.callout-note}
+## Before Choosing an Algorithm, Choose a Representation
+
+A dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: **the representation you choose determines which algorithms you can apply.**
+:::
 
 ::: {.callout-note}
 ## Labs Marked TBD
@@ -12,53 +18,80 @@ Labs are **not graded** and are the hands-on companion to each lecture unit. Eac
 Labs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.
 :::
 
-**Lab 1: Introduction to Machine Learning**
+**Lab 0: Python Prerequisites**
 
-- [Lab 1-1](lab01/python-basics.html): Python Basics
-- [Lab 1-2](lab01/numpy-basics.html): NumPy Basics
-- [Lab 1-3](lab01/matplotlib-basics.html): Matplotlib Basics
-- [Lab 1-4](lab01/pandas-basics.html): Pandas Basics
+Get comfortable with the Python stack used throughout the course before working with real datasets.
 
-**Lab 2: Linear Models **
+- [Lab 0-1](lab00/python-basics.html): Python Basics
+- [Lab 0-2](lab00/numpy-basics.html): NumPy Basics
+- [Lab 0-3](lab00/matplotlib-basics.html): Matplotlib Basics
+- [Lab 0-4](lab00/pandas-basics.html): Pandas Basics
 
-- [Lab 2-1](lab02/linear-regression.html): Linear Regression via Gradient Descent
-- [Lab 2-2](lab02/logistic-regression.html): Logistic Regression via Gradient Descent
-- [Lab 2-3](lab02/classification-metrics.html): Classification Metrics and ROC Curves
-- [Lab 2-4](lab02/softmax-regression.html): Softmax Regression via Gradient Descent
+**Lab 1: Exploring Data Representations**
 
-**Lab 3: Multi-Layer Perceptron**
+One notebook, five data types. For each type you will construct several representations of the *same* underlying data and compare what each one reveals.
 
-- [Lab 3-1](lab03/linear-regression-scratch.html): Linear Regression from Scratch
-- [Lab 3-2](lab03/logistic-regression-scratch.html): Logistic Regression from Scratch
-- [Lab 3-3](lab03/softmax-regression-scratch.html): Softmax Regression from Scratch
+- [Lab 1](lab01/lab01.html): Exploring Data Representations
+  - Part 1. Record data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)
+  - Part 2. Text data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)
+  - Part 3. Graph data — Zachary's Karate Club (visualization, edge list, adjacency list, adjacency matrix)
+  - Part 4. Interaction data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
+  - Part 5. Transaction data — Groceries (baskets, long table, binary matrix, co-occurrence graph)
 
-**Lab 4: Model Selection and Generalization **
+**Later labs (TBD)**
 
-- [Lab 4-1](lab04/mlp-regression-scratch.html): MLP Regression from Scratch
-- [Lab 4-2](lab04/mlp-regression-scratch2.html): Improving MLP Regression from Scratch (ReLU and Adam)
+Additional labs will be posted as the corresponding lecture units are covered.
 
-**Lab 5: Convolutional Neural Networks**
+## Datasets
 
-- [Lab 5-1](lab05/cnn-architecture.html): CNN Architecture Design & Parameter Counting
+Labs share a `data/` folder at the **top level of the course repository**. Quarto is configured so that every notebook runs with the project root as its working directory, so paths such as `data/transaction/groceries.csv` work from any lab.
 
-**Lab 6: Recurrent Neural Networks**
+| Folder | Dataset | Used in |
+|:---|:---|:---|
+| *(seaborn)* | Titanic | Lab 1, Part 1 (loaded in code; not stored under `data/`) |
+| `data/text/20newsgroups/` | 20 Newsgroups | Lab 1, Part 2 |
+| *(NetworkX)* | Zachary's Karate Club | Lab 1, Part 3 (built-in graph) |
+| `data/graph/Cora/` | Cora citation network | Lab 1 graph helpers (optional, larger graph) |
+| `data/graph/OGB/ogbn_arxiv/` | ogbn-arxiv | Lab 1 graph helpers (optional, larger graph) |
+| `data/interaction/Movielens/` | MovieLens 100K | Lab 1, Part 4 |
+| `data/transaction/groceries.csv` | Groceries market baskets | Lab 1, Part 5 |
 
-- [Lab 6-1](lab06/rnn-architecture.html): RNN Architecture Design & Parameter Counting
+::: {.callout-important}
+## Some Datasets Must Be Downloaded Once
+
+**MovieLens 100K** is not shipped with the repository. Download it from [GroupLens](https://grouplens.org/datasets/movielens/100k/) and place `u.data`, `u.item`, and `u.user` under `data/interaction/Movielens/`. Lab 1 Part 4 will not run until those files are present.
+
+**20 Newsgroups** and **Groceries** are already under `data/`. Titanic and Karate Club are loaded from libraries, so no extra files are required.
+:::
 
 ## What You Will Receive
 
-For each lab you will receive a single Jupyter notebook:
+### Lab 0
 
-- `labXX.ipynb`: A guided notebook with explanations and complete, 
-  runnable code for you to explore and experiment with.
+Each prerequisite lab is a single guided notebook with explanations and complete, runnable code:
 
-Some labs also include small data files or image assets placed in a shared `data/` folder at the top level of the course repository.
+- `python-basics.qmd`, `numpy-basics.qmd`, `matplotlib-basics.qmd`, `pandas-basics.qmd`
+
+### Lab 1 and later
+
+Starting with Lab 1, each lab is split so that **construction** and **interpretation** stay separate:
+
+- `labXX.qmd`: The notebook you read and run. It inspects returned objects, visualizes them, and asks you to interpret the results.
+- `labXX_*.py`: Helper modules that load data and *construct* representations. You do not need to rewrite these to complete the lab; you import them and study what they return.
+
+For Lab 1 the helpers are `lab01_record.py`, `lab01_text.py`, `lab01_graph.py`, `lab01_interaction.py`, and `lab01_transaction.py`.
+
+Graded homework is posted separately on the [Assignments](/assignments/index.html) page. Starter files will appear in `assignments/` as each unit is released.
 
 ## Workflow
 
-### Step 1: Open the Lab Notebook
+### Step 1: Set Up the Environment
 
-Launch the notebook using JupyterLab or Google Colab. Each lab notebook opens with a brief motivation section explaining what you are about to explore and why it matters in the context of machine learning.
+Follow the [Python Environment Setup](environment-setup.html) guide before opening any lab. Activate the course `pixi` environment (or use Colab) so that NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.
+
+### Step 2: Open the Lab Notebook
+
+Launch the notebook using JupyterLab, VS Code, or Google Colab. Each lab opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
 
 ::: {.callout-note}
 ## Running Cells in Order
@@ -66,28 +99,36 @@ Launch the notebook using JupyterLab or Google Colab. Each lab notebook opens wi
 Always run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports from earlier cells are missing.
 :::
 
-### Step 2: Run and Observe
+### Step 3: Run and Observe
 
-Unlike the homework assignments, **labs do not require you to write code from scratch or fill in `TODO` blocks.** Instead, complete and working code is provided for you. Your primary task is to run the cells, read the accompanying markdown explanations, and deeply understand how the mathematical equations from the lecture translate into NumPy operations or PyTorch layers. Pay close attention to how the data shapes transform at each step.
+Unlike the homework assignments, **labs do not require you to write code from scratch or fill in `TODO` blocks.** Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the *same* observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.
 
-### Step 3: Experiment Freely
+### Step 4: Experiment Freely
 
-Labs are exploratory playgrounds. Once you have run the provided code and observed its default output, you are highly encouraged to tinker with it. 
+Labs are exploratory playgrounds. Once you have run the provided code, change things:
 
-Try changing hyperparameters (like learning rates, batch sizes, or network depth), altering architectures, or even breaking things on purpose to see what kind of error messages PyTorch throws. Tinkering freely is one of the best ways to build intuition before tackling the homework.
+- Subsample users, items, documents, or transactions and watch the representations change.
+- Swap one representation for another (for example, a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).
+- Break things on purpose — a missing file path, a wrong key, a dense matrix that should have stayed sparse — and read the error.
+
+Tinkering freely is one of the best ways to build intuition before tackling the homework.
 
 ## Navigating the Notebook Structure
 
-Every lab notebook follows the same internal layout so you always know where to look.
+### Lab 0
 
-- **Objectives** lists the specific skills or concepts you will practice in that lab. Read this before you start.
+Each prerequisite notebook follows a skill-oriented layout:
 
-- **Background** gives a concise reminder of the theory needed for the tasks. This is not a replacement for the lecture; it is a quick reference.
+- **Objectives** lists the specific Python skills you will practice. Read this before you start.
+- Short concept notes explain why that library shows up in data mining workflows.
+- Numbered sections walk through examples you should run in order.
 
-- **Experiments** is organized as a sequence of numbered topics, each covering one focused concept or technique. Within each topic you will run the provided implementations, visualize the results, and observe the internal mechanics of the machine learning models. Work through the topics in order, since later topics often build on the results of earlier ones.
+### Lab 1
 
-- **Summary** distills the key takeaways from the lab into a short list of bullet points. Read this after you finish to reinforce what you learned and to check whether anything needs revisiting.
+Lab 1 is organized by **data type**, not by algorithm:
 
-- **References** cites the primary sources (textbooks, papers, or datasets) that the lab content is based on.
+- **Overview** states the theme of the lab: one dataset, many representations.
+- **Parts 1–5** each load one dataset, build several representations, and visualize or inspect them. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).
+- **Think** prompts at the end of a part ask you to say what was *stored* in the original data versus what was *derived* (for example, an item–item co-occurrence graph).
 
-- **Further Reading** points to optional resources — tutorials, documentation pages, or deeper dives — for students who want to go beyond the lab material.
+When a lab imports a `labXX_*.py` module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.

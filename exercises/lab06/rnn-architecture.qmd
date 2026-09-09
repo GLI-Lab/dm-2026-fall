@@ -1,5 +1,0 @@
----
-title: "Lab6-1. RNN Architecture Design & Parameter Counting"
-jupyter: python3
----
-
