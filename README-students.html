@@ -164,13 +164,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#machine-learning-course-for-students" id="toc-machine-learning-course-for-students" class="nav-link active" data-scroll-target="#machine-learning-course-for-students">Machine Learning Course (for students)</a>
+  <li><a href="#data-mining-course-for-students" id="toc-data-mining-course-for-students" class="nav-link active" data-scroll-target="#data-mining-course-for-students">Data Mining Course (for students)</a>
   <ul class="collapse">
-  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a>
-  <ul class="collapse">
+  <li><a href="#repository-layout" id="toc-repository-layout" class="nav-link" data-scroll-target="#repository-layout">Repository layout</a></li>
   <li><a href="#first-time-setup" id="toc-first-time-setup" class="nav-link" data-scroll-target="#first-time-setup">1. First-time setup</a></li>
   <li><a href="#update-course-materials" id="toc-update-course-materials" class="nav-link" data-scroll-target="#update-course-materials">2. Update course materials</a></li>
-  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -208,35 +206,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="machine-learning-course-for-students" class="level1">
-<h1>Machine Learning Course (for students)</h1>
-<p>The lab environment is set up with <strong>pixi</strong>.</p>
-<section id="workflow" class="level2">
-<h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
-<section id="first-time-setup" class="level3">
-<h3 class="anchored" data-anchor-id="first-time-setup">1. First-time setup</h3>
-<p>Install Pixi:</p>
-<ul>
-<li>https://pixi.sh/latest/getting_started/installation/</li>
-</ul>
-<p>Clone the student branch and enter the repo:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> students https://github.com/GLI-Lab/machine-learning-course.git</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> machine-learning-course</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Install the environment:</p>
-<p>Pixi reads the project configuration from <code>pixi.toml</code> (and the lock file, if present) and installs the required packages automatically.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Run Jupyter Lab:</p>
-<p>This runs the <code>jupyter</code> task defined in the Pixi project and starts Jupyter Lab with the course environment activated.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run jupyter</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Open the URL shown in the terminal in your browser.</p>
+<section id="data-mining-course-for-students" class="level1">
+<h1>Data Mining Course (for students)</h1>
+<p>Konkuk University, Fall 2026.</p>
+<p>Hands-on labs and homework starter code. The lab environment is set up with <strong>pixi</strong>.</p>
+<p>Course site: <a href="https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall" class="uri">https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall</a></p>
+<p>This branch (<code>students</code>) contains Jupyter notebooks (<code>.ipynb</code>), helper <code>.py</code> files, shared datasets, and the pixi environment. Lab contents, deadlines, and policies are on the course site.</p>
+<section id="repository-layout" class="level2">
+<h2 class="anchored" data-anchor-id="repository-layout">Repository layout</h2>
+<pre><code>dm-2026-fall/                 # clone of the students branch
+├── pixi.toml                 # dependency declarations
+├── pixi.lock                 # exact pinned versions
+├── data/                     # shared datasets (paths are from the repo root)
+├── exercises/                # lab notebooks
+└── assignments/              # homework starter code</code></pre>
+<p>Always start Jupyter <strong>from the repository root</strong> so that <code>data/</code> paths resolve correctly.</p>
 </section>
-<section id="update-course-materials" class="level3">
-<h3 class="anchored" data-anchor-id="update-course-materials">2. Update course materials</h3>
-<p>From the repo root, run:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull   <span class="co"># updates from origin/students when you're on the students branch</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="first-time-setup" class="level2">
+<h2 class="anchored" data-anchor-id="first-time-setup">1. First-time setup</h2>
+<p>Install Pixi: <a href="https://pixi.sh/latest/getting_started/installation/" class="uri">https://pixi.sh/latest/getting_started/installation/</a></p>
+<p>Windows: use <strong>WSL2</strong>, then follow the Linux steps inside Ubuntu. See the <a href="https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup.html">environment setup</a> page for details.</p>
+<p>Clone this branch and enter the repo:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> students https://github.com/GLI-Lab/dm-2026-fall.git</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dm-2026-fall</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Install the environment. Pixi reads <code>pixi.toml</code> and <code>pixi.lock</code> and installs the pinned packages:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Start JupyterLab (defined as the <code>lab</code> task in <code>pixi.toml</code>):</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run lab</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Copy the URL printed in the terminal into your browser (port 8888). In VS Code, open the repo folder and select the kernel at <code>.pixi/envs/default/bin/python</code>.</p>
+</section>
+<section id="update-course-materials" class="level2">
+<h2 class="anchored" data-anchor-id="update-course-materials">2. Update course materials</h2>
+<p>From the repo root, on the <code>students</code> branch:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> pull</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>If <code>pixi.toml</code> or <code>pixi.lock</code> changed, run <code>pixi install</code> again.</p>
 
 
-</section>
 </section>
 </section>
 
