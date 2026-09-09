@@ -1,0 +1,12 @@
+{
+  "hash": "375aeda081b8568d6f9f89a9d883e9be",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Transfer Learning\"\njupyter: python3\n---\n\n\n\n\nPretrained ResNet feature extractor vs fine-tuning 성능 비교, Grad-CAM으로 모델 attention 영역 시각화.\n\n",
+    "supporting": [
+      "lab10_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "hash": "10093e1fbcd9f6052d56910a6d04d035",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Optimizer 비교\"\njupyter: python3\n---\n\n\n\n\nSGD/Momentum/Adam의 loss surface 위 궤적 시각화, Dropout·weight decay·BatchNorm 유무에 따른 학습 곡선 비교.\n\n",
+    "supporting": [
+      "lab06_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

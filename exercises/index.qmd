@@ -1,0 +1,93 @@
+---
+title: "Exercises Guide"
+---
+
+## Labs
+
+Labs are **not graded** and are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for the theoretical concepts introduced in class by working directly with code. You will run, visualize, and experiment with the ideas so that by the time you reach a homework assignment, the underlying mechanics feel familiar.
+
+::: {.callout-note}
+## Labs Marked TBD
+
+Labs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.
+:::
+
+**Lab 1: Introduction to Machine Learning**
+
+- [Lab 1-1](lab01/python-basics.html): Python Basics
+- [Lab 1-2](lab01/numpy-basics.html): NumPy Basics
+- [Lab 1-3](lab01/matplotlib-basics.html): Matplotlib Basics
+- [Lab 1-4](lab01/pandas-basics.html): Pandas Basics
+
+**Lab 2: Linear Models **
+
+- [Lab 2-1](lab02/linear-regression.html): Linear Regression via Gradient Descent
+- [Lab 2-2](lab02/logistic-regression.html): Logistic Regression via Gradient Descent
+- [Lab 2-3](lab02/classification-metrics.html): Classification Metrics and ROC Curves
+- [Lab 2-4](lab02/softmax-regression.html): Softmax Regression via Gradient Descent
+
+**Lab 3: Multi-Layer Perceptron**
+
+- [Lab 3-1](lab03/linear-regression-scratch.html): Linear Regression from Scratch
+- [Lab 3-2](lab03/logistic-regression-scratch.html): Logistic Regression from Scratch
+- [Lab 3-3](lab03/softmax-regression-scratch.html): Softmax Regression from Scratch
+
+**Lab 4: Model Selection and Generalization **
+
+- [Lab 4-1](lab04/mlp-regression-scratch.html): MLP Regression from Scratch
+- [Lab 4-2](lab04/mlp-regression-scratch2.html): Improving MLP Regression from Scratch (ReLU and Adam)
+
+**Lab 5: Convolutional Neural Networks**
+
+- [Lab 5-1](lab05/cnn-architecture.html): CNN Architecture Design & Parameter Counting
+
+**Lab 6: Recurrent Neural Networks**
+
+- [Lab 6-1](lab06/rnn-architecture.html): RNN Architecture Design & Parameter Counting
+
+## What You Will Receive
+
+For each lab you will receive a single Jupyter notebook:
+
+- `labXX.ipynb`: A guided notebook with explanations and complete, 
+  runnable code for you to explore and experiment with.
+
+Some labs also include small data files or image assets placed in a shared `data/` folder at the top level of the course repository.
+
+## Workflow
+
+### Step 1: Open the Lab Notebook
+
+Launch the notebook using JupyterLab or Google Colab. Each lab notebook opens with a brief motivation section explaining what you are about to explore and why it matters in the context of machine learning.
+
+::: {.callout-note}
+## Running Cells in Order
+
+Always run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports from earlier cells are missing.
+:::
+
+### Step 2: Run and Observe
+
+Unlike the homework assignments, **labs do not require you to write code from scratch or fill in `TODO` blocks.** Instead, complete and working code is provided for you. Your primary task is to run the cells, read the accompanying markdown explanations, and deeply understand how the mathematical equations from the lecture translate into NumPy operations or PyTorch layers. Pay close attention to how the data shapes transform at each step.
+
+### Step 3: Experiment Freely
+
+Labs are exploratory playgrounds. Once you have run the provided code and observed its default output, you are highly encouraged to tinker with it. 
+
+Try changing hyperparameters (like learning rates, batch sizes, or network depth), altering architectures, or even breaking things on purpose to see what kind of error messages PyTorch throws. Tinkering freely is one of the best ways to build intuition before tackling the homework.
+
+## Navigating the Notebook Structure
+
+Every lab notebook follows the same internal layout so you always know where to look.
+
+- **Objectives** lists the specific skills or concepts you will practice in that lab. Read this before you start.
+
+- **Background** gives a concise reminder of the theory needed for the tasks. This is not a replacement for the lecture; it is a quick reference.
+
+- **Experiments** is organized as a sequence of numbered topics, each covering one focused concept or technique. Within each topic you will run the provided implementations, visualize the results, and observe the internal mechanics of the machine learning models. Work through the topics in order, since later topics often build on the results of earlier ones.
+
+- **Summary** distills the key takeaways from the lab into a short list of bullet points. Read this after you finish to reinforce what you learned and to check whether anything needs revisiting.
+
+- **References** cites the primary sources (textbooks, papers, or datasets) that the lab content is based on.
+
+- **Further Reading** points to optional resources — tutorials, documentation pages, or deeper dives — for students who want to go beyond the lab material.

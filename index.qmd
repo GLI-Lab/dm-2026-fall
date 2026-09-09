@@ -1,0 +1,115 @@
+---
+title: "Machine Learning"
+---
+
+This site is your central hub for all coding materials: environment setup, in-class Lab notebooks, and Homework starter code.
+
+This practicum follows a **"From Scratch to Framework"** philosophy. Core algorithms — Linear Regression, MLPs, Self-Attention — are first implemented using only **NumPy** so you understand the mechanics. We then move to **PyTorch** to scale those implementations, leverage GPU acceleration, and explore modern architectures.
+
+::: {.callout-note}
+## Konkuk eCampus
+
+**Konkuk eCampus** is used for official lecture slides, announcements, grade tracking, and homework `.py` submissions.
+:::
+
+::: {.callout-tip}
+## Help Us Improve
+
+This site is actively maintained. If you spot a typo, a broken link, or incorrect code, please reach out via eCampus. Your feedback keeps the materials accurate and up to date.
+:::
+
+## Labs and Homeworks
+
+This practicum is organized into two types of activities: **Labs** for exploration and **Homeworks** for evaluation.
+
+### Labs (In-Class Exercises)
+
+Labs accompany each lecture unit. You receive a Jupyter notebook with complete, runnable code. Your job is to run it, read the explanations, and build intuition for the material covered in lecture.
+
+Every lab notebook has the same structure:
+
+- **Objectives** — the specific skills or concepts you will practice. Read this first.
+- **Background** — a concise theory refresher. Not a replacement for the lecture; just a quick reference.
+- **Experiments** — executable cells to run, observe, and tinker with.
+
+**Workflow:**
+
+1. **Run and Observe.** Execute cells top to bottom. Trace how data shapes change at each step and how the math from lecture maps to NumPy and PyTorch code.
+2. **Tinker Freely.** Change hyperparameters, swap architectures, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.
+
+::: {.callout-warning}
+## Always Run Cells Top to Bottom
+
+Skipping cells or running them out of order causes later cells to fail due to missing variables or imports. If something breaks unexpectedly, restart the kernel and re-run from the top.
+:::
+
+### Homeworks (Graded)
+
+There are 8 homework assignments. All deadlines are at **11:59 PM KST**.
+
+- **Grading:** Evaluated by an autograder against your submitted `.py` files. Your score comes from both the provided doctests and **additional hidden test cases**. Passing all local doctests is a good sign, but it does not guarantee full credit.
+- **Format:** You receive a `.py` submission file and a `.ipynb` notebook for experimentation.
+
+**Workflow:**
+
+1. **Explore.** Open `hwXX.ipynb` and experiment freely. The notebook imports your functions from the `.py` file, so changes are reflected after a kernel restart.
+2. **Implement.** Find the `TODO` blocks in the `.py` file, remove `raise NotImplementedError`, and write your solution. See the [Assignments Guide](/assignments/index.html) for a full walkthrough.
+3. **Test.** Run `python -m doctest hwXX.py -v` in your terminal before submitting.
+4. **Submit.** Upload **only** the `.py` files to eCampus. Do not rename them and do not submit the notebook.
+
+::: {.callout-warning}
+## Two Things to Watch Out For
+
+**Restart the kernel after editing `.py` files.** Changes are not picked up until you restart and re-run all cells.
+
+**Remove `raise NotImplementedError` before submitting.** If this line remains in a function, it will always throw an error — even if your code above it is correct.
+:::
+
+## Schedule & Materials
+
+The timeline and specific contents below are subject to change as the course progresses. Labs marked as TBD have tentative topics that may be added, removed, or reordered.
+
+| Unit | Topic | Labs (Ungraded) | HW (Graded) |
+|:---|:---|:---|:---|
+| **1** | Introduction to Machine Learning | [Lab1](/exercises/lab01/python-basics.html) | [HW01](/assignments/hw01/hw01.html) |
+| **2** | Linear Models | [Lab2](/exercises/lab02/linear-regression.html) | - | [HW02](/assignments/hw02/hw02.html) |
+| **3** | Multi-Layer Perceptron | [Lab3](/exercises/lab03/linear-regression-scratch.html) | [HW02](/assignments/hw02/hw02.html) |
+| **4** | Model Validation and Generalization | [Lab4](/exercises/lab04/mlp-regression-scratch.html) | - | - |
+| **5** | Convolutional Neural Networks | [Lab5](/exercises/lab05/cnn-architecture.html) | HW03 |
+| **6** | Recurrent Neural Networks | [Lab6](/exercises/lab06/rnn-architecture.html) | HW04 |
+
+
+## Course Policies
+
+### Autograder Rules
+
+To avoid losing credit on a correct solution, follow these rules exactly:
+
+- **Do not change function signatures.** Keep function names and parameters exactly as given.
+- **Do not modify docstrings.** The doctests inside them are used for grading.
+- **Match the output format exactly.** Wrong type, wrong shape, or stray `print` statements will fail the autograder even if your logic is correct.
+- **Use only the packages already imported.** Do not add extra `import` statements.
+
+### Late Submission Policy
+
+Late submissions are accepted up to 3 days after the deadline:
+
+| Days Late | Penalty |
+|:---|:---|
+| 1 day | −20% |
+| 2 days | −40% |
+| 3 days | −60% |
+| More than 3 days | No credit |
+
+### Collaboration & Academic Integrity
+
+Our goal is for every student to genuinely understand the course material.
+
+**Homeworks are individual.** You may not share code or written solutions with others, regardless of their enrollment status.
+
+**High-level discussion is welcome.** After spending at least 10 minutes on a problem yourself, you may discuss it verbally or sketch ideas on a whiteboard. You may not take away any written or electronic record from those sessions — no notes, no photos, no code, no messages.
+
+**On AI assistance.** You are permitted to use AI tools (ChatGPT, GitHub Copilot, etc.) as a learning aid — to clarify concepts, understand error messages, or explore unfamiliar syntax. However, two things are non-negotiable:
+
+- **Understand what you submit.** You must be able to explain every line of your code. If you cannot, that is a violation of academic integrity regardless of how it was written.
+- **Read the documentation yourself.** AI-generated answers can be wrong, outdated, or misleading. Learning to navigate official documentation (NumPy, PyTorch, Python) directly is a core skill of this course. Treat AI as a starting point, not a final answer.

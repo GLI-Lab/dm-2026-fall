@@ -1,0 +1,66 @@
+# 최초 1회 실행
+# ------------------------------------------------------------
+# 부모 커밋 없는 새 브랜치 data 생성 (작업 디렉터리 내용은 main 그대로 유지)
+# git checkout --orphan data
+
+# 스테이징·작업 디렉터리를 비움 (main에서 넘어온 파일 전부 제거)
+# git reset --hard
+
+# 빈 커밋 하나로 브랜치 시작 (원격에 push할 최소 한 개 커밋 필요)
+# git commit --allow-empty -m "Initialising data branch"
+# git push origin data
+# git checkout main
+# ------------------------------------------------------------
+
+name: Publish to data branch
+
+on:
+  push:
+    branches: main
+    paths:
+      - 'data/**'        # data/ 폴더가 변경될 때만 실행
+  workflow_dispatch:     # GitHub Actions 탭에서 수동 실행 버튼 활성화
+
+jobs:
+  publish-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # 1. main 브랜치만 Github Actions 서버로 clone (data 브랜치의 존재 여부나 최신 상태는 모름)
+      - name: Check out repository (main)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # 2. data/ 폴더 전체를 /tmp에 임시 보관
+      - name: Save data files
+        run: cp -r data /tmp/
+
+      # 3. data 브랜치로 전환 (기존 히스토리 유지 → 변경분만 push)
+      #    origin/data 브랜치 정보를 가져와서, data 로컬 브랜치를 만들고 이동
+      - name: Fetch and checkout data branch
+        run: |
+          git fetch origin data
+          git checkout -B data origin/data
+
+      # 4. 작업 디렉터리를 /tmp/data 내용으로 교체
+      - name: Replace tree with data files
+        run: |
+          git ls-files | xargs -r rm -f
+          git ls-files -z --directory | sort -z -r | xargs -0 rmdir 2>/dev/null || true
+          cp -r /tmp/data/. .
+
+      # 5. 변경된 파일만 커밋 후 일반 push → 변경분(delta)만 커밋
+      - name: Commit and push to data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update data files from main"
+          fi
+          git push origin data

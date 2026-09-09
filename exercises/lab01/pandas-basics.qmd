@@ -1,0 +1,272 @@
+---
+title: "Lab1-4. Pandas Basics"
+jupyter: python3
+---
+
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab01/pandas-basics.ipynb)
+
+## Objectives
+
+- Understand core pandas data structures: **Series** and **DataFrames**.
+- **Data Inspection**: Learn how to quickly explore and summarize a dataset.
+- **Data Loading and Cleaning**: Load a real CSV dataset, handle missing values, and prepare it for a model.
+- **NumPy Conversion**: Convert a cleaned DataFrame into NumPy arrays ready for sklearn or PyTorch.
+- **Visualization with Seaborn**: Practice creating scatter plots, box plots, histograms, and pair plots directly from a DataFrame.
+
+::: {.callout-note}
+## Basic Concept: Why Pandas for Machine Learning?
+
+While NumPy handles the heavy mathematical lifting, **pandas** is the ultimate tool for data manipulation and analysis. Real-world data is messy: it has missing values, inconsistent formatting, and mixed data types such as text, dates, and numbers. Pandas is built on top of NumPy but provides a tabular interface (similar to Excel or SQL) that makes cleaning, filtering, and preparing datasets for machine learning highly intuitive.
+:::
+
+## Background
+
+Pandas revolves around two core data structures.
+
+A **Series** is a one-dimensional labeled array. Think of it as a single column in a spreadsheet, where each element has an index label. A **DataFrame** is a two-dimensional table composed of multiple Series objects sharing the same index. Each column is a Series, and the DataFrame itself holds them together under a unified row index.
+
+The relationship can be summarized as:
+
+$$\text{DataFrame} \supset \text{Series} \supset \{\text{Scalar values}\}$$
+
+Understanding this hierarchy is essential because most pandas operations, such as filtering, grouping, and aggregation, work on either the Series level or the DataFrame level, and mixing them up is one of the most common sources of bugs for beginners.
+
+## 0. Setup
+
+Run this cell first. All subsequent cells depend on these imports and the dataset URL.
+
+```{python}
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style='whitegrid', font_scale=1.25)
+
+AUTO_CSV = 'https://raw.githubusercontent.com/GLI-Lab/machine-learning-course/students/data/auto.csv'
+```
+
+## 1. Core Data Structures: DataFrames and Series 
+
+### 1.1 DataFrame
+
+A **DataFrame** is a two-dimensional table. The most common way to construct one from scratch is to pass a Python dictionary where each key becomes a column name and each value is a list of column entries.
+
+![Pandas Data Table Representation](https://pandas.pydata.org/docs/_images/01_table_dataframe.svg){fig-align="center" width="100%"}
+
+```{python}
+# 2-Dimensional: DataFrame
+# Bob's age is intentionally left as NaN to simulate a missing value
+data = {
+    'Name':      ['Alice', 'Bob', 'Charlie', 'Diana', 'Eve'],
+    'Age':       [25, np.nan, 22, 45, 33],
+    'Income':    [55000, 48000, 32000, 110000, 75000],
+    'Purchased': [0, 1, 0, 1, 1]
+}
+df = pd.DataFrame(data)
+print("DataFrame:\n", df)
+```
+
+Observe that Bob's `Age` shows as `NaN` (Not a Number). This is how pandas represents missing data.
+
+### 1.2 Series
+
+A **Series** is a one-dimensional array with a labeled index. You can think of it as a single column of data.
+
+![Each column in a DataFrame is a Series](https://pandas.pydata.org/docs/_images/02_series.svg){fig-align="center" width="100%"}
+
+```{python}
+# 1-Dimensional: Series
+# Each element has an automatically assigned integer index (0, 1, 2, ...)
+ages = pd.Series([25, 30, 22, 45, 33], name="Age")
+print("Series:\n", ages)
+print("\nShape:", ages.shape)
+```
+
+Notice that the output shows both the **index** (left column) and the **values** (right column). This index is what makes a Series different from a plain NumPy array.
+
+## 2. Inspecting Data
+
+Before applying any machine learning algorithm, you must understand the shape, data types, and statistical distribution of your data. These three methods are the first thing you should run on any new dataset.
+
+```{python}
+# View the first few rows (default is 5; here we request 3)
+print("=== Head ===")
+print(df.head(3))
+
+# Get a concise summary: column names, non-null counts, and dtypes
+print("\n=== DataFrame Info ===")
+df.info()
+
+# Generate descriptive statistics for all numeric columns
+print("\n=== Summary Statistics ===")
+print(df.describe())
+```
+
+::: {.callout-tip}
+## What to Look for in `.info()` and `.describe()`
+
+`.info()` tells you how many non-null values each column has. A column whose non-null count is less than the total row count contains missing values that need to be addressed before training.
+
+`.describe()` gives you the count, mean, standard deviation, and quartiles. A large gap between the 75th percentile (`75%`) and the maximum (`max`) often signals an outlier.
+:::
+
+## 3. Loading a Real Dataset
+
+The **Auto MPG** dataset contains fuel consumption and other attributes for 397 cars manufactured in the 1970s and 1980s. The raw CSV uses the symbol `?` to represent missing values, so we pass `na_values=['?']` to convert them to `NaN` automatically on load.
+
+```{python}
+auto_df = pd.read_csv(AUTO_CSV, na_values=['?'])
+print("Shape:", auto_df.shape)
+auto_df.head()
+```
+
+```{python}
+# Inspect column names
+list(auto_df.columns)
+```
+
+```{python}
+# Selecting a single column: returns a Series
+auto_df['mpg']
+```
+
+```{python}
+# Selecting multiple columns: returns a DataFrame
+auto_df[['mpg', 'weight']]
+```
+
+```{python}
+# Remove rows with any missing value and confirm the new shape
+auto_df.dropna(axis=0, inplace=True)
+print("Shape after dropna:", auto_df.shape)
+```
+
+### 3.1 Correlation Matrix
+
+Before building a model it is important to understand which features move together. The **Pearson correlation** between columns $i$ and $j$ ranges from $-1$ (perfect negative) to $+1$ (perfect positive). A heatmap makes these relationships immediately visible.
+
+```{python}
+numeric_cols = ['mpg', 'displacement', 'horsepower', 'weight', 'acceleration']
+corr = auto_df[numeric_cols].corr()
+
+fig, ax = plt.subplots(figsize=(6, 5))
+sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', center=0,
+            vmin=-1, vmax=1, ax=ax)
+ax.set_title("Feature Correlation Matrix")
+plt.tight_layout()
+plt.show()
+```
+
+`weight`, `displacement`, and `horsepower` are all strongly correlated with each other (r > 0.8) and negatively correlated with `mpg`. Plotting these relationships will be the focus of the next few sections.
+
+Once the DataFrame is clean, convert it to NumPy arrays before passing it to a model. sklearn and PyTorch both expect NumPy arrays or tensors, not DataFrames.
+
+```{python}
+# All feature columns except the last
+X = auto_df.iloc[:, :-1].to_numpy()
+
+# Last column as the label
+y = auto_df.iloc[:, -1].to_numpy()
+
+print("X shape:", X.shape)
+print("y shape:", y.shape)
+```
+
+## 4. Scatter Plots with Seaborn
+
+A **joint plot** from Seaborn combines a central scatter plot with marginal histograms along each axis. This lets you simultaneously see the relationship between two variables and their individual distributions.
+
+```{python}
+sns.jointplot(x='weight', y='mpg', data=auto_df)
+plt.show()
+```
+
+```{python}
+sns.jointplot(x='horsepower', y='mpg', data=auto_df)
+plt.show()
+```
+
+Both plots reveal a clear **negative correlation**: heavier cars and more powerful engines are associated with lower fuel efficiency. This kind of pre-modeling insight can inform feature selection decisions later.
+
+## 5. Categorical Data: Box Plots
+
+A **box plot** summarizes the distribution of a continuous variable across discrete groups. The box spans the interquartile range (IQR, from the 25th to the 75th percentile), the line inside the box marks the median, and the whiskers extend to roughly 1.5 times the IQR. Points beyond the whiskers are plotted as individual dots and are potential outliers.
+
+Before plotting, we cast the `cylinders` column to the `category` dtype. This tells both pandas and Seaborn to treat its unique integer values as discrete labels rather than as a continuous numeric axis.
+
+```{python}
+auto_df['cylinders'] = auto_df['cylinders'].astype('category')
+sns.boxplot(x='cylinders', y='mpg', data=auto_df)
+plt.show()
+```
+
+The plot makes it immediately clear that 4-cylinder engines tend to achieve much higher fuel efficiency than 6- or 8-cylinder engines, and that the 8-cylinder group shows relatively low variance.
+
+## 6. Histograms
+
+`sns.displot` draws a histogram of a single numeric column. Setting `kde=True` overlays a **kernel density estimate (KDE)**, which is a smooth, continuous approximation of the underlying distribution.
+
+```{python}
+fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+sns.histplot(auto_df['mpg'], bins=31, kde=True,  ax=axes[0])
+axes[0].set_title('With KDE Overlay')
+axes[0].set_xlim([0, 50])
+
+sns.histplot(auto_df['mpg'], bins=31, kde=False, ax=axes[1])
+axes[1].set_title('Without KDE Overlay')
+axes[1].set_xlim([0, 50])
+
+plt.tight_layout()
+plt.show()
+```
+
+The distribution is mildly right-skewed, with most cars clustered between 15 and 30 MPG and a tail extending toward higher values. Checking this distribution before training is important: if a feature is heavily skewed, applying a log transformation (as seen in Lab 1-3) can improve model performance.
+
+## 7. Pair Plots
+
+A **pair plot** draws a scatter plot for every pair of selected numeric features and a histogram on the diagonal. Coloring points by `cylinders` reveals whether different engine types cluster differently across feature combinations, which is a quick way to assess class separability before modeling.
+
+```{python}
+sns.pairplot(
+    auto_df,
+    vars=['mpg', 'displacement', 'horsepower', 'weight', 'acceleration'],
+    hue='cylinders'
+)
+plt.show()
+```
+
+```{python}
+# Summary statistics for a single column
+auto_df['mpg'].describe()
+```
+
+::: {.callout-tip}
+## Reading a Pair Plot
+
+Focus on the off-diagonal cells. A tight, elongated ellipse of points indicates a strong linear correlation between those two features. Features that are highly correlated with each other but not with the target may be redundant and can sometimes be dropped without hurting model performance, a concept you will revisit when studying dimensionality reduction.
+:::
+
+## Summary
+
+**Core data structures.** A `Series` is a one-dimensional labeled array; a `DataFrame` is a two-dimensional table of Series objects sharing a common index. Most pandas operations work on one of these two levels.
+
+**Exploratory Data Analysis.** Always run `.head()`, `.info()`, and `.describe()` on a new dataset before building any model. They reveal shape, missing values, data types, and distributional properties at a glance.
+
+**Data cleaning.** Use `na_values=['?']` on load to convert non-standard missing markers to `NaN`. Use `.dropna()` to remove incomplete rows before training.
+
+**Correlation matrix.** `df[cols].corr()` with `sns.heatmap` gives a quick overview of which features move together. Strongly correlated pairs (r ≈ ±1) often carry redundant information.
+
+**NumPy conversion.** Use `df.iloc[:, :-1].to_numpy()` to extract the feature matrix $X$ and `df.iloc[:, -1].to_numpy()` to extract the label vector $y$. Most ML libraries (sklearn, PyTorch) expect NumPy arrays, not DataFrames.
+
+## References
+
+- [An Introduction to Statistical Learning with Python](https://intro-stat-learning.github.io/ISLP/labs.html)
+- [Python for Data Analysis](https://wesmckinney.com/book/)
+
+## Further Reading
+
+- [Pandas Documentation](https://pandas.pydata.org/docs/getting_started/index.html)
+- [Data Science With Python Core Skills](https://realpython.com/learning-paths/data-science-python-core-skills/)
+- [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/)

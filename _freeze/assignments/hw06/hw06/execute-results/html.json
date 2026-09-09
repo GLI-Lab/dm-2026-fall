@@ -1,0 +1,12 @@
+{
+  "hash": "5ff9cc63051da5f64a10f964d8f723c5",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Autoencoder\"\njupyter: python3\n---\n\n\n\n\nIn this assignment you will build an **autoencoder** using PyTorch for unsupervised representation learning.\n\nYou will cover:\n\n- **Encoder**: Design a network that compresses input data into a compact latent vector $z$.\n- **Decoder**: Design a symmetric network that reconstructs the original input from $z$.\n- **Reconstruction loss**: Train the model end-to-end by minimizing the difference between the input and its reconstruction (MSE or binary cross-entropy).\n- **Latent space visualization**: Reduce the latent vectors to 2D (e.g., with t-SNE or PCA) and visualize the learned representation.\n- **Denoising autoencoder** *(optional)*: Corrupt inputs with noise during training and evaluate whether the model learns a more robust representation.\n\nProblems will be released closer to the due date.\n\n",
+    "supporting": [
+      "hw06_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,219 @@
+---
+title: "Assignments Guide"
+---
+
+## Homeworks
+
+There will be one homework (HW) for each topical unit of the course, due soon after we finish that unit. These are intended to build your conceptual analysis skills plus your implementation skills in Python. All deadlines are **at 11:59 PM KST**.
+
+| HW | Title | Due |
+|:---|:-----|:-----|
+| [HW01](hw01/hw01.html) | Numerical Programming with NumPy | 26.03.29 |
+| [HW02](hw02/hw02.html) | Linear and Logistic Regression via Gradient Descent | 26.04.05 |
+| [HW03](hw03/hw03.html) | Feedforward Neural Network with PyTorch | TBA |
+| [HW04](hw04/hw04.html) | Convolutional Neural Network with PyTorch | TBA |
+| [HW05](hw05/hw05.html) | Recurrent Neural Network with PyTorch | TBA |
+| [HW06](hw06/hw06.html) | Autoencoder | TBA |
+| [HW07](hw07/hw07.html) | SVM and Kernel Methods | TBA |
+| [HW08](hw08/hw08.html) | Decision Tree and Ensemble Methods | TBA |
+
+## What You'll Receive
+
+For each assignment, you will receive starter code consisting of two types of files.
+
+- `hwXX.py` (or multiple `hwXX_partN.py` files): **Submission file(s).** Write your solutions here.
+  - ex, `hw0_split.py`, `hw0_knn.py`
+- `hwXX.ipynb`: **Experimentation notebook.** Use this to explore, test, and debug your code interactively.
+
+## Workflow
+
+### Step 1: Explore in the Notebook
+
+Open `hwXX.ipynb` and use it freely to experiment with your ideas, visualize results, and debug. The notebook imports your functions from the `.py` files, so any changes you save in the Python scripts will be reflected in the notebook.
+
+Make sure you have completed the Python setup instructions for this course and activated the appropriate `pixi` Python environment before running any code.
+
+::: {.callout-warning}
+## Two Things to Watch Out For
+
+**Restart the kernel after editing `.py` files.**
+The notebook won't pick up your changes until you restart the kernel and re-run all cells.
+
+**Don't leave `raise NotImplementedError` in place.**
+If this line remains, your function will always throw an error, even if you wrote correct code above it.
+:::
+
+### Step 2: Implement in Your `.py` Files
+
+Open your assigned `.py` files and find the `TODO` blocks inside each function. **Remove the `raise NotImplementedError` line** and replace it with your implementation.
+
+**Before (starter code):**
+```{.python}
+def my_function(x):
+    # ========== TODO ==========
+    # Your task description here
+    raise NotImplementedError("Remove this line and implement above")
+    # ==========================
+```
+
+**After (your implementation):**
+```{.python}
+def my_function(x):
+    # ========== TODO ==========
+    # Your task description here
+    return x ** 2 + 1
+    # ==========================
+```
+
+::: {.callout-important}
+## Rules You Must Follow
+
+Your submissions will be evaluated not just on whether the code runs, but on whether your implementation **reflects the intended logic and approach** described in the assignment guide. Violating any of the rules below may result in **zero credit** for affected test cases.
+
+**Do not change function signatures.**
+: Keep the function names and parameters exactly as given.
+
+**Do not modify the docstrings.**
+: The doctests inside them are used for grading.
+
+**Output format must match exactly.**
+: The autograder compares your function's return value against the expected output. If the format differs (wrong type, wrong shape, extra `print` statements, etc.) the test will fail and no credit will be given for that test case.
+
+**Use only the packages already imported.**
+: Your solutions should use only the packages already imported in the starter code. Do not `import` any other packages.
+:::
+
+### Step 3: Run Doctests
+
+Before submitting, verify all tests pass using one of the two methods below. `doctest` is part of Python's standard library, so no extra installation is required.
+
+**Method 1: Terminal (Recommended)**
+
+Navigate to the directory where your `.py` file is located using the `cd` command, then run:
+```{.bash filename="terminal"}
+python -m doctest hwXX.py -v
+```
+
+**If all tests pass**, you will see output ending with:
+```
+X tests in Y items.
+X passed and 0 failed.
+Test passed.
+```
+
+**If any test fails**, the output will show the expected vs. actual values so you can debug.
+
+**Method 2: Inside the Notebook**
+
+If you prefer to stay in the notebook, you can test a specific function by adding a cell with the following code:
+```{.python}
+import doctest
+import hwXX
+
+# Test a single function
+doctest.run_docstring_examples(hwXX.my_function, hwXX.__dict__, verbose=True)
+```
+
+To run all doctests across the entire file from within the notebook:
+```{.python}
+import doctest
+import hwXX
+
+doctest.testmod(hwXX, verbose=True)
+```
+
+If all tests pass, the output will end with `Test passed.` If not, each failure will show the expected value alongside what your function actually returned.
+
+**Want to try your own test cases?**
+
+You can add extra tests at the bottom of your `.py` file inside an `if __name__ == "__main__":` block. This block runs only when you execute the file directly with `python hwXX.py` and is completely ignored during grading.
+```{.python}
+if __name__ == "__main__":
+    # Try your own test cases here — this block is ignored during grading
+    print(my_function([1, 2, 3]))
+
+    assert my_function([]) == []
+    assert my_function([1]) == [1]
+```
+
+### Step 4: Submit
+
+1. **Submit Code**: Upload only the requested `.py` files to [Konkuk eCampus](https://ecampus.konkuk.ac.kr/). **Do not submit the `.ipynb` notebooks.**
+2. **Do not rename the files.** Submitting a file with a modified name (e.g., `hw01 (1).py`) may result in zero credit for that file, as the autograder identifies submissions by exact filename.
+3. **Verify Upload**: After a successful submission, confirm that exactly the files you were asked to turn in are visible on eCampus.
+
+## Evaluation
+
+Grading is conducted by the instructor or TAs using an autograder script run against your submitted `.py` files. Your grade primarily comes from this autograder score, which includes **additional hidden test cases** beyond the doctests provided in the starter code. 
+
+Passing all local doctests is a good sign, but it does not guarantee a full score. The hidden tests verify that your implementation genuinely follows the intended logic, not just whether it produces the right answer for the given examples.
+
+**Late Submission Policy**
+
+Late submissions are accepted up to 3 days after the deadline, with a penalty applied per day as follows.
+
+- 1 day late: 20% deduction
+- 2 days late: 40% deduction
+- 3 days late: 60% deduction
+- More than 3 days late: no credit accepted
+
+## How Doctests Work
+
+Each function contains test cases embedded in its docstring. Lines starting with `>>>` are Python commands that get executed automatically, and the line immediately below is the **expected output**.
+
+Here is a complete example using `sample.py`:
+```{.python filename="sample.py"}
+def add(a, b):
+    """
+    Returns the sum of a and b.
+
+    >>> add(2, 3)
+    5
+    >>> add(-1, 1)
+    0
+    >>> add(0, 0)
+    0
+    """
+    # ========== TODO ==========
+    # Add a and b and return the result
+    # Hint: use the + operator
+    return a + b
+    # ==========================
+
+
+if __name__ == "__main__":
+    # Try your own test cases here — this block is ignored during grading
+    print(add(10, 20))
+    assert add(1, 1) == 2
+```
+
+Running `python -m doctest sample.py -v` in your terminal will produce:
+```{.txt}
+Trying:
+    add(2, 3)
+Expecting:
+    5
+ok
+Trying:
+    add(-1, 1)
+Expecting:
+    0
+ok
+Trying:
+    add(0, 0)
+Expecting:
+    0
+ok
+...
+3 tests in 2 items.
+3 passed and 0 failed.
+Test passed.
+```
+
+The output must match **exactly**. If your function returns `5.0` instead of `5`, or prints `5` instead of returning it, the test will fail.
+
+::: {.callout-note}
+## Floating-Point Output
+
+Since many assignments involve numerical computation, your functions will often return float values. Doctest matches output as a string, so `5.0` and `5` are treated as different results. When the expected output in a docstring is a rounded value, use `round()` in your return statement to match it precisely. For example, `return round(result, 4)` ensures your output aligns with the expected format.
+:::

@@ -1,0 +1,12 @@
+{
+  "hash": "ff72eaa0d8752978d947378fb265cc7a",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Feature map 시각화\"\njupyter: python3\n---\n\n\n\n\nCIFAR-10 간단 CNN 학습 후 각 layer의 activation map과 학습된 filter 시각화, 파라미터 수 직접 계산 검증.\n\n",
+    "supporting": [
+      "lab07_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

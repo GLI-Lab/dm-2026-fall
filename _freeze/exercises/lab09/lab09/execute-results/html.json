@@ -1,0 +1,12 @@
+{
+  "hash": "1a014c8a869fbfb4baad84aaf5fd5f5f",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"VAE latent space\"\njupyter: python3\n---\n\n\n\n\nMNIST VAE 학습 후 2D latent space interpolation, GAN 학습 시 Generator/Discriminator loss 다이나믹스 관찰.\n\n",
+    "supporting": [
+      "lab09_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

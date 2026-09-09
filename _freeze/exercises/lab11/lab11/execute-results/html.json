@@ -1,0 +1,12 @@
+{
+  "hash": "65daa10594edaa917245034b2e03b59c",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Kernel 시각화\"\njupyter: python3\n---\n\n\n\n\n2D 데이터에서 linear/RBF/poly kernel의 decision boundary 비교, C·gamma 변화에 따른 margin 변화 관찰.\n\n",
+    "supporting": [
+      "lab11_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

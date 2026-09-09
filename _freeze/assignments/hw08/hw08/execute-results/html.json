@@ -1,0 +1,12 @@
+{
+  "hash": "54e8462ee46eeda9d553d1b47a1fbcb1",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Decision Tree and Ensemble Methods\"\njupyter: python3\n---\n\n\n\n\nIn this assignment you will implement **decision trees** and explore **ensemble methods** that combine multiple learners.\n\nYou will cover:\n\n- **Decision tree**: Implement a decision tree classifier using information gain (entropy) or Gini impurity as the splitting criterion; control tree depth to study bias–variance tradeoff.\n- **Bagging / Random Forest**: Train an ensemble of trees on bootstrapped subsets of the data and aggregate predictions by majority vote or averaging.\n- **Boosting**: Implement AdaBoost or Gradient Boosting, where each new tree corrects the residual errors of the previous ensemble.\n- **Feature importance**: Compute and visualize which features contribute most to predictions.\n- **Comparison**: Evaluate a single decision tree against random forest and boosting on the same dataset and explain the performance differences.\n\nProblems will be released closer to the due date.\n\n",
+    "supporting": [
+      "hw08_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

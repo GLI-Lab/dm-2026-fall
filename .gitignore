@@ -1,0 +1,23 @@
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+# Python
+__pycache__/
+*.pyc
+
+# Solution files (local only, never push)
+solution/
+
+# VSCode & Jupyter
+.vscode/
+.ipynb_checkpoints/
+
+# Quarto
+/.quarto/
+_site/
+*.quarto_ipynb
+*.qmd.bak
+
+*.ipynb
+_temp/

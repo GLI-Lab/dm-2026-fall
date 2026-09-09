@@ -1,0 +1,12 @@
+{
+  "hash": "f39e64b47336fc5842f2b5e567f84c12",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Naive Bayes\"\njupyter: python3\n---\n\n\n\n\nLikelihood/prior/posterior 직접 계산, 조건부 독립 가정 위반 시 성능 변화 실험.\n\n",
+    "supporting": [
+      "lab14_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

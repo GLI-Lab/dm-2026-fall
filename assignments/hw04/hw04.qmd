@@ -1,0 +1,16 @@
+---
+title: "Convolutional Neural Network with PyTorch"
+jupyter: python3
+---
+
+In this assignment you will design and train a **convolutional neural network (CNN)** for image classification using PyTorch.
+
+You will cover:
+
+- **Convolutional layers**: Apply `nn.Conv2d` with various filter sizes, strides, and padding settings; understand how they detect local features.
+- **Pooling**: Use max-pooling and average-pooling to reduce spatial dimensions and build translation invariance.
+- **Architecture design**: Stack convolutional blocks followed by fully connected layers to form a complete classification pipeline.
+- **Training and evaluation**: Train the network on an image dataset, monitor loss and accuracy, and evaluate on a held-out test set.
+- **Visualization**: Visualize learned filters and feature maps to develop intuition about what each layer captures.
+
+Problems will be released closer to the due date.

@@ -1,0 +1,12 @@
+{
+  "hash": "5a690283f0fc95c46f021d6dbd3b327e",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Char-level language model\"\njupyter: python3\n---\n\n\n\n\nVanilla RNN vs LSTM으로 텍스트 생성, hidden state 변화 시각화 및 gradient norm 추적(vanishing gradient 관찰).\n\n",
+    "supporting": [
+      "lab08_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

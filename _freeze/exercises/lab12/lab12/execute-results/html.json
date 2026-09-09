@@ -1,0 +1,12 @@
+{
+  "hash": "c6cab3f8ed78a0e771583ea77205e15f",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Decision Tree\"\njupyter: python3\n---\n\n\n\n\nGini/Entropy 기반 split 로직 Numpy 구현, 트리 깊이별 decision boundary 시각화 및 분산(instability) 실험.\n\n",
+    "supporting": [
+      "lab12_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

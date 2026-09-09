@@ -1,0 +1,105 @@
+# 최초 1회 실행
+# ------------------------------------------------------------
+# 부모 커밋 없는 새 브랜치 students 생성 (작업 디렉터리 내용은 main 그대로 유지)
+# git checkout --orphan students
+
+# 스테이징·작업 디렉터리를 비움 (main에서 넘어온 파일 전부 제거)
+# git reset --hard
+
+# 빈 커밋 하나로 브랜치 시작 (원격에 push할 최소 한 개 커밋 필요)
+# git commit --allow-empty -m "Initialising students branch"
+# git push origin students
+# git checkout main
+# ------------------------------------------------------------
+
+name: Publish to students branch
+
+on:                            # 실행 조건
+  push:
+    branches: main             # main 브랜치에 push할 때 자동 실행
+  workflow_dispatch:           # GitHub Actions 탭에서 수동 실행 버튼 활성화
+
+jobs:
+  convert-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      # 1. main 브랜치만 Github Actions 서버로 clone (students 브랜치의 존재 여부나 최신 상태는 모름)
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      # 2. Quarto CLI 설치
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+
+      # 3. Prepare _out, modify qmd, and convert to ipynb
+      - name: Prepare _out, modify qmd, and convert to ipynb
+        run: |
+          mkdir -p _out
+          cp pixi.toml pixi.lock _out/ 2>/dev/null || true
+          cp README-students.md _out/README.md
+          # (1) exercises, assignments, data 폴더 통째로 _out으로 복사
+          cp -r exercises assignments data _out/ 2>/dev/null || true
+          
+          # (2) 파이썬 스크립트 실행 (_out 폴더 내의 .qmd Callout 치환)
+          python3 scripts/convert.py
+          
+          # (3) find 명령어로 하위 폴더 깊이와 상관없이 모든 .qmd 파일을 찾아 변환
+          find _out/exercises _out/assignments -type f -name "*.qmd" 2>/dev/null | while read -r f; do
+            base=$(basename "$f" .qmd)
+            
+            # index.qmd는 배포하지 않으므로 삭제 후 스킵
+            if [ "$base" = "index" ]; then
+              rm "$f"
+              continue
+            fi
+            
+            dir=$(dirname "$f")
+            quarto convert "$f" --output "$dir/$base.ipynb"
+            
+            # 변환 완료 후 학생용 브랜치에 qmd가 남지 않도록 삭제
+            rm "$f"
+          done
+          
+          cat > _out/.gitignore << 'EOF'
+          # pixi environments
+          .pixi/*
+          !.pixi/config.toml
+          # VSCode & Jupyter
+          .vscode/
+          .ipynb_checkpoints/
+          EOF
+
+      # 4. students 브랜치로 전환  (기존 히스토리 유지 → 변경분만 push)
+      #    origin/students 브랜치 정보를 가져와서, Github Actions 서버에 students 로컬 브랜치(또는 이미 있으면 리셋)를 만들고 students 로컬 브랜치로 이동
+      #    tracked 파일 → origin/students 내용으로 교체 / untracked 파일 → 건드리지 않고 그대로 유지 (단, 같은 경로에 충돌이 생기면 에러)
+      - name: Fetch and checkout students branch
+        run: |
+          git fetch origin students
+          git checkout -B students origin/students
+
+      # 5. 작업 디렉터리를 _out 내용으로 교체
+      - name: Replace tree with students content
+        run: |
+          git ls-files | xargs -r rm -f
+          git ls-files -z --directory | sort -z -r | xargs -0 rmdir 2>/dev/null || true
+          cp -r _out/* .
+          cp _out/.gitignore .
+          rm -rf _out
+
+      # 6. 변경된 파일만 커밋 후 일반 push → 변경분(delta)만 커밋
+      - name: Commit and push to students
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update ipynb from main (qmd convert)"
+          fi
+          git push origin students

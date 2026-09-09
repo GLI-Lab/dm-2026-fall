@@ -1,0 +1,12 @@
+{
+  "hash": "aabd5793f0ff745708ae73023da58f6c",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Feedforward Neural Network with PyTorch\"\njupyter: python3\n---\n\n\n\n\nIn this assignment you will build and train a **feedforward neural network (multi-layer perceptron)** using PyTorch.\n\nYou will cover:\n\n- **Model definition**: Define a multi-layer perceptron as a `torch.nn.Module` subclass, specifying the number of hidden layers, hidden units, and activation functions.\n- **Forward pass**: Implement the `forward` method to pass input through each layer.\n- **Training loop**: Write a complete training loop — compute the loss, call `loss.backward()`, and update parameters with an optimizer (SGD or Adam).\n- **Regularization**: Experiment with dropout and weight decay to reduce overfitting.\n- **Evaluation**: Track training and validation loss across epochs and report test accuracy.\n\nProblems will be released closer to the due date.\n\n",
+    "supporting": [
+      "hw03_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

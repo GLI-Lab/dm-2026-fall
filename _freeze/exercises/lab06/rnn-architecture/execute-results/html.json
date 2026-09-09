@@ -1,0 +1,12 @@
+{
+  "hash": "d11348c2e5d63cf946970decad0745be",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Lab6-1. RNN Architecture Design & Parameter Counting\"\njupyter: python3\n---\n\n",
+    "supporting": [
+      "rnn-architecture_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

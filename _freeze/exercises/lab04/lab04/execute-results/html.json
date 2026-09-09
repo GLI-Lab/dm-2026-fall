@@ -1,0 +1,12 @@
+{
+  "hash": "32e833e31df45e5124486c253e9e148d",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"MLP Forward/Backward\"\njupyter: python3\n---\n\n\n\n\n손으로 gradient 계산 후 numerical gradient checking, 활성함수별 gradient flow 시각화.\n\n",
+    "supporting": [
+      "lab04_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "hash": "b555f2ac192f0b52f7523b255243ea05",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Bagging vs Boosting\"\njupyter: python3\n---\n\n\n\n\n단일 트리 vs Random Forest vs XGBoost의 bias-variance tradeoff 실험, feature importance 시각화.\n\n",
+    "supporting": [
+      "lab13_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

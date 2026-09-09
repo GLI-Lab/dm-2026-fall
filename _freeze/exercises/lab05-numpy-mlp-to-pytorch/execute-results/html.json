@@ -1,0 +1,12 @@
+{
+  "hash": "f964f827bd72ad0aa5ad841d8e17c2a6",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Numpy MLP to PyTorch\"\njupyter: python3\n---\n\n\n\n\nDataset/DataLoader 구성, TensorBoard 로깅까지 동일 task 재현.\n\n",
+    "supporting": [
+      "lab05-numpy-mlp-to-pytorch_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

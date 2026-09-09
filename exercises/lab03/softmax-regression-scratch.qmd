@@ -1,0 +1,556 @@
+---
+title: "Lab3-3. Softmax Regression from Scratch"
+jupyter: python3
+---
+
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab03/softmax-regression-scratch.ipynb)
+
+## Objectives
+
+- Understand how replacing `Sigmoid` with `Softmax` and `BCELoss` with `CrossEntropyLoss` extends binary classification to **multi-class classification**.
+- Implement **Softmax Regression** from scratch using the same `Linear` class from Labs 3-1 and 3-2, combined with a new `Softmax` layer and `CrossEntropyLoss`.
+- Build a clean `SoftmaxRegression` class with `fit()` and `predict()` methods that handles the full forward-backward-update cycle for $K$ classes.
+- Visualize training dynamics and evaluate multi-class classification performance.
+
+::: {.callout-note}
+## From Binary Classification to Multi-Class Classification
+
+In Lab 3-2, you built Logistic Regression using `Linear(D, 1)` followed by `Sigmoid()`, outputting a single probability for the positive class. In this lab, we replace `Sigmoid` with `Softmax` and output a **probability distribution over $K$ classes** simultaneously. The `Linear` layer now maps to $K$ outputs instead of 1, and `Softmax` normalizes them so they sum to 1. The clean gradient property carries over: just as sigmoid + BCE produced $\frac{1}{N}(\hat{y} - y)$, softmax + cross-entropy produces $\frac{1}{N}(\hat{\mathbf{y}} - \mathbf{y})$ where $\mathbf{y}$ is now a one-hot vector.
+:::
+
+## 0. Setup
+
+```{python}
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style='whitegrid', font_scale=1.2)
+```
+
+## 1. Preparing the Dataset
+
+We load the same London houses dataset, but now create a **3-class classification target** by splitting prices into terciles: "affordable" (bottom third), "moderate" (middle third), and "expensive" (top third). Each class contains roughly one-third of the samples.
+
+```{python}
+from sklearn.model_selection import train_test_split
+
+# Load data
+data = np.genfromtxt("../../data/london_houses_transformed.csv", delimiter=",", skip_header=1)
+X = data[:, :-1]
+prices = data[:, -1]
+
+# Create 3-class target using terciles
+t1 = np.percentile(prices, 33.3)
+t2 = np.percentile(prices, 66.6)
+
+labels = np.zeros(len(prices), dtype=int)
+labels[prices > t1] = 1
+labels[prices > t2] = 2
+
+K = 3  # number of classes
+
+# One-hot encode: shape (N, K)
+Y = np.zeros((len(labels), K))
+Y[np.arange(len(labels)), labels] = 1.0
+
+print(f"Feature matrix X shape: {X.shape}")
+print(f"Target matrix  Y shape: {Y.shape}")
+print(f"Price thresholds: £{t1:,.0f} | £{t2:,.0f}")
+print(f"Class distribution: {(labels == 0).sum()} affordable, "
+      f"{(labels == 1).sum()} moderate, {(labels == 2).sum()} expensive")
+```
+
+```{python}
+# Train / Test split (80/20)
+X_train_raw, X_test_raw, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.2, random_state=15
+)
+
+# Normalize features (fit on training data only)
+X_mean, X_std = X_train_raw.mean(axis=0), X_train_raw.std(axis=0) + 1e-8
+X_train = (X_train_raw - X_mean) / X_std
+X_test  = (X_test_raw  - X_mean) / X_std
+
+N, D = X_train.shape
+print(f"Dataset: {X.shape[0]} total samples")
+print(f"  Train: {N} | Test: {X_test.shape[0]}")
+print(f"  Features (D): {D} | Classes (K): {K}")
+```
+
+::: {.callout-warning}
+## One-Hot Encoding
+
+The target $\mathbf{y}_i$ is a one-hot vector of length $K$. For a sample in class 1 (moderate), the vector is $[0, 1, 0]$. This format is required by the cross-entropy loss, which computes $-\sum_k y_k \log(\hat{y}_k)$. Since only one element of $\mathbf{y}$ is nonzero.
+:::
+
+## 2. Defining the Layer Building Blocks
+
+### 2.1 Linear Layer
+
+**Forward:**
+
+$$z = \mathbf{x}\mathbf{W}^\top + b$$
+
+**Backward** (given upstream gradient $\texttt{grad} = \partial \mathcal{L} / \partial z$):
+
+$$\frac{\partial z}{\partial \mathbf{W}} = \mathbf{x}, \quad \frac{\partial z}{\partial b} = 1, \quad \frac{\partial z}{\partial \mathbf{x}} = \mathbf{W}$$
+
+$$\Longrightarrow \qquad \frac{\partial \mathcal{L}}{\partial \mathbf{W}} = (\underbrace{\frac{\partial \mathcal{L}}{\partial z}}_{\texttt{grad}})^{\top} \!\cdot\; \underbrace{\frac{\partial z}{\partial \mathbf{W}}}_{\mathbf{x}} = \texttt{grad}^\top \mathbf{x}, \qquad \frac{\partial \mathcal{L}}{\partial b} = \sum_i \texttt{grad}_i, \qquad \frac{\partial \mathcal{L}}{\partial \mathbf{x}} = \underbrace{\frac{\partial \mathcal{L}}{\partial z}}_{\texttt{grad}} \!\cdot\; \underbrace{\frac{\partial z}{\partial \mathbf{x}}}_{\mathbf{W}} = \texttt{grad}\;\mathbf{W}$$
+
+With `Linear(D, K)`, the weight matrix is $\mathbf{W} \in \mathbb{R}^{K \times D}$ and the output is $z \in \mathbb{R}^{N \times K}$: one logit per class per sample.
+
+```{python}
+class Linear:
+    def __init__(self, in_dims, out_dims):
+        bound = 1 / np.sqrt(in_dims)
+        self.W = np.random.uniform(-bound, bound, size=(out_dims, in_dims))
+        self.b = np.random.uniform(-bound, bound, size=(out_dims,))
+
+    def forward(self, x):
+        self.x = x
+        return x @ self.W.T + self.b
+
+    def backward(self, grad):
+        self.deltaW = grad.T @ self.x
+        self.deltab = grad.sum(axis=0)
+        return grad @ self.W
+```
+
+### 2.2 Softmax Layer
+
+The `Softmax` layer generalizes `Sigmoid` from 2 classes to $K$ classes. It converts a vector of raw logits $\mathbf{z} = [z_1, \ldots, z_K]$ into a probability distribution where all values are positive and sum to 1.
+
+**Forward:**
+
+$$\text{softmax}(z_k) = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}$$
+
+In practice, we subtract $\max(\mathbf{z})$ before exponentiating for numerical stability. This does not change the result because $\frac{e^{z_k - c}}{\sum_j e^{z_j - c}} = \frac{e^{z_k}}{\sum_j e^{z_j}}$ for any constant $c$.
+
+**Backward** (given upstream gradient $\texttt{grad} = \partial \mathcal{L} / \partial \text{softmax}$):
+
+The Jacobian of softmax for a single sample with output $\mathbf{s}$ is:
+
+$$\frac{\partial s_i}{\partial z_j} = s_i(\delta_{ij} - s_j)$$
+
+where $\delta_{ij}$ is the Kronecker delta. In matrix form this is $\text{diag}(\mathbf{s}) - \mathbf{s}\mathbf{s}^\top$. Applying the chain rule:
+
+$$\frac{\partial \mathcal{L}}{\partial z_k} = \sum_i \underbrace{\frac{\partial \mathcal{L}}{\partial s_i}}_{\texttt{grad}_i} \cdot \underbrace{\frac{\partial s_i}{\partial z_k}}_{s_i(\delta_{ik} - s_k)} = s_k \cdot \texttt{grad}_k - s_k \sum_i s_i \cdot \texttt{grad}_i$$
+
+In vectorized form: $\frac{\partial \mathcal{L}}{\partial \mathbf{z}} = \mathbf{s} \odot \texttt{grad} - \mathbf{s} \cdot (\mathbf{s} \cdot \texttt{grad})^\top \mathbf{1}$
+
+```{python}
+class Softmax:
+    def forward(self, x):
+        # Subtract max for numerical stability
+        exp_x = np.exp(x - x.max(axis=1, keepdims=True))
+        self.a = exp_x / exp_x.sum(axis=1, keepdims=True)
+        return self.a
+
+    def backward(self, grad):
+        # s * grad - s * sum(s * grad)
+        sg = self.a * grad
+        return sg - self.a * sg.sum(axis=1, keepdims=True)
+```
+
+::: {.callout-tip collapse="true"}
+## Layer Verification
+
+```{python}
+sm = Softmax()
+test_logits = np.array([[2.0, 1.0, 0.1],
+                         [0.0, 0.0, 0.0]])
+test_probs = sm.forward(test_logits)
+
+print("Softmax outputs:")
+print(f"  [2.0, 1.0, 0.1] -> {test_probs[0]} (sum = {test_probs[0].sum():.4f})")
+print(f"  [0.0, 0.0, 0.0] -> {test_probs[1]} (sum = {test_probs[1].sum():.4f})")
+```
+
+The first row shows that higher logits get higher probabilities. The second row shows that equal logits produce a uniform distribution $[1/3, 1/3, 1/3]$. Both rows sum to 1.
+:::
+
+## 3. Defining the Cross-Entropy Loss
+
+**Forward:**
+
+$$\mathcal{L}_{\text{CE}} = -\frac{1}{N}\sum_{i=1}^{N}\sum_{k=1}^{K} y_{ik} \log(\hat{y}_{ik})$$
+
+Since $\mathbf{y}_i$ is one-hot, only the true class $c$ contributes: $\mathcal{L} = -\frac{1}{N}\sum_{i=1}^{N}\log(\hat{y}_{i,c})$.
+
+**Backward** (gradient with respect to softmax output):
+
+$$\frac{\partial \mathcal{L}}{\partial \hat{y}_{ik}} = -\frac{1}{N} \cdot \frac{y_{ik}}{\hat{y}_{ik}}$$
+
+```{python}
+class CrossEntropyLoss:
+    def __init__(self, eps=1e-7):
+        self.eps = eps
+
+    def forward(self, pred, true):
+        self.pred = pred
+        self.true = true
+        self.N = pred.shape[0]
+        p = np.clip(pred, self.eps, 1 - self.eps)
+        return -(true * np.log(p)).sum(axis=1).mean()
+
+    def backward(self):
+        p = np.clip(self.pred, self.eps, 1 - self.eps)
+        return -(1 / self.N) * (self.true / p)
+
+    def __call__(self, pred, true):
+        return self.forward(pred, true)
+```
+
+::: {.callout-note}
+## Softmax + Cross-Entropy = Clean Gradient
+
+Just as with sigmoid + BCE in Lab 3-2, the softmax + cross-entropy combination produces a remarkably clean combined gradient. When the CE gradient $-\frac{1}{N}\frac{\mathbf{y}}{\hat{\mathbf{y}}}$ passes through `Softmax.backward()`, the result simplifies to:
+
+$$\frac{\partial \mathcal{L}}{\partial \mathbf{z}} = \frac{1}{N}(\hat{\mathbf{y}} - \mathbf{y})$$
+
+The gradient reaching the `Linear` layer is simply the mean difference between predicted probabilities and one-hot targets. This is the multi-class generalization of the $\frac{1}{N}(\hat{y} - y)$ gradient you saw in Lab 3-2.
+:::
+
+## 4. Building the Softmax Regression Model
+
+The structure mirrors `LogisticRegression` from Lab 3-2, with `Sigmoid` replaced by `Softmax`, `BCELoss` replaced by `CrossEntropyLoss`, and the output dimension changed from 1 to $K$.
+
+```{python}
+class SoftmaxRegression:
+    def __init__(self, input_dim, num_classes, lr=0.01):
+        """
+        Parameters
+        ----------
+        input_dim : int
+            Number of input features (D).
+        num_classes : int
+            Number of output classes (K).
+        lr : float
+            Learning rate for gradient descent.
+        """
+        self.linear  = Linear(input_dim, num_classes)
+        self.softmax = Softmax()
+        self.loss_func = CrossEntropyLoss()
+        self.lr = lr
+
+    def predict(self, X):
+        """Forward pass: Linear -> Softmax. Returns class probabilities."""
+        z = self.linear.forward(X)
+        return self.softmax.forward(z)
+
+    def predict_class(self, X):
+        """Return predicted class indices."""
+        probs = self.predict(X)
+        return np.argmax(probs, axis=1)
+
+    def _update(self):
+        """Apply gradient descent to the Linear layer's parameters."""
+        self.linear.W = self.linear.W - self.lr * self.linear.deltaW
+        self.linear.b = self.linear.b - self.lr * self.linear.deltab
+
+    def fit(self, X_train, Y_train, X_test, Y_test,
+            epochs=5000, print_every=500):
+        """
+        Train the model using full-batch gradient descent.
+
+        Parameters
+        ----------
+        X_train, Y_train : ndarray
+            Training features and one-hot encoded labels.
+        X_test, Y_test : ndarray
+            Test data (for monitoring only, not used for training).
+        epochs : int
+            Number of training iterations.
+        print_every : int
+            Print progress every this many epochs.
+
+        Returns
+        -------
+        history : dict
+            Training and test loss/accuracy recorded at every epoch.
+        """
+        history = {
+            "train_loss": [], "test_loss": [],
+            "train_acc": [],  "test_acc": []
+        }
+
+        for epoch in range(epochs):
+            # --- Forward pass ---
+            prediction = self.predict(X_train)
+            loss = self.loss_func(prediction, Y_train)
+
+            # --- Backward pass (Softmax then Linear) ---
+            grad = self.loss_func.backward()
+            grad = self.softmax.backward(grad)
+            self.linear.backward(grad)
+
+            # --- Update weights ---
+            self._update()
+
+            # --- Record training metrics ---
+            history["train_loss"].append(loss)
+            train_pred = np.argmax(prediction, axis=1)
+            train_true = np.argmax(Y_train, axis=1)
+            train_acc = (train_pred == train_true).mean()
+            history["train_acc"].append(train_acc)
+
+            # --- Evaluate on test set (no gradient computation) ---
+            test_prob = self.predict(X_test)
+            test_loss = self.loss_func(test_prob, Y_test)
+            test_pred = np.argmax(test_prob, axis=1)
+            test_true = np.argmax(Y_test, axis=1)
+            test_acc = (test_pred == test_true).mean()
+            history["test_loss"].append(test_loss)
+            history["test_acc"].append(test_acc)
+
+            # --- Print progress ---
+            if epoch % print_every == 0 or epoch == epochs - 1:
+                print(f"  Epoch {epoch:4d} | "
+                      f"Train Loss: {loss:.4f}, Acc: {train_acc:.4f} | "
+                      f"Test Loss: {test_loss:.4f}, Acc: {test_acc:.4f}")
+
+        return history
+```
+
+Compared to `LogisticRegression` from Lab 3-2, the structural changes are minimal: `self.sigmoid` became `self.softmax`, `self.loss_func` is now `CrossEntropyLoss`, and `predict_class()` uses `argmax` over $K$ columns instead of thresholding a single output. The forward-backward-update loop is identical.
+
+## 5. Training the Model
+
+### 5.1 Running the Training Loop
+
+```{python}
+np.random.seed(42)
+
+clf = SoftmaxRegression(input_dim=D, num_classes=K, lr=0.1)
+history = clf.fit(
+    X_train, Y_train,
+    X_test, Y_test,
+    epochs=5000,
+    print_every=500
+)
+```
+
+At epoch 0, the untrained model assigns roughly equal probability to each class, so accuracy starts near $1/K \approx 33\%$ and the loss starts near $\log(K) \approx 1.099$.
+
+### 5.2 Visualizing the Training Curves
+
+```{python}
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
+
+# Left panel: Cross-Entropy Loss
+ax1.plot(history["train_loss"], label="Train Loss", color="#e74c3c", linewidth=1.5)
+ax1.plot(history["test_loss"],  label="Test Loss",  color="#3498db", linewidth=1.5)
+ax1.set_xlabel("Epoch")
+ax1.set_ylabel("Cross-Entropy Loss")
+ax1.set_title("Training vs Test Loss")
+ax1.legend()
+ax1.grid(True, alpha=0.3)
+
+# Right panel: Accuracy
+ax2.plot(history["train_acc"], label="Train Accuracy", color="#e74c3c", linewidth=1.5)
+ax2.plot(history["test_acc"],  label="Test Accuracy",  color="#3498db", linewidth=1.5)
+ax2.set_xlabel("Epoch")
+ax2.set_ylabel("Accuracy")
+ax2.set_title("Training vs Test Accuracy")
+ax2.legend()
+ax2.grid(True, alpha=0.3)
+
+plt.tight_layout()
+plt.show()
+```
+
+As with the previous labs, the train and test curves should stay close together. Multi-class accuracy will naturally be lower than binary accuracy from Lab 3-2 because the task is harder: distinguishing three price tiers is more difficult than a single above/below-median split.
+
+## 6. Evaluation on Unseen Test Data
+
+```{python}
+Y_pred_classes = clf.predict_class(X_test)
+Y_pred_probs   = clf.predict(X_test)
+Y_true_classes = np.argmax(Y_test, axis=1)
+
+accuracy = (Y_pred_classes == Y_true_classes).mean()
+
+class_names = ["Affordable", "Moderate", "Expensive"]
+print(f"TEST PREDICTIONS (UNSEEN DATA):")
+print(f"  Overall Accuracy: {accuracy:.4f} ({accuracy:.2%})")
+
+# Per-class accuracy
+print(f"\n  Per-class accuracy:")
+for c in range(K):
+    mask = Y_true_classes == c
+    class_acc = (Y_pred_classes[mask] == c).mean()
+    print(f"    {class_names[c]:12s}: {class_acc:.4f} ({mask.sum()} samples)")
+```
+
+## 7. Complete Code
+
+```{python}
+import numpy as np
+from sklearn.model_selection import train_test_split
+
+# ============================================================
+# 1. Data Preparation
+# ============================================================
+data = np.genfromtxt("../../data/london_houses_transformed.csv", delimiter=",", skip_header=1)
+X = data[:, :-1]
+prices = data[:, -1]
+
+t1 = np.percentile(prices, 33.3)
+t2 = np.percentile(prices, 66.6)
+
+labels = np.zeros(len(prices), dtype=int)
+labels[prices > t1] = 1
+labels[prices > t2] = 2
+
+K = 3
+Y = np.zeros((len(labels), K))
+Y[np.arange(len(labels)), labels] = 1.0
+
+X_train_raw, X_test_raw, Y_train, Y_test = train_test_split(
+    X, Y, test_size=0.2, random_state=15
+)
+
+X_mean, X_std = X_train_raw.mean(axis=0), X_train_raw.std(axis=0) + 1e-8
+X_train = (X_train_raw - X_mean) / X_std
+X_test  = (X_test_raw  - X_mean) / X_std
+N, D = X_train.shape
+
+# ============================================================
+# 2. Building Blocks
+# ============================================================
+class Linear:
+    def __init__(self, in_dims, out_dims):
+        bound = 1 / np.sqrt(in_dims)
+        self.W = np.random.uniform(-bound, bound, size=(out_dims, in_dims))
+        self.b = np.random.uniform(-bound, bound, size=(out_dims,))
+
+    def forward(self, x):
+        self.x = x
+        return x @ self.W.T + self.b
+
+    def backward(self, grad):
+        self.deltaW = grad.T @ self.x
+        self.deltab = grad.sum(axis=0)
+        return grad @ self.W
+
+
+class Softmax:
+    def forward(self, x):
+        exp_x = np.exp(x - x.max(axis=1, keepdims=True))
+        self.a = exp_x / exp_x.sum(axis=1, keepdims=True)
+        return self.a
+
+    def backward(self, grad):
+        sg = self.a * grad
+        return sg - self.a * sg.sum(axis=1, keepdims=True)
+
+
+class CrossEntropyLoss:
+    def __init__(self, eps=1e-7):
+        self.eps = eps
+
+    def forward(self, pred, true):
+        self.pred = pred
+        self.true = true
+        self.N = pred.shape[0]
+        p = np.clip(pred, self.eps, 1 - self.eps)
+        return -(true * np.log(p)).sum(axis=1).mean()
+
+    def backward(self):
+        p = np.clip(self.pred, self.eps, 1 - self.eps)
+        return -(1 / self.N) * (self.true / p)
+
+    def __call__(self, pred, true):
+        return self.forward(pred, true)
+
+# ============================================================
+# 3. Softmax Regression Model
+# ============================================================
+class SoftmaxRegression:
+    def __init__(self, input_dim, num_classes, lr=0.01):
+        self.linear  = Linear(input_dim, num_classes)
+        self.softmax = Softmax()
+        self.loss_func = CrossEntropyLoss()
+        self.lr = lr
+
+    def predict(self, X):
+        z = self.linear.forward(X)
+        return self.softmax.forward(z)
+
+    def predict_class(self, X):
+        return np.argmax(self.predict(X), axis=1)
+
+    def _update(self):
+        self.linear.W -= self.lr * self.linear.deltaW
+        self.linear.b -= self.lr * self.linear.deltab
+
+    def fit(self, X_train, Y_train, X_test, Y_test,
+            epochs=5000, print_every=500):
+        history = {
+            "train_loss": [], "test_loss": [],
+            "train_acc": [],  "test_acc": []
+        }
+        for epoch in range(epochs):
+            prediction = self.predict(X_train)
+            loss = self.loss_func(prediction, Y_train)
+
+            grad = self.loss_func.backward()
+            grad = self.softmax.backward(grad)
+            self.linear.backward(grad)
+            self._update()
+
+            history["train_loss"].append(loss)
+            train_acc = (np.argmax(prediction, axis=1) == np.argmax(Y_train, axis=1)).mean()
+            history["train_acc"].append(train_acc)
+
+            test_prob = self.predict(X_test)
+            test_loss = self.loss_func(test_prob, Y_test)
+            test_acc = (np.argmax(test_prob, axis=1) == np.argmax(Y_test, axis=1)).mean()
+            history["test_loss"].append(test_loss)
+            history["test_acc"].append(test_acc)
+
+            if epoch % print_every == 0 or epoch == epochs - 1:
+                print(f"  Epoch {epoch:4d} | "
+                      f"Train Loss: {loss:.4f}, Acc: {train_acc:.4f} | "
+                      f"Test Loss: {test_loss:.4f}, Acc: {test_acc:.4f}")
+        return history
+
+# ============================================================
+# 4. Train & Evaluate
+# ============================================================
+np.random.seed(42)
+clf = SoftmaxRegression(input_dim=D, num_classes=K, lr=0.1)
+history = clf.fit(X_train, Y_train, X_test, Y_test, epochs=5000, print_every=500)
+
+Y_pred_classes = clf.predict_class(X_test)
+Y_true_classes = np.argmax(Y_test, axis=1)
+accuracy = (Y_pred_classes == Y_true_classes).mean()
+
+print(f"\nTEST RESULTS:")
+print(f"  Accuracy: {accuracy:.4f}")
+
+class_names = ["Affordable", "Moderate", "Expensive"]
+for c in range(K):
+    mask = Y_true_classes == c
+    class_acc = (Y_pred_classes[mask] == c).mean()
+    print(f"  {class_names[c]:12s}: {class_acc:.4f}")
+```
+
+## Summary
+
+- Softmax Regression uses the same `Linear` layer as the previous labs, but replaces `Sigmoid` with `Softmax` and `BCELoss` with **Cross-Entropy Loss**. The `Linear` layer now outputs $K$ logits instead of 1, and `Softmax` converts them into a probability distribution over $K$ classes.
+- The **softmax + cross-entropy combination** produces the same clean gradient $\frac{1}{N}(\hat{\mathbf{y}} - \mathbf{y})$ as sigmoid + BCE, but generalized to $K$ dimensions. The training loop (forward, backward, update) remains unchanged.
+- The softmax backward pass uses the identity $\frac{\partial s_i}{\partial z_j} = s_i(\delta_{ij} - s_j)$, which can be computed efficiently in vectorized form as $\mathbf{s} \odot \texttt{grad} - \mathbf{s} \cdot \text{sum}(\mathbf{s} \odot \texttt{grad})$ without explicit Jacobian construction.
+- **Per-class accuracy** and the true-class probability distribution reveal which classes the model finds hardest to separate, guiding further feature engineering or the decision to move to a nonlinear model.
+
+## References
+
+- Bishop, C. M. (2006). *Pattern Recognition and Machine Learning*. Springer.
+- Goodfellow, I., Bengio, Y., and Courville, A. (2016). *Deep Learning*. MIT Press.
+
+## Further Reading
+
+- [CS231n: Linear Classification and Softmax](https://cs231n.github.io/linear-classify/)
+- [The Softmax Function and Its Derivative (Explained Visually)](https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/)
+- [StatQuest: Softmax (YouTube)](https://www.youtube.com/watch?v=KpKog-L9veg)

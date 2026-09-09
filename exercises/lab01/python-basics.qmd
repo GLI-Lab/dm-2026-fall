@@ -1,0 +1,302 @@
+---
+title: "Lab1-1. Python Basics"
+jupyter: python3
+---
+
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab01/python-basics.ipynb)
+
+## Objectives
+
+- Understand core Python data structures: **Lists** and **Dictionaries**.
+- **Functions and Control Flow**: Learn how to write modular, reusable logic for data processing pipelines.
+- **List Comprehensions**: Grasp the Pythonic way to create and filter lists efficiently.
+- **Classes and Objects**: Get introduced to the basics of Object-Oriented Programming (OOP), which is the foundation for defining neural networks in PyTorch.
+
+::: {.callout-note}
+## Basic Concept: Why Python for Machine Learning?
+
+Python is the lingua franca of modern machine learning. Standard Python is not fast enough for heavy matrix mathematics on its own, which is why we delegate numerical computation to C-optimized libraries such as NumPy and PyTorch. However, Python's clean syntax and massive ecosystem make it the perfect "glue" language: we use it to load configurations, clean raw text, build data pipelines, and orchestrate complex training loops.
+
+In this lab you will practice the Python constructs that appear most frequently in ML codebases. Each section is designed to connect directly to tasks you will encounter in later labs.
+:::
+
+## 1. Core Data Structures: Lists and Dictionaries
+
+Before working with matrices and tensors, you need a firm grip on how standard Python stores ordered sequences and key-value pairs. These two structures appear constantly in real ML code.
+
+### 1.1 Lists
+
+A **list** is an ordered, mutable sequence. In ML workflows, lists are commonly used to store feature names, file paths for a dataset, or a sequence of layer sizes in a network architecture.
+
+```{python}
+# Lists: Ordered, mutable sequences
+features = ['age', 'income', 'height', 'weight']
+print("Original features:", features)
+
+features.append('blood_pressure')
+print("After append:", features)
+
+# Indexing: Python uses 0-based indexing
+print("First feature :", features[0])
+print("Last feature  :", features[-1])   # Negative index counts from the end
+```
+
+A concrete ML example: when you define a multi-layer perceptron, you often store the number of units per hidden layer as a list and then iterate over it to build the network programmatically.
+
+`enumerate(iterable)` wraps any iterable and yields `(index, value)` pairs. It replaces the manual counter pattern `i = 0; i += 1` and is the standard way to loop when you need both the position and the value simultaneously.
+
+```{python}
+# Typical use case: defining a network architecture as a list
+hidden_sizes = [128, 64, 32]
+
+for i, size in enumerate(hidden_sizes):
+    print(f"  Layer {i + 1}: {size} units")
+```
+
+### 1.2 Dictionaries
+
+A **dictionary** maps unique keys to values. In ML, dictionaries are the standard container for hyperparameters and experiment configurations, because they let you access any setting by name rather than by a fragile index.
+
+```{python}
+# Dictionaries: Key-value pairs for storing configurations
+hyperparameters = {
+    'learning_rate': 0.001,
+    'batch_size':    32,
+    'optimizer':     'Adam'
+}
+
+print("Learning rate:", hyperparameters['learning_rate'])
+
+# Adding a new entry after creation
+hyperparameters['epochs'] = 50
+print("Full config:", hyperparameters)
+```
+
+::: {.callout-warning}
+## Why Not Just Use Lists for Everything?
+
+Standard Python lists can hold elements of mixed types, such as `[1, "hello", 3.14]`. Because Python must check the type of each element at runtime, mathematical operations over lists are very slow compared to NumPy arrays. NumPy arrays store elements of a single fixed type in contiguous memory, which allows vectorized operations that run orders of magnitude faster. You will see this difference concretely in the NumPy lab.
+:::
+
+## 2. Functions and Control Flow
+
+Machine learning codebases are built around modular functions: one function loads data, another computes a metric, another runs a single training step. Writing clean, well-named functions is what separates readable research code from unmaintainable spaghetti.
+
+```{python}
+def categorize_age(age):
+    """Categorize a person's age into a life-stage label.
+
+    This is a simple illustration of control flow. In practice, you
+    would use similar logic to bin a continuous feature into discrete
+    categories before one-hot encoding.
+    """
+    if age < 18:
+        return 'Minor'
+    elif age < 65:
+        return 'Adult'
+    else:
+        return 'Senior'
+
+ages = [15, 34, 72]
+for a in ages:
+    print(f"Age {a:3d}  ->  {categorize_age(a)}")
+```
+
+Here is a more ML-flavored example. The function below computes **accuracy**, one of the most common evaluation metrics for classification.
+
+$$\text{Accuracy} = \frac{\text{Number of correct predictions}}{\text{Total number of predictions}}$$
+
+`zip(a, b)` pairs up elements from two iterables by position, yielding `(a[0], b[0])`, `(a[1], b[1])`, and so on. In training loops it is used to iterate over batches of inputs and labels together: `for x_batch, y_batch in zip(x_batches, y_batches)`.
+
+```{python}
+def compute_accuracy(y_true, y_pred):
+    """Return the fraction of predictions that match the ground-truth labels."""
+    correct = sum(t == p for t, p in zip(y_true, y_pred))
+    return correct / len(y_true)
+
+y_true = [1, 0, 1, 1, 0]
+y_pred = [1, 0, 0, 1, 0]   # Third prediction is wrong
+
+acc = compute_accuracy(y_true, y_pred)
+print(f"Accuracy: {acc:.2f}")   # Expected: 0.80
+```
+
+### Sorting and Selection with `key`
+
+The built-in functions `sorted`, `min`, and `max` all accept an optional `key` argument: a one-argument function applied to each element before comparison. This pattern appears constantly in ML when you need to find the best checkpoint, rank features by importance, or sort classes by frequency.
+
+A **lambda** is a compact, anonymous function defined inline. `lambda x: expression` is exactly equivalent to writing a named function that takes `x` and returns `expression` — just without giving it a name. Lambdas are almost always used as the `key` argument.
+
+```{python}
+# Find the epoch with the lowest validation loss
+# Each element is (epoch_number, val_loss)
+val_losses = [(1, 2.4), (2, 1.9), (3, 1.5), (4, 1.6), (5, 1.8)]
+
+best = min(val_losses, key=lambda x: x[1])   # compare by loss (index 1)
+print(f"Best epoch: {best[0]}, validation loss: {best[1]}")
+```
+
+```{python}
+# Sort classes by frequency, highest first
+class_counts = {'cat': 120, 'dog': 340, 'bird': 85}
+
+ranked = sorted(class_counts.items(), key=lambda x: x[1], reverse=True)
+for cls, count in ranked:
+    print(f"  {cls:6s}: {count} samples")
+```
+
+The `key=lambda x: x[1]` pattern generalizes to any list of tuples — epoch/loss pairs, feature/score pairs, word/frequency pairs — wherever you need to order or select by one field of a multi-field record.
+
+## 3. List Comprehensions
+
+List comprehensions provide a concise and readable way to build lists. They appear throughout ML code, for example when loading file paths, normalizing a list of strings, or filtering samples by some criterion.
+
+The general syntax is:
+
+```{.python}
+result = [expression for item in iterable if condition]
+```
+
+The `if condition` part is optional; omit it when you want to transform every element without filtering.
+
+### 3.1 Transforming Elements
+
+```{python}
+# Standard for-loop approach
+raw_text = ["  Hello ", "WORLD  ", " machine learning"]
+clean_loop = []
+for word in raw_text:
+    clean_loop.append(word.strip().lower())
+print("Loop result        :", clean_loop)
+
+# Equivalent list comprehension (one line, no append needed)
+clean_comp = [word.strip().lower() for word in raw_text]
+print("Comprehension result:", clean_comp)
+```
+
+Both produce identical output. The comprehension is preferred in Python because it is more concise and often faster, since the interpreter can optimize it internally.
+
+### 3.2 Filtering Elements
+
+Adding an `if` clause at the end turns a comprehension into a combined transform-and-filter operation.
+
+```{python}
+numbers = [-5, 2, -1, 10, 8]
+
+# Keep only positive values (e.g., filtering out invalid sensor readings)
+positives = [n for n in numbers if n > 0]
+print("Positive numbers:", positives)
+```
+
+A realistic ML example: collecting all image file paths in a directory that match a specific extension.
+
+```{python}
+all_files = [
+    'img_001.jpg', 'README.txt', 'img_002.jpg',
+    'label.csv',  'img_003.png'
+]
+
+# Keep only JPEG files
+jpg_files = [f for f in all_files if f.endswith('.jpg')]
+print("JPEG files:", jpg_files)
+```
+
+## 4. Basics of Classes (OOP)
+
+In PyTorch, you define every neural network as a Python **class** that inherits from `torch.nn.Module`. Understanding how classes work is therefore not optional: it is a hard prerequisite for writing any deep learning model.
+
+A class bundles **data** (stored as attributes in `__init__`) and **behavior** (defined as methods) into a single reusable object. The pattern looks like this:
+
+```{.python}
+class MyModel(torch.nn.Module):
+    def __init__(self):
+        super().__init__()
+        # Define layers here as attributes
+        self.linear = torch.nn.Linear(10, 1)
+
+    def forward(self, x):
+        # Define the forward pass here
+        return self.linear(x)
+```
+
+You do not need to know PyTorch yet. The example below implements a `StandardScaler` — a preprocessing class that standardizes features to zero mean and unit variance — and demonstrates two patterns that appear throughout this course.
+
+**Stateful learning (fit → transform):** The `fit` method examines training data and stores what it learned (here: mean and standard deviation) as attributes. The `transform` method then applies that knowledge to any data. Separating these two steps is a core design principle: statistics are computed *once* on training data and applied identically to validation and test data.
+
+```{python}
+class StandardScaler:
+    """Standardize features to zero mean and unit variance.
+
+    Demonstrates the stateful fit → transform pattern used by every
+    sklearn estimator and most ML preprocessing pipelines.
+
+    Attributes
+    ----------
+    mean_ : float
+        Mean computed from the training data in fit().
+    std_ : float
+        Standard deviation computed from the training data in fit().
+    """
+
+    def __init__(self):
+        self.mean_ = None
+        self.std_  = None
+
+    def fit(self, data):
+        """Compute mean and std from training data."""
+        n          = len(data)
+        self.mean_ = sum(data) / n
+        variance   = sum((x - self.mean_) ** 2 for x in data) / n
+        self.std_  = variance ** 0.5
+        return self
+
+    def transform(self, data):
+        """Apply z-score normalization: z = (x − mean) / std."""
+        return [(x - self.mean_) / self.std_ for x in data]
+
+    def inverse_transform(self, data):
+        """Reverse standardization to recover the original scale."""
+        return [x * self.std_ + self.mean_ for x in data]
+
+
+train_data = [10, 20, 30, 40, 50]
+test_data  = [15, 25, 35]
+
+scaler = StandardScaler()
+scaler.fit(train_data)                          # learn mean & std from train only
+
+train_scaled = scaler.transform(train_data)
+test_scaled  = scaler.transform(test_data)      # apply train statistics to test
+
+print(f"mean_={scaler.mean_:.1f}  std_={scaler.std_:.4f}")
+print("Train scaled :", [round(z, 4) for z in train_scaled])
+print("Test  scaled :", [round(z, 4) for z in test_scaled])
+print("Recovered    :", [round(x, 1) for x in scaler.inverse_transform(train_scaled)])
+```
+
+::: {.callout-important}
+## `self` is Not Magic
+
+Every instance method must accept `self` as its first parameter. `self` is simply a reference to the object itself, allowing one method to access attributes set by another method (such as `mean_` set in `fit` and read in `transform`). Python passes `self` automatically when you call `scaler.transform(data)`; you never pass it manually.
+:::
+
+## Summary
+
+**Lists and Dictionaries** are the two workhorses of Python data handling. Use lists when order matters and you need to iterate; use dictionaries when you need fast lookup by name, such as a hyperparameter configuration.
+
+**Functions** encapsulate a single unit of logic. Write one function per task and name it clearly. Use `enumerate` when you need both index and value in a loop; use `zip` to iterate over two sequences in lockstep (e.g., batches of inputs and labels). Use `sorted` / `min` / `max` with `key=lambda x: x[field]` to rank or select from lists of tuples — finding the best checkpoint, sorting by class frequency, and similar tasks.
+
+**List comprehensions** are the Pythonic way to transform or filter sequences in one line. You will use them constantly when processing file paths, labels, and raw text strings.
+
+**Classes** are the structural foundation of PyTorch models. Every network you write in this course will be a class with an `__init__` method that defines layers and a `forward` method that defines the computation. The `StandardScaler` example above demonstrates the `fit → transform` pattern shared by every sklearn estimator: statistics are learned once from training data and applied identically to test data, preventing data leakage.
+
+## References
+
+- [An Introduction to Statistical Learning with Python](https://intro-stat-learning.github.io/ISLP/labs.html)
+- [Python for Data Analysis](https://wesmckinney.com/book/)
+
+## Further Reading
+
+- [A Whirlwind Tour of Python](https://github.com/jakevdp/WhirlwindTourOfPython/?tab=readme-ov-file)
+- [Data Science With Python Core Skills](https://realpython.com/learning-paths/data-science-python-core-skills/)
+- [Python Data Science Handbook](https://jakevdp.github.io/PythonDataScienceHandbook/)

@@ -1,0 +1,12 @@
+{
+  "hash": "e5fdd224914f08209fec31f9f923b85d",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"K-Fold Cross-Validation\"\njupyter: python3\n---\n\n\n\n\n다항 회귀 차수별 train/val loss 곡선 그려보며 overfitting/underfitting 관찰.\n\n",
+    "supporting": [
+      "lab03-kfold-cv_files"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}

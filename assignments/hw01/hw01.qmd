@@ -1,0 +1,272 @@
+---
+title: "HW1. Numerical Programming with NumPy"
+jupyter: python3
+---
+
+## Overview
+
+In this assignment you will implement a complete **K-Nearest Neighbors (KNN)** classification pipeline using only NumPy. Each function targets a specific NumPy skill from Lab 1-2: broadcasting for pairwise distance computation, `argsort` for neighbor retrieval, fancy indexing for feature gathering, and reductions for majority-vote prediction.
+
+You will implement four functions inside `hw1_knn.py`. A separate file `test_knn.py` contains doctests you can run locally to check your work before submitting.
+
+## Background: K-Nearest Neighbors
+
+KNN is one of the simplest supervised learning algorithms. Given a labeled dataset of $N$ points and a new unlabeled query point, KNN finds the $K$ closest points in the dataset (measured by Euclidean distance) and predicts the query's label by majority vote among those $K$ neighbors.
+
+The **Euclidean distance** between two $F$-dimensional vectors $\mathbf{a}$ and $\mathbf{b}$ is
+
+$$
+d(\mathbf{a}, \mathbf{b}) = \sqrt{\sum_{f=1}^{F} (a_f - b_f)^2}
+$$
+
+Given $N$ data points in matrix $\mathbf{X} \in \mathbb{R}^{N \times F}$ and $Q$ query points in matrix $\mathbf{Z} \in \mathbb{R}^{Q \times F}$, you need to compute the full $Q \times N$ distance matrix where entry $(q, n)$ stores $d(\mathbf{z}_q, \mathbf{x}_n)$.
+
+The KNN pipeline proceeds in three stages:
+
+1. Compute all pairwise distances between queries and data points.
+2. For each query, identify the indices of the $K$ nearest data points.
+3. Gather the neighbors' labels and predict via majority vote.
+
+::: {.callout-note}
+## NumPy Skills Exercised
+Each function in this assignment maps directly to a core NumPy concept from Lab 1-2. `euclidean_distances` requires **broadcasting** and **reductions** (Sections 6, 9). `find_k_nearest_indices` uses **argsort** and **slicing** (Sections 2, 4). `calc_k_nearest_neighbors` combines the above with **fancy indexing** (Section 2). `predict_knn_classification` uses fancy indexing plus `np.bincount` / `np.argmax` for counting-based reductions.
+:::
+
+
+### Grading-Preview Doctests
+
+The public doctests are intentionally small and deterministic so you can quickly sanity-check your implementation. They use a small fixed 2D example from `test_knn.py`, with $N = 20$ data points and $Q = 5$ query points. For readability, the matrices below show only part of that example, with some entries abbreviated using $\ldots$. The exact coordinates used for grading-preview doctests are defined in `test_knn.py`.
+
+$$
+\mathbf{X} =
+\begin{bmatrix}
+0 & 0 \\
+1 & 1 \\
+2 & 0 \\
+\ldots & \ldots \\
+18 & 6 \\
+19 & 5 \\
+\end{bmatrix},
+\qquad
+\mathbf{Z} =
+\begin{bmatrix}
+0.2 & 0.1 \\
+\ldots & \ldots \\
+12.7 & 8.2 \\
+17.8 & 5.8
+\end{bmatrix}
+$$
+
+The **Finding Nearest Neighbors via Euclidean Distance** pipeline flows as follows for $K = 3$:
+
+1. **`euclidean_distances`** produces a $(5, 20)$ distance matrix. For example, the distance from query $\mathbf{z}_0 = [0.2,\; 0.1]$ to data point $\mathbf{x}_0 = [0,\; 0]$ is $\sqrt{0.05}$.
+2. **`find_k_nearest_indices`** sorts each row and returns the first $K$ column indices: query 0 gets neighbors at indices $[0, 1, 2]`.
+3. **`calc_k_nearest_neighbors`** gathers the actual feature vectors at those indices, producing a $(5, 3, 2)$ array.
+4. **`predict_knn_classification`** looks up each neighbor's label, counts votes, and returns the winning class per query.
+
+These doctests are only a grading preview. The hidden tests will additionally check edge cases such as different feature dimensions, different values of $K$, and multi-class labels.
+
+## Problems
+
+### Problem Definition
+
+Complete the four `TODO` functions in `hw1_knn.py`. Each function builds on the previous one, so implement them in order. `test_knn.py` provides doctests for each function. Do not modify it.
+
+### Function 1: `euclidean_distances`
+
+Compute the full pairwise Euclidean distance matrix between data and query points **without any Python loops**. The key idea is to use `np.newaxis` so that NumPy's broadcasting computes all $Q \times N$ differences in one shot.
+````{.python filename="hw1_knn.py"}
+def euclidean_distances(data_NF, query_QF):
+    ''' Compute pairwise Euclidean distances between data and query points.
+
+    Uses NumPy broadcasting to compute all Q*N distances without explicit
+    Python loops.
+
+    Args
+    ----
+    data_NF : 2D np.array, shape (N, F)
+        Each row is a feature vector of one data point.
+    query_QF : 2D np.array, shape (Q, F)
+        Each row is a feature vector of one query point.
+
+    Returns
+    -------
+    dist_QN : 2D np.array, shape (Q, N)
+        dist_QN[q, n] is the Euclidean distance from query q to data point n.
+    '''
+    N, F = data_NF.shape
+    Q, F2 = query_QF.shape
+    assert F == F2
+
+    # ========== TODO ==========
+    # Compute pairwise Euclidean distances using broadcasting.
+    #
+    # Hint: Expand dimensions with np.newaxis so that subtraction
+    #       broadcasts over Q and N simultaneously.
+    #       query_QF[:, np.newaxis, :] has shape (Q, 1, F)
+    #       data_NF[np.newaxis, :, :]  has shape (1, N, F)
+    #       Their difference has shape (Q, N, F).
+    #       Then square, sum over axis=2, and take the square root.
+    raise NotImplementedError("Remove this line and implement above")
+    # ==========================
+````
+
+**Strategy.** Reshape `query_QF` to `(Q, 1, F)` and `data_NF` to `(1, N, F)`. Their difference broadcasts to shape `(Q, N, F)`. Square each element, sum over the last axis (features), and take the square root.
+
+::: {.callout-tip}
+## Broadcasting Alignment
+When you write `query_QF[:, np.newaxis, :] - data_NF[np.newaxis, :, :]`, NumPy aligns the shapes from the right: `(Q, 1, F)` and `(1, N, F)` are compatible because every dimension pair is either equal or one of them is 1. The result has shape `(Q, N, F)`, giving you the per-feature difference for every query-data pair at once.
+:::
+
+
+### Function 2: `find_k_nearest_indices`
+
+Given a distance matrix of shape `(Q, N)`, return the indices of the $K$ closest data points for each query.
+````{.python filename="hw1_knn.py"}
+def find_k_nearest_indices(dist_QN, K):
+    ''' Find indices of the K nearest neighbors from a distance matrix.
+
+    Args
+    ----
+    dist_QN : 2D np.array, shape (Q, N)
+        Pairwise distance matrix.
+    K : int, must satisfy 1 <= K <= N
+        Number of nearest neighbors to retrieve.
+
+    Returns
+    -------
+    indices_QK : 2D np.array of ints, shape (Q, K)
+        indices_QK[q, k] is the index into the original data array
+        of the k-th nearest neighbor of query q.
+        Neighbors are ordered from closest to farthest.
+        Ties are broken by smaller index first (guaranteed by argsort stability).
+    '''
+    Q, N = dist_QN.shape
+    K = int(K)
+    if K < 1 or K > N:
+        raise ValueError("K must satisfy 1 <= K <= N")
+
+    # ========== TODO ==========
+    # Use np.argsort along axis=1 to get sorted indices per query,
+    # then slice the first K columns.
+    raise NotImplementedError("Remove this line and implement above")
+    # ==========================
+````
+
+**Strategy.** Apply `np.argsort` along `axis=1` to sort each row of distances. Then slice the first $K$ columns. NumPy's `argsort` is stable, so ties (equal distances) are broken by smaller index first.
+
+
+### Function 3: `calc_k_nearest_neighbors`
+
+Combine the previous two functions, then use fancy indexing to gather the actual feature vectors of the neighbors.
+````{.python filename="hw1_knn.py"}
+def calc_k_nearest_neighbors(data_NF, query_QF, K=1):
+    ''' Compute and return k-nearest neighbors under Euclidean distance.
+
+    This function combines euclidean_distances and find_k_nearest_indices,
+    then gathers the actual feature vectors of the neighbors.
+
+    Args
+    ----
+    data_NF : 2D np.array, shape (N, F)
+        Each row is a feature vector of one data point.
+    query_QF : 2D np.array, shape (Q, F)
+        Each row is a feature vector of one query point.
+    K : int, must satisfy 1 <= K <= N
+        Number of neighbors to find per query.
+
+    Returns
+    -------
+    neighb_QKF : 3D np.array, shape (Q, K, F)
+        Entry [q, k] is the feature vector of the k-th nearest neighbor
+        of the q-th query.
+        Ties are broken by the original row order in data_NF.
+    '''
+    N, F = data_NF.shape
+    Q, F2 = query_QF.shape
+    assert F == F2
+    K = int(K)
+    if K < 1 or K > N:
+        raise ValueError("K must satisfy 1 <= K <= N")
+
+    # ========== TODO ==========
+    # 1. Call euclidean_distances to get dist_QN of shape (Q, N)
+    # 2. Call find_k_nearest_indices to get indices_QK of shape (Q, K)
+    # 3. Use fancy indexing: data_NF[indices_QK] produces shape (Q, K, F)
+    raise NotImplementedError("Remove this line and implement above")
+    # ==========================
+````
+
+**Strategy.** Call `euclidean_distances`, then `find_k_nearest_indices`, then index into `data_NF` with the resulting integer array. When you write `data_NF[indices_QK]` where `indices_QK` has shape `(Q, K)`, NumPy replaces each index with the corresponding row of `data_NF`, producing shape `(Q, K, F)` directly.
+
+
+### Function 4: `predict_knn_classification`
+
+Given integer class labels for all data points and the neighbor indices for each query, predict each query's class by majority vote.
+````{.python filename="hw1_knn.py"}
+def predict_knn_classification(labels_N, nearest_indices_QK):
+    ''' Predict class labels via majority vote among K nearest neighbors.
+
+    Args
+    ----
+    labels_N : 1D np.array of ints, shape (N,)
+        Integer class label for each data point (e.g., 0, 1, 2, ...).
+    nearest_indices_QK : 2D np.array of ints, shape (Q, K)
+        Indices of K nearest neighbors for each query.
+
+    Returns
+    -------
+    predictions_Q : 1D np.array of ints, shape (Q,)
+        Predicted class for each query by majority vote.
+        Ties are broken in favor of the smallest class label.
+    '''
+    Q, K = nearest_indices_QK.shape
+
+    # ========== TODO ==========
+    # 1. Gather neighbor labels: labels_N[nearest_indices_QK] -> shape (Q, K)
+    # 2. For each query, find the most common label.
+    #    Hint: loop over Q queries. For each row of neighbor labels,
+    #          np.bincount counts how many times each label appears,
+    #          and np.argmax returns the label with the highest count.
+    #          np.bincount naturally breaks ties toward the smallest index.
+    raise NotImplementedError("Remove this line and implement above")
+    # ==========================
+````
+
+**Strategy.** Use fancy indexing `labels_N[nearest_indices_QK]` to get a `(Q, K)` array of neighbor labels. Then loop over queries: for each row, call `np.bincount` to count occurrences of each class and `np.argmax` to pick the most frequent one. Since `np.argmax` returns the first occurrence of the maximum value, ties are automatically broken in favor of the smallest class label.
+
+::: {.callout-important}
+## Rules You Must Follow
+Do not change function signatures or docstrings. Use only `numpy` (already imported). Do not add extra `import` statements. Make sure no `raise NotImplementedError` lines remain in your submitted code. The autograder compares return values exactly, so match the expected shapes and dtypes.
+:::
+
+
+## Running Doctests
+
+Place `hw1_knn.py` and [test_knn.py]{.kbd} in the same directory, then run from the terminal:
+````{.bash filename="terminal"}
+pixi run python -m doctest test_knn.py -v
+````
+
+If all tests pass you will see output ending with:
+````{.text}
+14 tests in 1 items.
+14 passed and 0 failed.
+Test passed.
+````
+
+You can also test from inside a notebook:
+```{.python}
+import doctest
+import test_knn
+doctest.testmod(test_knn, verbose=True)
+```
+
+## Submission
+
+Upload only `hw1_knn.py` to eCampus. Do not rename the file. Do not submit the notebook or `test_knn.py`. The autograder will run both the public doctests shown above and additional hidden test cases covering edge cases such as K=N, single-query inputs, higher-dimensional features, and multi-class labels.
+
+::: {.callout-warning}
+## Common Mistakes
+Forgetting to remove `raise NotImplementedError` is the most frequent cause of zero scores. Also watch out for returning the wrong shape (e.g., `(Q, N)` instead of `(Q, K)` in `find_k_nearest_indices`) and using Python loops where broadcasting is expected (the hidden tests may include timing checks for `euclidean_distances`).
+:::

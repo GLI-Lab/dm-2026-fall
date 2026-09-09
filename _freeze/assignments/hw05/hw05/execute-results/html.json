@@ -1,0 +1,12 @@
+{
+  "hash": "839fe9a29b3be812379c4ab75d3777ff",
+  "result": {
+    "engine": "jupyter",
+    "markdown": "---\ntitle: \"Recurrent Neural Network with PyTorch\"\njupyter: python3\n---\n\n\n\n\nIn this assignment you will implement **recurrent neural networks (RNN / LSTM)** using PyTorch for sequence modeling.\n\nYou will cover:\n\n- **Vanilla RNN**: Implement a simple RNN cell manually and understand the hidden-state recurrence $h_t = \\tanh(W_h h_{t-1} + W_x x_t + b)$.\n- **LSTM**: Use `nn.LSTM` to handle long-range dependencies and compare it with the vanilla RNN.\n- **Sequence processing**: Prepare variable-length sequences, apply padding, and use `pack_padded_sequence` for efficient batching.\n- **Training**: Train on a sequential dataset (e.g., time-series prediction or character-level language modeling) and analyze gradient flow.\n- **Evaluation**: Measure performance on held-out sequences and visualize predicted vs. true values.\n\nProblems will be released closer to the due date.\n\n",
+    "supporting": [
+      "hw05_files/figure-html"
+    ],
+    "filters": [],
+    "includes": {}
+  }
+}
