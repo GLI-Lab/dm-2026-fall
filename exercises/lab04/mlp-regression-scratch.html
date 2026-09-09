@@ -1,0 +1,1475 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Byungkook Oh">
+
+<title>Lab4-1. MLP Regression from Scratch – Machine Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-dd8e0821c47296b3dcb472f524dd5682.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../exercises/index.html" aria-current="page"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../assignments/index.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
+</i> 
+<span class="menu-text">GLI Lab</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/GLI-Lab/machine-learning-course" title="Machine Learning Course GitHub" class="quarto-navigation-tool px-1" aria-label="Machine Learning Course GitHub"><i class="bi bi-github"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab04/mlp-regression-scratch.html">Lab4. Model Selection and Generalization</a></li><li class="breadcrumb-item"><a href="../../exercises/lab04/mlp-regression-scratch.html">MLP Regression (Scratch)</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../exercises/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercises</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab1. Introduction to ML</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/python-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Basics (⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/numpy-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Numpy Basics (⭐⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/matplotlib-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matplotlib Basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/pandas-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Basics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab2. Linear Models</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/linear-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/logistic-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/classification-metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Classification Metrics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/softmax-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Softmax Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab3. Multi-Layer Perceptron</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/linear-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/logistic-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logistic Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/softmax-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Softmax Regression (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lab4. Model Selection and Generalization</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">MLP Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLP Regression-Improved (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab5. Convolutional NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab05/cnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab6. Recurrent NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab06/rnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link active" data-scroll-target="#objectives">Objectives</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">0. Setup</a></li>
+  <li><a href="#preparing-the-dataset" id="toc-preparing-the-dataset" class="nav-link" data-scroll-target="#preparing-the-dataset">1. Preparing the Dataset</a></li>
+  <li><a href="#defining-the-layer-building-blocks" id="toc-defining-the-layer-building-blocks" class="nav-link" data-scroll-target="#defining-the-layer-building-blocks">2. Defining the Layer Building Blocks</a>
+  <ul class="collapse">
+  <li><a href="#linear-layer" id="toc-linear-layer" class="nav-link" data-scroll-target="#linear-layer">2.1 Linear Layer</a></li>
+  <li><a href="#sigmoid-layer" id="toc-sigmoid-layer" class="nav-link" data-scroll-target="#sigmoid-layer">2.2 Sigmoid Layer</a></li>
+  <li><a href="#identity-layer" id="toc-identity-layer" class="nav-link" data-scroll-target="#identity-layer">2.3 Identity Layer</a></li>
+  </ul></li>
+  <li><a href="#defining-the-mse-loss" id="toc-defining-the-mse-loss" class="nav-link" data-scroll-target="#defining-the-mse-loss">3. Defining the MSE Loss</a></li>
+  <li><a href="#the-mlp-container-and-optimizer" id="toc-the-mlp-container-and-optimizer" class="nav-link" data-scroll-target="#the-mlp-container-and-optimizer">4. The MLP Container and Optimizer</a>
+  <ul class="collapse">
+  <li><a href="#mlp-class" id="toc-mlp-class" class="nav-link" data-scroll-target="#mlp-class">4.1 MLP Class</a></li>
+  <li><a href="#optimizer-class" id="toc-optimizer-class" class="nav-link" data-scroll-target="#optimizer-class">4.2 Optimizer Class</a></li>
+  </ul></li>
+  <li><a href="#building-and-training-the-mlp" id="toc-building-and-training-the-mlp" class="nav-link" data-scroll-target="#building-and-training-the-mlp">5. Building and Training the MLP</a>
+  <ul class="collapse">
+  <li><a href="#model-architecture" id="toc-model-architecture" class="nav-link" data-scroll-target="#model-architecture">5.1 Model Architecture</a></li>
+  <li><a href="#training-loop" id="toc-training-loop" class="nav-link" data-scroll-target="#training-loop">5.2 Training Loop</a></li>
+  <li><a href="#running-the-training" id="toc-running-the-training" class="nav-link" data-scroll-target="#running-the-training">5.3 Running the Training</a></li>
+  <li><a href="#visualizing-the-training-curves" id="toc-visualizing-the-training-curves" class="nav-link" data-scroll-target="#visualizing-the-training-curves">5.4 Visualizing the Training Curves</a></li>
+  </ul></li>
+  <li><a href="#evaluation-on-unseen-test-data" id="toc-evaluation-on-unseen-test-data" class="nav-link" data-scroll-target="#evaluation-on-unseen-test-data">6. Evaluation on Unseen Test Data</a>
+  <ul class="collapse">
+  <li><a href="#predicted-vs-actual-scatter-plot" id="toc-predicted-vs-actual-scatter-plot" class="nav-link" data-scroll-target="#predicted-vs-actual-scatter-plot">6.1 Predicted vs Actual Scatter Plot</a></li>
+  </ul></li>
+  <li><a href="#comparing-all-models" id="toc-comparing-all-models" class="nav-link" data-scroll-target="#comparing-all-models">7. Comparing All Models</a></li>
+  <li><a href="#complete-code" id="toc-complete-code" class="nav-link" data-scroll-target="#complete-code">8. Complete Code</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab04/mlp-regression-scratch.html">Lab4. Model Selection and Generalization</a></li><li class="breadcrumb-item"><a href="../../exercises/lab04/mlp-regression-scratch.html">MLP Regression (Scratch)</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab4-1. MLP Regression from Scratch</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Byungkook Oh </p>
+          </div>
+  </div>
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026.05.02</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab04/mlp-regression-scratch.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<section id="objectives" class="level2">
+<h2 class="anchored" data-anchor-id="objectives">Objectives</h2>
+<ul>
+<li>Understand how the same building blocks (<code>Linear</code>, <code>Sigmoid</code>, <code>Identity</code>) from Labs 3-1 through 3-3 can be <strong>stacked into a deep network</strong> using a generic <code>MLP</code> container class.</li>
+<li>Implement a <strong>Multi-Layer Perceptron (MLP)</strong> for regression using the modular architecture from the lecture: <code>MLP</code> class with a <code>blocks</code> list, and a decoupled <code>Optimizer</code> class.</li>
+<li>Observe how adding hidden layers with nonlinear activations improves prediction accuracy compared to the single-layer Linear Regression from Lab 3-1.</li>
+<li>Visualize training dynamics and evaluate model performance on the London house price dataset.</li>
+</ul>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>From Single-Layer to Multi-Layer
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In Labs 3-1 through 3-3, each model used a single <code>Linear</code> layer followed by one activation. The forward and backward passes were written out explicitly inside each model class. In this lab, we introduce two new abstractions from the lecture: the <strong><code>MLP</code> container</strong> that chains any sequence of blocks via a <code>for</code> loop, and a <strong>decoupled <code>Optimizer</code></strong> that updates all <code>Linear</code> layers automatically. These abstractions let us scale from 1 layer to 100 layers without rewriting a single line of the training loop.</p>
+</div>
+</div>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">0. Setup</h2>
+<div id="b39281ee" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">'whitegrid'</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="preparing-the-dataset" class="level2">
+<h2 class="anchored" data-anchor-id="preparing-the-dataset">1. Preparing the Dataset</h2>
+<p>We load the same London houses dataset and apply the same preprocessing as Lab 3-1: 80/20 train-test split, then normalize both features and target using training statistics only.</p>
+<div id="5f2f6a9a" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.genfromtxt(<span class="st">"../../data/london_houses_transformed.csv"</span>, delimiter<span class="op">=</span><span class="st">","</span>, skip_header<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data[:, :<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> data[:, <span class="op">-</span><span class="dv">1</span>:]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Train / Test split (80/20)</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>X_train_raw, X_test_raw, Y_train_raw, Y_test_raw <span class="op">=</span> train_test_split(</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    X, Y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">15</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize features (fit on training data only to avoid data leakage)</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>X_mean, X_std <span class="op">=</span> X_train_raw.mean(axis<span class="op">=</span><span class="dv">0</span>), X_train_raw.std(axis<span class="op">=</span><span class="dv">0</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> (X_train_raw <span class="op">-</span> X_mean) <span class="op">/</span> X_std</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>X_test  <span class="op">=</span> (X_test_raw  <span class="op">-</span> X_mean) <span class="op">/</span> X_std</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Normalize target</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>Y_mean, Y_std <span class="op">=</span> Y_train_raw.mean(), Y_train_raw.std()</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>Y_train <span class="op">=</span> (Y_train_raw <span class="op">-</span> Y_mean) <span class="op">/</span> Y_std</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>Y_test  <span class="op">=</span> (Y_test_raw  <span class="op">-</span> Y_mean) <span class="op">/</span> Y_std</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>N, D <span class="op">=</span> X_train.shape</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dataset: </span><span class="sc">{</span>X<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss"> total samples"</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Train: </span><span class="sc">{</span>N<span class="sc">}</span><span class="ss"> | Test: </span><span class="sc">{</span>X_test<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Features (D): </span><span class="sc">{</span>D<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Dataset: 3441 total samples
+  Train: 2752 | Test: 689
+  Features (D): 87</code></pre>
+</div>
+</div>
+</section>
+<section id="defining-the-layer-building-blocks" class="level2">
+<h2 class="anchored" data-anchor-id="defining-the-layer-building-blocks">2. Defining the Layer Building Blocks</h2>
+<p>These are the same classes from the previous labs and the lecture. All three are reused without any modification.</p>
+<section id="linear-layer" class="level3">
+<h3 class="anchored" data-anchor-id="linear-layer">2.1 Linear Layer</h3>
+<p><strong>Forward:</strong></p>
+<p><span class="math display">\[z = \mathbf{x}\mathbf{W}^\top + b\]</span></p>
+<p><strong>Backward</strong> (given upstream gradient <span class="math inline">\(\texttt{grad} = \partial \mathcal{L} / \partial z\)</span>):</p>
+<p><span class="math display">\[\frac{\partial z}{\partial \mathbf{W}} = \mathbf{x}, \quad \frac{\partial z}{\partial b} = 1, \quad \frac{\partial z}{\partial \mathbf{x}} = \mathbf{W}\]</span></p>
+<p><span class="math display">\[\Longrightarrow \qquad \frac{\partial \mathcal{L}}{\partial \mathbf{W}} = (\underbrace{\frac{\partial \mathcal{L}}{\partial z}}_{\texttt{grad}})^{\top} \!\cdot\; \underbrace{\frac{\partial z}{\partial \mathbf{W}}}_{\mathbf{x}} = \texttt{grad}^\top \mathbf{x}, \qquad \frac{\partial \mathcal{L}}{\partial b} = \sum_i \texttt{grad}_i, \qquad \frac{\partial \mathcal{L}}{\partial \mathbf{x}} = \underbrace{\frac{\partial \mathcal{L}}{\partial z}}_{\texttt{grad}} \!\cdot\; \underbrace{\frac{\partial z}{\partial \mathbf{x}}}_{\mathbf{W}} = \texttt{grad}\;\mathbf{W}\]</span></p>
+<div id="f0370686" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Linear:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dims, out_dims):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        bound <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(in_dims)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.W <span class="op">=</span> np.random.uniform(<span class="op">-</span>bound, bound, size<span class="op">=</span>(out_dims, in_dims))</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b <span class="op">=</span> np.random.uniform(<span class="op">-</span>bound, bound, size<span class="op">=</span>(out_dims,))</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> x</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x <span class="op">@</span> <span class="va">self</span>.W.T <span class="op">+</span> <span class="va">self</span>.b</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.deltaW <span class="op">=</span> grad.T <span class="op">@</span> <span class="va">self</span>.x</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.deltab <span class="op">=</span> grad.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad <span class="op">@</span> <span class="va">self</span>.W</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="sigmoid-layer" class="level3">
+<h3 class="anchored" data-anchor-id="sigmoid-layer">2.2 Sigmoid Layer</h3>
+<p><strong>Forward:</strong></p>
+<p><span class="math display">\[\sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
+<p><strong>Backward</strong> (given upstream gradient <span class="math inline">\(\texttt{grad} = \partial \mathcal{L} / \partial \sigma\)</span>):</p>
+<p><span class="math display">\[\frac{\partial \sigma}{\partial z} = \sigma(z)(1 - \sigma(z)) \qquad \Longrightarrow \qquad \frac{\partial \mathcal{L}}{\partial z} = \underbrace{\frac{\partial \mathcal{L}}{\partial \sigma}}_{\texttt{grad}} \cdot \underbrace{\frac{\partial \sigma}{\partial z}}_{\sigma(z)(1 - \sigma(z))} = \texttt{grad} \cdot \sigma(z)(1 - \sigma(z))\]</span></p>
+<div id="cb638124" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Sigmoid:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.a <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.a</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad <span class="op">*</span> <span class="va">self</span>.a <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.a)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="identity-layer" class="level3">
+<h3 class="anchored" data-anchor-id="identity-layer">2.3 Identity Layer</h3>
+<p><strong>Forward:</strong></p>
+<p><span class="math display">\[h(z) = z\]</span></p>
+<p><strong>Backward</strong> (given upstream gradient <span class="math inline">\(\texttt{grad}\)</span>):</p>
+<p><span class="math display">\[\frac{\partial h}{\partial z} = 1 \qquad \Longrightarrow \qquad \frac{\partial \mathcal{L}}{\partial z} = \underbrace{\frac{\partial \mathcal{L}}{\partial h}}_{\texttt{grad}} \cdot \frac{\partial h}{\partial z} = \texttt{grad} \cdot 1 = \texttt{grad}\]</span></p>
+<div id="ef0ee403" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Identity:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="defining-the-mse-loss" class="level2">
+<h2 class="anchored" data-anchor-id="defining-the-mse-loss">3. Defining the MSE Loss</h2>
+<p><strong>Forward:</strong></p>
+<p><span class="math display">\[\mathcal{L}_{\text{MSE}} = \frac{1}{N}\sum_{i=1}^{N}(\hat{y}_i - y_i)^2\]</span></p>
+<p><strong>Backward</strong> (gradient with respect to predictions):</p>
+<p><span class="math display">\[\frac{\partial \mathcal{L}}{\partial \hat{y}_i} = \frac{2}{N}(\hat{y}_i - y_i)\]</span></p>
+<div id="114d1f76" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MSELoss:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, pred, true):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pred <span class="op">=</span> pred</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.true <span class="op">=</span> true</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.N <span class="op">=</span> pred.shape[<span class="dv">0</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ((pred <span class="op">-</span> true) <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>):</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (<span class="dv">2</span> <span class="op">/</span> <span class="va">self</span>.N) <span class="op">*</span> (<span class="va">self</span>.pred <span class="op">-</span> <span class="va">self</span>.true)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, pred, true):</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.forward(pred, true)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="the-mlp-container-and-optimizer" class="level2">
+<h2 class="anchored" data-anchor-id="the-mlp-container-and-optimizer">4. The MLP Container and Optimizer</h2>
+<p>This is the key difference from Labs 3-1 through 3-3. Instead of writing explicit layer-by-layer calls inside each model class, we introduce two generic abstractions from the lecture.</p>
+<section id="mlp-class" class="level3">
+<h3 class="anchored" data-anchor-id="mlp-class">4.1 MLP Class</h3>
+<p>The <code>MLP</code> class takes a list of blocks and chains them together. The <code>forward()</code> method passes data through each block in sequence. The <code>backward()</code> method reverses through them, propagating gradients from the output back to the input. This is the same class the lecture used for the 3-layer network, but it works identically for any number of layers.</p>
+<div id="c37543c1" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MLP:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, blocks: <span class="bu">list</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.blocks <span class="op">=</span> blocks</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.blocks:</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> block.forward(x)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.blocks[::<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>            grad <span class="op">=</span> block.backward(grad)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="optimizer-class" class="level3">
+<h3 class="anchored" data-anchor-id="optimizer-class">4.2 Optimizer Class</h3>
+<p>The <code>Optimizer</code> is decoupled from the model. It scans the model’s <code>blocks</code> list, finds every <code>Linear</code> layer, and applies the gradient descent update using the gradients (<code>deltaW</code>, <code>deltab</code>) that were computed during the backward pass. This means adding more <code>Linear</code> layers to the model requires zero changes to the optimizer.</p>
+<div id="e12ec81a" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Optimizer:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, lr, model):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lr <span class="op">=</span> lr</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.model <span class="op">=</span> model</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> step(<span class="va">self</span>):</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.model.blocks:</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> block.<span class="va">__class__</span> <span class="op">==</span> Linear:</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                block.W <span class="op">=</span> block.W <span class="op">-</span> <span class="va">self</span>.lr <span class="op">*</span> block.deltaW</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                block.b <span class="op">=</span> block.b <span class="op">-</span> <span class="va">self</span>.lr <span class="op">*</span> block.deltab</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why Decouple the Optimizer?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In Labs 3-1 through 3-3, the <code>_update()</code> method was hardcoded inside each model class, directly referencing <code>self.linear.W</code>. This breaks as soon as you have multiple <code>Linear</code> layers. The decoupled <code>Optimizer</code> solves this by iterating over all blocks and updating any <code>Linear</code> layer it finds. This is exactly how PyTorch’s <code>torch.optim.SGD</code> works: you pass it <code>model.parameters()</code> and it handles all of them, regardless of how many layers exist.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="building-and-training-the-mlp" class="level2">
+<h2 class="anchored" data-anchor-id="building-and-training-the-mlp">5. Building and Training the MLP</h2>
+<section id="model-architecture" class="level3">
+<h3 class="anchored" data-anchor-id="model-architecture">5.1 Model Architecture</h3>
+<p>The lecture’s MLP architecture is:</p>
+<p><span class="math display">\[\mathbf{X} \xrightarrow{\text{Linear}(87, 64)} \xrightarrow{\text{Sigmoid}} \xrightarrow{\text{Linear}(64, 32)} \xrightarrow{\text{Sigmoid}} \xrightarrow{\text{Linear}(32, 1)} \xrightarrow{\text{Identity}} \hat{Y}\]</span></p>
+<p>This network has two hidden layers (64 and 32 neurons) with sigmoid activations, and one output neuron with identity activation for regression. Compare this with Lab 3-1, which was simply <code>Linear(87, 1)</code> followed by <code>Identity</code>.</p>
+<div id="a4851741" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> MLP([</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    Linear(D, <span class="dv">64</span>), Sigmoid(),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    Linear(<span class="dv">64</span>, <span class="dv">32</span>), Sigmoid(),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    Linear(<span class="dv">32</span>, <span class="dv">1</span>),  Identity()</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> Optimizer(lr<span class="op">=</span><span class="fl">0.01</span>, model<span class="op">=</span>model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="training-loop" class="level3">
+<h3 class="anchored" data-anchor-id="training-loop">5.2 Training Loop</h3>
+<p>The <code>train()</code> function follows the same three-step pattern (forward, backward, step) from all previous labs. The difference is that <code>model.forward()</code> and <code>model.backward()</code> now internally chain through 6 blocks instead of 2, and <code>optimizer.step()</code> updates 3 <code>Linear</code> layers instead of 1.</p>
+<div id="a3a513fa" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train(model, optimizer, X_train, Y_train, X_test, Y_test,</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>          Y_mean, Y_std, loss_func<span class="op">=</span>MSELoss(), epochs<span class="op">=</span><span class="dv">5000</span>, print_every<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    history <span class="op">=</span> {<span class="st">"train_loss"</span>: [], <span class="st">"test_loss"</span>: [],</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>               <span class="st">"train_mae"</span>: [],  <span class="st">"test_mae"</span>: []}</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(epochs):</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Forward pass ---</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        prediction <span class="op">=</span> model.forward(X_train)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        loss <span class="op">=</span> loss_func(prediction, Y_train)</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Backward pass ---</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> loss_func.backward()</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        model.backward(grad)</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Update all Linear layers ---</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        optimizer.step()</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Record training metrics ---</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        history[<span class="st">"train_loss"</span>].append(loss)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        train_mae <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            prediction <span class="op">*</span> Y_std <span class="op">+</span> Y_mean <span class="op">-</span> (Y_train <span class="op">*</span> Y_std <span class="op">+</span> Y_mean)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>        ).mean()</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>        history[<span class="st">"train_mae"</span>].append(train_mae)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>        <span class="co"># --- Evaluate on test set ---</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>        test_pred <span class="op">=</span> model.forward(X_test)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        test_loss <span class="op">=</span> ((test_pred <span class="op">-</span> Y_test) <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>        test_mae <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>            test_pred <span class="op">*</span> Y_std <span class="op">+</span> Y_mean <span class="op">-</span> (Y_test <span class="op">*</span> Y_std <span class="op">+</span> Y_mean)</span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        ).mean()</span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>        history[<span class="st">"test_loss"</span>].append(test_loss)</span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a>        history[<span class="st">"test_mae"</span>].append(test_mae)</span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> epoch <span class="op">%</span> print_every <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> epoch <span class="op">==</span> epochs <span class="op">-</span> <span class="dv">1</span>:</span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  Epoch </span><span class="sc">{</span>epoch<span class="sc">:4d}</span><span class="ss"> | "</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>                  <span class="ss">f"Train Loss: </span><span class="sc">{</span>loss<span class="sc">:.6f}</span><span class="ss"> | Test Loss: </span><span class="sc">{</span>test_loss<span class="sc">:.6f}</span><span class="ss">"</span>)</span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> history</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="running-the-training" class="level3">
+<h3 class="anchored" data-anchor-id="running-the-training">5.3 Running the Training</h3>
+<div id="793dbf36" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> train(model, optimizer, X_train, Y_train, X_test, Y_test,</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>                Y_mean, Y_std, epochs<span class="op">=</span><span class="dv">5000</span>, print_every<span class="op">=</span><span class="dv">500</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Epoch    0 | Train Loss: 1.002276 | Test Loss: 0.919860
+  Epoch  500 | Train Loss: 0.935780 | Test Loss: 0.862027
+  Epoch 1000 | Train Loss: 0.705099 | Test Loss: 0.657530
+  Epoch 1500 | Train Loss: 0.467778 | Test Loss: 0.454862
+  Epoch 2000 | Train Loss: 0.358349 | Test Loss: 0.362028
+  Epoch 2500 | Train Loss: 0.324365 | Test Loss: 0.333076
+  Epoch 3000 | Train Loss: 0.305670 | Test Loss: 0.316486
+  Epoch 3500 | Train Loss: 0.291287 | Test Loss: 0.303706
+  Epoch 4000 | Train Loss: 0.279909 | Test Loss: 0.293656
+  Epoch 4500 | Train Loss: 0.270982 | Test Loss: 0.285747
+  Epoch 4999 | Train Loss: 0.263814 | Test Loss: 0.279382</code></pre>
+</div>
+</div>
+</section>
+<section id="visualizing-the-training-curves" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-training-curves">5.4 Visualizing the Training Curves</h3>
+<div id="a6c21de5" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">5</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>ax1.plot(history[<span class="st">"train_loss"</span>], label<span class="op">=</span><span class="st">"Train Loss"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>ax1.plot(history[<span class="st">"test_loss"</span>],  label<span class="op">=</span><span class="st">"Test Loss"</span>,  color<span class="op">=</span><span class="st">"#3498db"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>ax1.set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ax1.set_ylabel(<span class="st">"MSE Loss (normalized)"</span>)</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>ax1.set_title(<span class="st">"Training vs Test Loss"</span>)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>ax1.legend()</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>ax1.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>ax2.plot(history[<span class="st">"train_mae"</span>], label<span class="op">=</span><span class="st">"Train MAE"</span>, color<span class="op">=</span><span class="st">"#e74c3c"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>ax2.plot(history[<span class="st">"test_mae"</span>],  label<span class="op">=</span><span class="st">"Test MAE"</span>,  color<span class="op">=</span><span class="st">"#3498db"</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>ax2.set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>ax2.set_ylabel(<span class="st">"MAE (£)"</span>)</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>ax2.set_title(<span class="st">"Training vs Test MAE"</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>ax2.legend()</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>ax2.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mlp-regression-scratch_files/figure-html/cell-13-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Unlike the linear models from previous labs where train and test curves stayed very close, the MLP may show a small gap between train and test loss. This is expected: with more parameters (87x64 + 64x32 + 32x1 = 7,648 weights vs.&nbsp;87 for linear regression), the MLP has enough capacity to fit the training data more tightly, which can lead to mild overfitting.</p>
+</section>
+</section>
+<section id="evaluation-on-unseen-test-data" class="level2">
+<h2 class="anchored" data-anchor-id="evaluation-on-unseen-test-data">6. Evaluation on Unseen Test Data</h2>
+<div id="49bc5992" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>Y_pred_norm <span class="op">=</span> model.forward(X_test)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Denormalize back to real prices</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>Y_pred <span class="op">=</span> Y_pred_norm <span class="op">*</span> Y_std <span class="op">+</span> Y_mean</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>Y_real <span class="op">=</span> Y_test <span class="op">*</span> Y_std <span class="op">+</span> Y_mean</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> np.<span class="bu">abs</span>(Y_pred <span class="op">-</span> Y_real).mean()</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"TEST PREDICTIONS (UNSEEN DATA):"</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  MAE: £</span><span class="sc">{</span>mae<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>TEST PREDICTIONS (UNSEEN DATA):
+  MAE: £480,320</code></pre>
+</div>
+</div>
+<p>Compare this MAE with the Linear Regression MAE from Lab 3-1 (~£500K-£600K). The MLP should achieve a lower MAE, demonstrating that the nonlinear hidden layers capture patterns in the data that a purely linear model cannot.</p>
+<section id="predicted-vs-actual-scatter-plot" class="level3">
+<h3 class="anchored" data-anchor-id="predicted-vs-actual-scatter-plot">6.1 Predicted vs Actual Scatter Plot</h3>
+<div id="424ed53d" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">7</span>))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>ax.scatter(Y_real <span class="op">/</span> <span class="fl">1e6</span>, Y_pred <span class="op">/</span> <span class="fl">1e6</span>, alpha<span class="op">=</span><span class="fl">0.3</span>, color<span class="op">=</span><span class="st">'steelblue'</span>,</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>           edgecolors<span class="op">=</span><span class="st">'k'</span>, linewidths<span class="op">=</span><span class="fl">0.3</span>, s<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>lims <span class="op">=</span> [<span class="dv">0</span>, Y_real.<span class="bu">max</span>() <span class="op">/</span> <span class="fl">1e6</span> <span class="op">*</span> <span class="fl">1.05</span>]</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>ax.plot(lims, lims, <span class="st">'r--'</span>, linewidth<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span><span class="st">'Perfect prediction'</span>)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"Actual Price (£M)"</span>)</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"Predicted Price (£M)"</span>)</span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Predicted vs Actual House Prices (MLP)"</span>)</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>ax.set_xlim(lims)</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>ax.set_ylim(lims)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>ax.set_aspect(<span class="st">'equal'</span>)</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.3</span>)</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="mlp-regression-scratch_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="comparing-all-models" class="level2">
+<h2 class="anchored" data-anchor-id="comparing-all-models">7. Comparing All Models</h2>
+<p>Let us compare the MLP with the Linear Regression from Lab 3-1 by training both on the same data and evaluating on the same test set.</p>
+<div id="7ca992ed" class="cell" data-execution_count="15">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Train a fresh Linear Regression for comparison</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>linear_model <span class="op">=</span> MLP([</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    Linear(D, <span class="dv">1</span>), Identity()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>linear_optimizer <span class="op">=</span> Optimizer(lr<span class="op">=</span><span class="fl">0.01</span>, model<span class="op">=</span>linear_model)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Linear Regression:"</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>linear_history <span class="op">=</span> train(linear_model, linear_optimizer,</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>                       X_train, Y_train, X_test, Y_test,</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>                       Y_mean, Y_std, epochs<span class="op">=</span><span class="dv">5000</span>, print_every<span class="op">=</span><span class="dv">99999</span>)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>Y_pred_linear <span class="op">=</span> linear_model.forward(X_test) <span class="op">*</span> Y_std <span class="op">+</span> Y_mean</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>mae_linear <span class="op">=</span> np.<span class="bu">abs</span>(Y_pred_linear <span class="op">-</span> Y_real).mean()</span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="st">'Model'</span><span class="sc">:&lt;25s}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'MAE'</span><span class="sc">:&gt;15s}</span><span class="ss">"</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'-'</span><span class="op">*</span><span class="dv">40</span><span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Linear Regression'</span><span class="sc">:&lt;25s}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'£'</span><span class="op">+</span><span class="ss">f'</span><span class="sc">{</span>mae_linear<span class="sc">:,.0f}</span><span class="ss">'</span><span class="sc">:&gt;15s}</span><span class="ss">"</span>)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'MLP (64-32)'</span><span class="sc">:&lt;25s}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'£'</span><span class="op">+</span><span class="ss">f'</span><span class="sc">{</span>mae<span class="sc">:,.0f}</span><span class="ss">'</span><span class="sc">:&gt;15s}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear Regression:
+  Epoch    0 | Train Loss: 1.223665 | Test Loss: 1.125681
+  Epoch 4999 | Train Loss: 0.283295 | Test Loss: 0.297246
+
+Model                                 MAE
+----------------------------------------
+Linear Regression                £498,674
+MLP (64-32)                      £480,320</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Architectural Comparison
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Both models use the exact same <code>MLP</code> container, <code>Optimizer</code>, <code>MSELoss</code>, and training loop. The only difference is the list of blocks passed to <code>MLP()</code>:</p>
+<p><strong>Linear Regression</strong>: <code>MLP([Linear(D, 1), Identity()])</code></p>
+<p><strong>MLP</strong>: <code>MLP([Linear(D, 64), Sigmoid(), Linear(64, 32), Sigmoid(), Linear(32, 1), Identity()])</code></p>
+<p>The modular design means that swapping architectures is as simple as changing the constructor argument. The training infrastructure does not need to know or care how many layers exist.</p>
+</div>
+</div>
+</section>
+<section id="complete-code" class="level2">
+<h2 class="anchored" data-anchor-id="complete-code">8. Complete Code</h2>
+<div id="4b730da2" class="cell" data-execution_count="16">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Data Preparation</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>data <span class="op">=</span> np.genfromtxt(<span class="st">"../../data/london_houses_transformed.csv"</span>, delimiter<span class="op">=</span><span class="st">","</span>, skip_header<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> data[:, :<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>Y <span class="op">=</span> data[:, <span class="op">-</span><span class="dv">1</span>:]</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>X_train_raw, X_test_raw, Y_train_raw, Y_test_raw <span class="op">=</span> train_test_split(</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    X, Y, test_size<span class="op">=</span><span class="fl">0.2</span>, random_state<span class="op">=</span><span class="dv">15</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>X_mean, X_std <span class="op">=</span> X_train_raw.mean(axis<span class="op">=</span><span class="dv">0</span>), X_train_raw.std(axis<span class="op">=</span><span class="dv">0</span>) <span class="op">+</span> <span class="fl">1e-8</span></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>X_train <span class="op">=</span> (X_train_raw <span class="op">-</span> X_mean) <span class="op">/</span> X_std</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>X_test  <span class="op">=</span> (X_test_raw  <span class="op">-</span> X_mean) <span class="op">/</span> X_std</span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>Y_mean, Y_std <span class="op">=</span> Y_train_raw.mean(), Y_train_raw.std()</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>Y_train <span class="op">=</span> (Y_train_raw <span class="op">-</span> Y_mean) <span class="op">/</span> Y_std</span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>Y_test  <span class="op">=</span> (Y_test_raw  <span class="op">-</span> Y_mean) <span class="op">/</span> Y_std</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>N, D <span class="op">=</span> X_train.shape</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Building Blocks</span></span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Linear:</span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, in_dims, out_dims):</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        bound <span class="op">=</span> <span class="dv">1</span> <span class="op">/</span> np.sqrt(in_dims)</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.W <span class="op">=</span> np.random.uniform(<span class="op">-</span>bound, bound, size<span class="op">=</span>(out_dims, in_dims))</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.b <span class="op">=</span> np.random.uniform(<span class="op">-</span>bound, bound, size<span class="op">=</span>(out_dims,))</span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.x <span class="op">=</span> x</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x <span class="op">@</span> <span class="va">self</span>.W.T <span class="op">+</span> <span class="va">self</span>.b</span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.deltaW <span class="op">=</span> grad.T <span class="op">@</span> <span class="va">self</span>.x</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.deltab <span class="op">=</span> grad.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad <span class="op">@</span> <span class="va">self</span>.W</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Sigmoid:</span>
+<span id="cb20-45"><a href="#cb20-45" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb20-46"><a href="#cb20-46" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.a <span class="op">=</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> np.exp(<span class="op">-</span>x))</span>
+<span id="cb20-47"><a href="#cb20-47" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.a</span>
+<span id="cb20-48"><a href="#cb20-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-49"><a href="#cb20-49" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb20-50"><a href="#cb20-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad <span class="op">*</span> <span class="va">self</span>.a <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.a)</span>
+<span id="cb20-51"><a href="#cb20-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-52"><a href="#cb20-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-53"><a href="#cb20-53" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Identity:</span>
+<span id="cb20-54"><a href="#cb20-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb20-55"><a href="#cb20-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb20-56"><a href="#cb20-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-57"><a href="#cb20-57" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb20-58"><a href="#cb20-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad</span>
+<span id="cb20-59"><a href="#cb20-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-60"><a href="#cb20-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-61"><a href="#cb20-61" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MSELoss:</span>
+<span id="cb20-62"><a href="#cb20-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, pred, true):</span>
+<span id="cb20-63"><a href="#cb20-63" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.pred <span class="op">=</span> pred</span>
+<span id="cb20-64"><a href="#cb20-64" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.true <span class="op">=</span> true</span>
+<span id="cb20-65"><a href="#cb20-65" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.N <span class="op">=</span> pred.shape[<span class="dv">0</span>]</span>
+<span id="cb20-66"><a href="#cb20-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> ((pred <span class="op">-</span> true) <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb20-67"><a href="#cb20-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-68"><a href="#cb20-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>):</span>
+<span id="cb20-69"><a href="#cb20-69" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (<span class="dv">2</span> <span class="op">/</span> <span class="va">self</span>.N) <span class="op">*</span> (<span class="va">self</span>.pred <span class="op">-</span> <span class="va">self</span>.true)</span>
+<span id="cb20-70"><a href="#cb20-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-71"><a href="#cb20-71" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__call__</span>(<span class="va">self</span>, pred, true):</span>
+<span id="cb20-72"><a href="#cb20-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.forward(pred, true)</span>
+<span id="cb20-73"><a href="#cb20-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-74"><a href="#cb20-74" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-75"><a href="#cb20-75" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. MLP Container &amp; Optimizer</span></span>
+<span id="cb20-76"><a href="#cb20-76" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-77"><a href="#cb20-77" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MLP:</span>
+<span id="cb20-78"><a href="#cb20-78" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, blocks: <span class="bu">list</span>):</span>
+<span id="cb20-79"><a href="#cb20-79" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.blocks <span class="op">=</span> blocks</span>
+<span id="cb20-80"><a href="#cb20-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-81"><a href="#cb20-81" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> forward(<span class="va">self</span>, x):</span>
+<span id="cb20-82"><a href="#cb20-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.blocks:</span>
+<span id="cb20-83"><a href="#cb20-83" aria-hidden="true" tabindex="-1"></a>            x <span class="op">=</span> block.forward(x)</span>
+<span id="cb20-84"><a href="#cb20-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> x</span>
+<span id="cb20-85"><a href="#cb20-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-86"><a href="#cb20-86" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> backward(<span class="va">self</span>, grad):</span>
+<span id="cb20-87"><a href="#cb20-87" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.blocks[::<span class="op">-</span><span class="dv">1</span>]:</span>
+<span id="cb20-88"><a href="#cb20-88" aria-hidden="true" tabindex="-1"></a>            grad <span class="op">=</span> block.backward(grad)</span>
+<span id="cb20-89"><a href="#cb20-89" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> grad</span>
+<span id="cb20-90"><a href="#cb20-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-91"><a href="#cb20-91" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-92"><a href="#cb20-92" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Optimizer:</span>
+<span id="cb20-93"><a href="#cb20-93" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, lr, model):</span>
+<span id="cb20-94"><a href="#cb20-94" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.lr <span class="op">=</span> lr</span>
+<span id="cb20-95"><a href="#cb20-95" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.model <span class="op">=</span> model</span>
+<span id="cb20-96"><a href="#cb20-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-97"><a href="#cb20-97" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> step(<span class="va">self</span>):</span>
+<span id="cb20-98"><a href="#cb20-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> block <span class="kw">in</span> <span class="va">self</span>.model.blocks:</span>
+<span id="cb20-99"><a href="#cb20-99" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> block.<span class="va">__class__</span> <span class="op">==</span> Linear:</span>
+<span id="cb20-100"><a href="#cb20-100" aria-hidden="true" tabindex="-1"></a>                block.W <span class="op">-=</span> <span class="va">self</span>.lr <span class="op">*</span> block.deltaW</span>
+<span id="cb20-101"><a href="#cb20-101" aria-hidden="true" tabindex="-1"></a>                block.b <span class="op">-=</span> <span class="va">self</span>.lr <span class="op">*</span> block.deltab</span>
+<span id="cb20-102"><a href="#cb20-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-103"><a href="#cb20-103" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-104"><a href="#cb20-104" aria-hidden="true" tabindex="-1"></a><span class="co"># 4. Train &amp; Evaluate</span></span>
+<span id="cb20-105"><a href="#cb20-105" aria-hidden="true" tabindex="-1"></a><span class="co"># ============================================================</span></span>
+<span id="cb20-106"><a href="#cb20-106" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb20-107"><a href="#cb20-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-108"><a href="#cb20-108" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> MLP([</span>
+<span id="cb20-109"><a href="#cb20-109" aria-hidden="true" tabindex="-1"></a>    Linear(D, <span class="dv">64</span>), Sigmoid(),</span>
+<span id="cb20-110"><a href="#cb20-110" aria-hidden="true" tabindex="-1"></a>    Linear(<span class="dv">64</span>, <span class="dv">32</span>), Sigmoid(),</span>
+<span id="cb20-111"><a href="#cb20-111" aria-hidden="true" tabindex="-1"></a>    Linear(<span class="dv">32</span>, <span class="dv">1</span>),  Identity()</span>
+<span id="cb20-112"><a href="#cb20-112" aria-hidden="true" tabindex="-1"></a>])</span>
+<span id="cb20-113"><a href="#cb20-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-114"><a href="#cb20-114" aria-hidden="true" tabindex="-1"></a>optimizer <span class="op">=</span> Optimizer(lr<span class="op">=</span><span class="fl">0.01</span>, model<span class="op">=</span>model)</span>
+<span id="cb20-115"><a href="#cb20-115" aria-hidden="true" tabindex="-1"></a>loss_func <span class="op">=</span> MSELoss()</span>
+<span id="cb20-116"><a href="#cb20-116" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-117"><a href="#cb20-117" aria-hidden="true" tabindex="-1"></a>history <span class="op">=</span> {<span class="st">"train_loss"</span>: [], <span class="st">"test_loss"</span>: [],</span>
+<span id="cb20-118"><a href="#cb20-118" aria-hidden="true" tabindex="-1"></a>           <span class="st">"train_mae"</span>: [],  <span class="st">"test_mae"</span>: []}</span>
+<span id="cb20-119"><a href="#cb20-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-120"><a href="#cb20-120" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> epoch <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5000</span>):</span>
+<span id="cb20-121"><a href="#cb20-121" aria-hidden="true" tabindex="-1"></a>    prediction <span class="op">=</span> model.forward(X_train)</span>
+<span id="cb20-122"><a href="#cb20-122" aria-hidden="true" tabindex="-1"></a>    loss <span class="op">=</span> loss_func(prediction, Y_train)</span>
+<span id="cb20-123"><a href="#cb20-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-124"><a href="#cb20-124" aria-hidden="true" tabindex="-1"></a>    grad <span class="op">=</span> loss_func.backward()</span>
+<span id="cb20-125"><a href="#cb20-125" aria-hidden="true" tabindex="-1"></a>    model.backward(grad)</span>
+<span id="cb20-126"><a href="#cb20-126" aria-hidden="true" tabindex="-1"></a>    optimizer.step()</span>
+<span id="cb20-127"><a href="#cb20-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-128"><a href="#cb20-128" aria-hidden="true" tabindex="-1"></a>    history[<span class="st">"train_loss"</span>].append(loss)</span>
+<span id="cb20-129"><a href="#cb20-129" aria-hidden="true" tabindex="-1"></a>    train_mae <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb20-130"><a href="#cb20-130" aria-hidden="true" tabindex="-1"></a>        prediction <span class="op">*</span> Y_std <span class="op">+</span> Y_mean <span class="op">-</span> (Y_train <span class="op">*</span> Y_std <span class="op">+</span> Y_mean)</span>
+<span id="cb20-131"><a href="#cb20-131" aria-hidden="true" tabindex="-1"></a>    ).mean()</span>
+<span id="cb20-132"><a href="#cb20-132" aria-hidden="true" tabindex="-1"></a>    history[<span class="st">"train_mae"</span>].append(train_mae)</span>
+<span id="cb20-133"><a href="#cb20-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-134"><a href="#cb20-134" aria-hidden="true" tabindex="-1"></a>    test_pred <span class="op">=</span> model.forward(X_test)</span>
+<span id="cb20-135"><a href="#cb20-135" aria-hidden="true" tabindex="-1"></a>    test_loss <span class="op">=</span> ((test_pred <span class="op">-</span> Y_test) <span class="op">**</span> <span class="dv">2</span>).mean()</span>
+<span id="cb20-136"><a href="#cb20-136" aria-hidden="true" tabindex="-1"></a>    test_mae <span class="op">=</span> np.<span class="bu">abs</span>(</span>
+<span id="cb20-137"><a href="#cb20-137" aria-hidden="true" tabindex="-1"></a>        test_pred <span class="op">*</span> Y_std <span class="op">+</span> Y_mean <span class="op">-</span> (Y_test <span class="op">*</span> Y_std <span class="op">+</span> Y_mean)</span>
+<span id="cb20-138"><a href="#cb20-138" aria-hidden="true" tabindex="-1"></a>    ).mean()</span>
+<span id="cb20-139"><a href="#cb20-139" aria-hidden="true" tabindex="-1"></a>    history[<span class="st">"test_loss"</span>].append(test_loss)</span>
+<span id="cb20-140"><a href="#cb20-140" aria-hidden="true" tabindex="-1"></a>    history[<span class="st">"test_mae"</span>].append(test_mae)</span>
+<span id="cb20-141"><a href="#cb20-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-142"><a href="#cb20-142" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> epoch <span class="op">%</span> <span class="dv">500</span> <span class="op">==</span> <span class="dv">0</span> <span class="kw">or</span> epoch <span class="op">==</span> <span class="dv">4999</span>:</span>
+<span id="cb20-143"><a href="#cb20-143" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  Epoch </span><span class="sc">{</span>epoch<span class="sc">:4d}</span><span class="ss"> | "</span></span>
+<span id="cb20-144"><a href="#cb20-144" aria-hidden="true" tabindex="-1"></a>              <span class="ss">f"Train Loss: </span><span class="sc">{</span>loss<span class="sc">:.6f}</span><span class="ss"> | Test Loss: </span><span class="sc">{</span>test_loss<span class="sc">:.6f}</span><span class="ss">"</span>)</span>
+<span id="cb20-145"><a href="#cb20-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-146"><a href="#cb20-146" aria-hidden="true" tabindex="-1"></a>Y_pred <span class="op">=</span> model.forward(X_test) <span class="op">*</span> Y_std <span class="op">+</span> Y_mean</span>
+<span id="cb20-147"><a href="#cb20-147" aria-hidden="true" tabindex="-1"></a>Y_real <span class="op">=</span> Y_test <span class="op">*</span> Y_std <span class="op">+</span> Y_mean</span>
+<span id="cb20-148"><a href="#cb20-148" aria-hidden="true" tabindex="-1"></a>mae <span class="op">=</span> np.<span class="bu">abs</span>(Y_pred <span class="op">-</span> Y_real).mean()</span>
+<span id="cb20-149"><a href="#cb20-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-150"><a href="#cb20-150" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">TEST RESULTS:"</span>)</span>
+<span id="cb20-151"><a href="#cb20-151" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  MAE: £</span><span class="sc">{</span>mae<span class="sc">:,.0f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Epoch    0 | Train Loss: 1.002276 | Test Loss: 0.919860
+  Epoch  500 | Train Loss: 0.935780 | Test Loss: 0.862027
+  Epoch 1000 | Train Loss: 0.705099 | Test Loss: 0.657530
+  Epoch 1500 | Train Loss: 0.467778 | Test Loss: 0.454862
+  Epoch 2000 | Train Loss: 0.358349 | Test Loss: 0.362028
+  Epoch 2500 | Train Loss: 0.324365 | Test Loss: 0.333076
+  Epoch 3000 | Train Loss: 0.305670 | Test Loss: 0.316486
+  Epoch 3500 | Train Loss: 0.291287 | Test Loss: 0.303706
+  Epoch 4000 | Train Loss: 0.279909 | Test Loss: 0.293656
+  Epoch 4500 | Train Loss: 0.270982 | Test Loss: 0.285747
+  Epoch 4999 | Train Loss: 0.263814 | Test Loss: 0.279382
+
+TEST RESULTS:
+  MAE: £480,320</code></pre>
+</div>
+</div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li>The <strong><code>MLP</code> container</strong> chains any sequence of blocks through a <code>for</code> loop, making the architecture definition a single list: <code>MLP([Linear(D, 64), Sigmoid(), Linear(64, 32), Sigmoid(), Linear(32, 1), Identity()])</code>. Adding or removing layers requires no changes to the training loop.</li>
+<li>The <strong>decoupled <code>Optimizer</code></strong> scans the model’s blocks and updates every <code>Linear</code> layer it finds. This scales automatically from 1 to any number of layers, matching how <code>torch.optim.SGD</code> works in PyTorch.</li>
+<li>The <strong>training loop</strong> is unchanged from Labs 3-1 through 3-3: forward, backward, step. The only difference is that <code>model.forward()</code> and <code>model.backward()</code> internally iterate over more blocks, and <code>optimizer.step()</code> updates more weight matrices.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Bishop, C. M. (2006). <em>Pattern Recognition and Machine Learning</em>. Springer.</li>
+<li>Goodfellow, I., Bengio, Y., and Courville, A. (2016). <em>Deep Learning</em>. MIT Press.</li>
+</ul>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://www.youtube.com/watch?v=aircAruvnKk">3Blue1Brown: But what is a neural network?</a></li>
+<li><a href="https://www.youtube.com/watch?v=Ilg3gGewQ5U">3Blue1Brown: Backpropagation</a></li>
+<li><a href="https://cs231n.github.io/neural-networks-1/">CS231n: Neural Networks</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/gli\.konkuk\.ac\.kr\/board\/lectures\/machine-learning");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

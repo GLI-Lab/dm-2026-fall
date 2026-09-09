@@ -1,0 +1,1373 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Byungkook Oh">
+
+<title>Lab2-4. Softmax Regression via Gradient Descent – Machine Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-dd8e0821c47296b3dcb472f524dd5682.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../exercises/index.html" aria-current="page"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../assignments/index.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
+</i> 
+<span class="menu-text">GLI Lab</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/GLI-Lab/machine-learning-course" title="Machine Learning Course GitHub" class="quarto-navigation-tool px-1" aria-label="Machine Learning Course GitHub"><i class="bi bi-github"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/linear-regression.html">Lab2. Linear Models</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/softmax-regression.html">Softmax Regression</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../exercises/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercises</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab1. Introduction to ML</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/python-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Basics (⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/numpy-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Numpy Basics (⭐⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/matplotlib-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matplotlib Basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/pandas-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Basics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lab2. Linear Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/linear-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/logistic-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/classification-metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Classification Metrics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/softmax-regression.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Softmax Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab3. Multi-Layer Perceptron</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/linear-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/logistic-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logistic Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/softmax-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Softmax Regression (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab4. Model Selection and Generalization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLP Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLP Regression-Improved (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab5. Convolutional NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab05/cnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab6. Recurrent NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab06/rnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link active" data-scroll-target="#objectives">Objectives</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a>
+  <ul class="collapse">
+  <li><a href="#from-sigmoid-to-softmax" id="toc-from-sigmoid-to-softmax" class="nav-link" data-scroll-target="#from-sigmoid-to-softmax">From Sigmoid to Softmax</a></li>
+  <li><a href="#softmax-function" id="toc-softmax-function" class="nav-link" data-scroll-target="#softmax-function">Softmax Function</a></li>
+  <li><a href="#cross-entropy-loss" id="toc-cross-entropy-loss" class="nav-link" data-scroll-target="#cross-entropy-loss">Cross-Entropy Loss</a></li>
+  <li><a href="#gradient-not-included-in-the-exam" id="toc-gradient-not-included-in-the-exam" class="nav-link" data-scroll-target="#gradient-not-included-in-the-exam">Gradient (Not included in the exam)</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">0. Setup</a></li>
+  <li><a href="#softmax-regression-via-gradient-descent" id="toc-softmax-regression-via-gradient-descent" class="nav-link" data-scroll-target="#softmax-regression-via-gradient-descent">1. Softmax Regression via Gradient Descent</a>
+  <ul class="collapse">
+  <li><a href="#generating-synthetic-data" id="toc-generating-synthetic-data" class="nav-link" data-scroll-target="#generating-synthetic-data">1.1 Generating Synthetic Data</a></li>
+  <li><a href="#implementing-the-loss-and-gradient" id="toc-implementing-the-loss-and-gradient" class="nav-link" data-scroll-target="#implementing-the-loss-and-gradient">1.2 Implementing the Loss and Gradient</a></li>
+  <li><a href="#writing-the-training-loop" id="toc-writing-the-training-loop" class="nav-link" data-scroll-target="#writing-the-training-loop">1.3 Writing the Training Loop</a></li>
+  <li><a href="#running-the-optimizer" id="toc-running-the-optimizer" class="nav-link" data-scroll-target="#running-the-optimizer">1.4 Running the Optimizer</a></li>
+  <li><a href="#visualizing-the-decision-regions" id="toc-visualizing-the-decision-regions" class="nav-link" data-scroll-target="#visualizing-the-decision-regions">1.5 Visualizing the Decision Regions</a></li>
+  </ul></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/linear-regression.html">Lab2. Linear Models</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/softmax-regression.html">Softmax Regression</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab2-4. Softmax Regression via Gradient Descent</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Byungkook Oh </p>
+          </div>
+  </div>
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026.05.02</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab02/softmax-regression.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<section id="objectives" class="level2">
+<h2 class="anchored" data-anchor-id="objectives">Objectives</h2>
+<ul>
+<li>Extend binary logistic regression to <strong>multi-class classification</strong> using softmax regression (multinomial logistic regression).</li>
+<li>Implement the <strong>cross-entropy loss</strong> and its gradient in both element-wise and matrix form.</li>
+<li>Visualize how <strong>decision regions</strong> evolve during training, partitioning the feature space into <span class="math inline">\(K\)</span> classes.</li>
+</ul>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<section id="from-sigmoid-to-softmax" class="level3">
+<h3 class="anchored" data-anchor-id="from-sigmoid-to-softmax">From Sigmoid to Softmax</h3>
+<p>Logistic regression handles two classes by squeezing a single linear score through the sigmoid. When we have <span class="math inline">\(K &gt; 2\)</span> classes, the natural generalization is <strong>softmax regression</strong>. Instead of one weight vector <span class="math inline">\(\mathbf{w} \in \mathbb{R}^d\)</span>, we learn a weight matrix <span class="math inline">\(\mathbf{W} \in \mathbb{R}^{d \times K}\)</span> — one column per class. The model computes <span class="math inline">\(K\)</span> raw scores (logits) for each sample and converts them into a probability distribution using the <strong>softmax function</strong>.</p>
+</section>
+<section id="softmax-function" class="level3">
+<h3 class="anchored" data-anchor-id="softmax-function">Softmax Function</h3>
+<p>Given a logit vector <span class="math inline">\(\mathbf{z} = [z_1, \dots, z_K]^\top\)</span>, the softmax function assigns each class a probability:</p>
+<p><span class="math display">\[\text{softmax}(\mathbf{z})_k = \frac{e^{z_k}}{\sum_{j=1}^{K} e^{z_j}}, \qquad k = 1, \dots, K\]</span></p>
+<p>All outputs are positive and sum to 1, forming a valid probability distribution. When <span class="math inline">\(K = 2\)</span>, softmax reduces exactly to sigmoid applied to the difference <span class="math inline">\(z_1 - z_2\)</span>.</p>
+</section>
+<section id="cross-entropy-loss" class="level3">
+<h3 class="anchored" data-anchor-id="cross-entropy-loss">Cross-Entropy Loss</h3>
+<p>Let <span class="math inline">\(\mathbf{y}_i\)</span> be the <strong>one-hot encoding</strong> of the label for sample <span class="math inline">\(i\)</span> — a vector of length <span class="math inline">\(K\)</span> with a single 1 at the true class position and 0 elsewhere. The cross-entropy loss over <span class="math inline">\(n\)</span> samples is:</p>
+<p><span class="math display">\[\mathcal{L}_{\text{CE}}(\mathbf{W}) = -\frac{1}{n} \sum_{i=1}^{n} \sum_{k=1}^{K} y_{ik} \log p_{ik}\]</span></p>
+<p>where <span class="math inline">\(\mathbf{p}_i = \text{softmax}(\mathbf{X}_i \mathbf{W})\)</span>. Since <span class="math inline">\(\mathbf{y}_i\)</span> is one-hot, only the term for the true class survives in the inner sum:</p>
+<p><span class="math display">\[\mathcal{L}_{\text{CE}} = -\frac{1}{n} \sum_{i=1}^{n} \log p_{i,\, c_i}\]</span></p>
+<p>where <span class="math inline">\(c_i\)</span> is the true class of sample <span class="math inline">\(i\)</span>. This is the negative log-probability of the correct class, averaged over all samples.</p>
+</section>
+<section id="gradient-not-included-in-the-exam" class="level3">
+<h3 class="anchored" data-anchor-id="gradient-not-included-in-the-exam">Gradient (Not included in the exam)</h3>
+<p>In logistic regression, the gradient is</p>
+<p><span class="math display">\[
+\nabla_\mathbf{w} \mathcal{L}_{\text{BCE}} = \frac{1}{n}\mathbf{X}^\top (\mathbf{p} - \mathbf{y})
+\]</span></p>
+<p>Softmax regression keeps the same <strong>feature-weighted error</strong> pattern, but now there is one probability/error term per class, so the gradient becomes a matrix rather than a vector. We will not derive this from scratch here, but the stacking structure is useful to see.</p>
+<p>If we define the error matrix <span class="math inline">\(\mathbf{E} = \mathbf{P} - \mathbf{Y}\)</span>, then each entry of the gradient is</p>
+<p><span class="math display">\[\frac{\partial \mathcal{L}}{\partial W_{jk}} = \frac{1}{n}\sum_{i=1}^{n} e_{ik} \, x_{ij}\]</span></p>
+<p>For a fixed class <span class="math inline">\(k\)</span>, collecting the partial derivatives with respect to all feature weights gives one gradient column:</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+\frac{\partial \mathcal{L}}{\partial W_{1k}} \\
+\frac{\partial \mathcal{L}}{\partial W_{2k}} \\
+\vdots \\
+\frac{\partial \mathcal{L}}{\partial W_{dk}}
+\end{bmatrix}
+=
+\frac{1}{n}
+\begin{bmatrix}
+\sum_{i=1}^{n} e_{ik} x_{i1} \\
+\sum_{i=1}^{n} e_{ik} x_{i2} \\
+\vdots \\
+\sum_{i=1}^{n} e_{ik} x_{id}
+\end{bmatrix}
+\]</span></p>
+<p>Doing this for every class and placing those columns side by side gives the full gradient matrix:</p>
+<p><span class="math display">\[
+\nabla_\mathbf{W}\mathcal{L}
+=
+\begin{bmatrix}
+\frac{\partial \mathcal{L}}{\partial W_{11}} &amp; \frac{\partial \mathcal{L}}{\partial W_{12}} &amp; \cdots &amp; \frac{\partial \mathcal{L}}{\partial W_{1K}} \\
+\frac{\partial \mathcal{L}}{\partial W_{21}} &amp; \frac{\partial \mathcal{L}}{\partial W_{22}} &amp; \cdots &amp; \frac{\partial \mathcal{L}}{\partial W_{2K}} \\
+\vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+\frac{\partial \mathcal{L}}{\partial W_{d1}} &amp; \frac{\partial \mathcal{L}}{\partial W_{d2}} &amp; \cdots &amp; \frac{\partial \mathcal{L}}{\partial W_{dK}}
+\end{bmatrix}
+=
+\frac{1}{n}\mathbf{X}^\top \mathbf{E}
+=
+\frac{1}{n}\mathbf{X}^\top (\mathbf{P} - \mathbf{Y})
+\]</span></p>
+<p>where <span class="math inline">\(\mathbf{P}\)</span> is the <span class="math inline">\(n \times K\)</span> matrix of predicted probabilities and <span class="math inline">\(\mathbf{Y}\)</span> is the <span class="math inline">\(n \times K\)</span> one-hot label matrix.</p>
+<p>This is the same stacking idea as before, now lifted from a vector to a matrix: in logistic regression we stacked partial derivatives into one gradient vector, while in softmax regression we stack one such vector per class to form the gradient matrix. Multiplying by <span class="math inline">\(\mathbf{X}^\top\)</span> computes the feature-weighted average of these class-wise errors — exactly the same pattern as the binary case.</p>
+</section>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">0. Setup</h2>
+<div id="dd5dcb18" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> matplotlib.colors <span class="im">import</span> ListedColormap</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">'whitegrid'</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="softmax-regression-via-gradient-descent" class="level2">
+<h2 class="anchored" data-anchor-id="softmax-regression-via-gradient-descent">1. Softmax Regression via Gradient Descent</h2>
+<section id="generating-synthetic-data" class="level3">
+<h3 class="anchored" data-anchor-id="generating-synthetic-data">1.1 Generating Synthetic Data</h3>
+<p>We create the same 2-feature dataset from the logistic regression lab, but this time we keep all three original cluster labels instead of collapsing them to binary.</p>
+<div id="6a7ecdc5" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>X_raw, y_multi <span class="op">=</span> make_blobs(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    n_samples<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    centers<span class="op">=</span>[(<span class="dv">0</span>, <span class="dv">0</span>), (<span class="fl">1.0</span>, <span class="fl">0.0</span>), (<span class="fl">0.0</span>, <span class="fl">1.0</span>)],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    cluster_std<span class="op">=</span>[<span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">3</span>   <span class="co"># number of classes</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(y_multi)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the design matrix: prepend a column of ones for the bias term</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># X_aug has shape (250, 3): each row is [1, x1_i, x2_i]</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>X_aug <span class="op">=</span> np.column_stack([np.ones(n), X_raw])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># One-hot encode: Y_onehot has shape (n, K)</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>Y_onehot <span class="op">=</span> np.zeros((n, K))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>Y_onehot[np.arange(n), y_multi] <span class="op">=</span> <span class="fl">1.0</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"X_aug shape    : </span><span class="sc">{</span>X_aug<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)       <span class="co"># (250, 3)</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Y_onehot shape : </span><span class="sc">{</span>Y_onehot<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)     <span class="co"># (250, 3)</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Classes        : </span><span class="sc">{</span>np<span class="sc">.</span>unique(y_multi)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Samples/class  : </span><span class="sc">{</span>[<span class="bu">int</span>(np.<span class="bu">sum</span>(y_multi <span class="op">==</span> k)) <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K)]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X_aug shape    : (250, 3)
+Y_onehot shape : (250, 3)
+Classes        : [0 1 2]
+Samples/class  : [84, 83, 83]</code></pre>
+</div>
+</div>
+<p>The design matrix <code>X_aug</code> is identical to the logistic regression lab: each row is <span class="math inline">\([1, x_{i1}, x_{i2}]\)</span>. The key difference is the label representation — from a binary vector to a <strong>one-hot matrix</strong> <span class="math inline">\(\mathbf{Y}\)</span> of shape <span class="math inline">\((n, K)\)</span>.</p>
+<div id="bd7d29c1" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">5</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>markers <span class="op">=</span> [<span class="st">'s'</span>, <span class="st">'o'</span>, <span class="st">'^'</span>]</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>colors  <span class="op">=</span> [<span class="st">'tomato'</span>, <span class="st">'steelblue'</span>, <span class="st">'seagreen'</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>labels  <span class="op">=</span> [<span class="st">'Class 0'</span>, <span class="st">'Class 1'</span>, <span class="st">'Class 2'</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> y_multi <span class="op">==</span> k</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X_raw[mask, <span class="dv">0</span>], X_raw[mask, <span class="dv">1</span>],</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>               marker<span class="op">=</span>markers[k], color<span class="op">=</span>colors[k], edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>               linewidths<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span>labels[k], alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"3-Class Classification Dataset"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>ax.legend()</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="softmax-regression_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The three clusters are well-separated: Class 0 near the origin, Class 1 along the positive <span class="math inline">\(x_1\)</span> axis, and Class 2 along the positive <span class="math inline">\(x_2\)</span> axis. A linear model should be able to partition these three regions with high accuracy.</p>
+</section>
+<section id="implementing-the-loss-and-gradient" class="level3">
+<h3 class="anchored" data-anchor-id="implementing-the-loss-and-gradient">1.2 Implementing the Loss and Gradient</h3>
+<p>We implement the softmax, cross-entropy loss, and gradient following the formulas from the Background section. The weight matrix <span class="math inline">\(\mathbf{W}\)</span> has shape <span class="math inline">\((d, K) = (3, 3)\)</span>: three input dimensions (bias, <span class="math inline">\(x_1\)</span>, <span class="math inline">\(x_2\)</span>) times three classes.</p>
+<p><strong>Element-wise view.</strong> For a single sample <span class="math inline">\(i\)</span> with true class <span class="math inline">\(c_i\)</span>, the predicted probability vector is <span class="math inline">\(\mathbf{p}_i = \text{softmax}(\mathbf{X}_i \mathbf{W})\)</span>. The error for class <span class="math inline">\(k\)</span> is:</p>
+<p><span class="math display">\[e_{ik} = p_{ik} - y_{ik} = \begin{cases} p_{ik} - 1 &amp; \text{if } k = c_i \\ p_{ik} &amp; \text{otherwise} \end{cases}\]</span></p>
+<p>The gradient contribution from sample <span class="math inline">\(i\)</span> to the weight connecting feature <span class="math inline">\(j\)</span> to class <span class="math inline">\(k\)</span> is <span class="math inline">\(e_{ik} \cdot x_{ij}\)</span>. Averaging over all samples gives <span class="math inline">\(\frac{\partial \mathcal{L}}{\partial W_{jk}} = \frac{1}{n} \sum_i e_{ik} \, x_{ij}\)</span>, which in matrix form is <span class="math inline">\(\frac{1}{n} \mathbf{X}^\top (\mathbf{P} - \mathbf{Y})\)</span>.</p>
+<div id="8bc24303" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> softmax(Z):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Numerically stable softmax over rows.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Subtracting the row-max prevents overflow in exp.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    Z has shape (n, K); returns P with the same shape.</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    Z_stable <span class="op">=</span> Z <span class="op">-</span> Z.<span class="bu">max</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    E <span class="op">=</span> np.exp(Z_stable)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> E <span class="op">/</span> E.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">1</span>, keepdims<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ce_loss(X, Y, W):</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">    Cross-entropy loss for softmax regression.</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="co">    X: (n, d),  Y: (n, K) one-hot,  W: (d, K)</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co">    L = -(1/n) * sum_i sum_k Y_ik * log(P_ik)</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    P <span class="op">=</span> softmax(X <span class="op">@</span> W)                   <span class="co"># (n, K)</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> <span class="fl">1e-12</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="bu">float</span>(np.mean(np.<span class="bu">sum</span>(Y <span class="op">*</span> np.log(P <span class="op">+</span> eps), axis<span class="op">=</span><span class="dv">1</span>)))</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ce_gradient_elementwise(X, Y, W):</span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co">    Compute the gradient by iterating over samples and features.</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="co">    This makes each step explicit for pedagogical clarity.</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns dL/dW of shape (d, K).</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    n, d <span class="op">=</span> X.shape</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a>    K <span class="op">=</span> Y.shape[<span class="dv">1</span>]</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    P <span class="op">=</span> softmax(X <span class="op">@</span> W)         <span class="co"># (n, K)</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a>    E <span class="op">=</span> P <span class="op">-</span> Y                  <span class="co"># (n, K) error matrix</span></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a>    grad <span class="op">=</span> np.zeros((d, K))</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(d):         <span class="co"># for each feature (including bias)</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):     <span class="co"># for each class</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a>            grad[j, k] <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> np.<span class="bu">sum</span>(E[:, k] <span class="op">*</span> X[:, j])</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> grad</span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ce_gradient(X, Y, W):</span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="co">    Same result in one line using matrix multiplication.</span></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="co">    (1/n) * X^T @ (P - Y) computes all d×K partial derivatives at once.</span></span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> X.shape[<span class="dv">0</span>]</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a>    P <span class="op">=</span> softmax(X <span class="op">@</span> W)                    <span class="co"># (n, K)</span></span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> (X.T <span class="op">@</span> (P <span class="op">-</span> Y))   <span class="co"># (d, K)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>The structure mirrors the binary case almost exactly:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Binary (Logistic)</th>
+<th>Multi-class (Softmax)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>sigmoid(X @ w)</code> → probabilities (scalar per sample)</td>
+<td><code>softmax(X @ W)</code> → probabilities (vector per sample)</td>
+</tr>
+<tr class="even">
+<td><code>bce_loss</code>: <span class="math inline">\(-\frac{1}{n}\sum[y\log p + (1{-}y)\log(1{-}p)]\)</span></td>
+<td><code>ce_loss</code>: <span class="math inline">\(-\frac{1}{n}\sum_i \log p_{i,c_i}\)</span></td>
+</tr>
+<tr class="odd">
+<td><code>bce_gradient</code>: <span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{p} - \mathbf{y})\)</span></td>
+<td><code>ce_gradient</code>: <span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{P} - \mathbf{Y})\)</span></td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\mathbf{w} \in \mathbb{R}^d\)</span> (vector)</td>
+<td><span class="math inline">\(\mathbf{W} \in \mathbb{R}^{d \times K}\)</span> (matrix)</td>
+</tr>
+</tbody>
+</table>
+<p>Let us verify that both gradient implementations produce the same result:</p>
+<div id="a1223a15" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>W_init <span class="op">=</span> np.zeros((X_aug.shape[<span class="dv">1</span>], K))  <span class="co"># (3, 3)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>grad_elem   <span class="op">=</span> ce_gradient_elementwise(X_aug, Y_onehot, W_init)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>grad_matrix <span class="op">=</span> ce_gradient(X_aug, Y_onehot, W_init)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Initial CE loss : </span><span class="sc">{</span>ce_loss(X_aug, Y_onehot, W_init)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Expected        : </span><span class="sc">{</span><span class="op">-</span>np<span class="sc">.</span>log(<span class="fl">1.0</span> <span class="op">/</span> K)<span class="sc">:.4f}</span><span class="ss">  (= -log(1/K), uniform prediction)"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Gradient (element-wise):</span><span class="ch">\n</span><span class="sc">{</span>grad_elem<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Gradient (matrix):</span><span class="ch">\n</span><span class="sc">{</span>grad_matrix<span class="sc">.</span><span class="bu">round</span>(<span class="dv">4</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Match: </span><span class="sc">{</span>np<span class="sc">.</span>allclose(grad_elem, grad_matrix)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial CE loss : 1.0986
+Expected        : 1.0986  (= -log(1/K), uniform prediction)
+
+Gradient (element-wise):
+[[-0.0027  0.0013  0.0013]
+ [ 0.1211 -0.2308  0.1097]
+ [ 0.1095  0.1073 -0.2168]]
+
+Gradient (matrix):
+[[-0.0027  0.0013  0.0013]
+ [ 0.1211 -0.2308  0.1097]
+ [ 0.1095  0.1073 -0.2168]]
+
+Match: True</code></pre>
+</div>
+</div>
+<p>At <span class="math inline">\(\mathbf{W} = \mathbf{0}\)</span>, softmax outputs <span class="math inline">\(p_k = 1/K = 1/3\)</span> for every class and every sample, so the initial loss is <span class="math inline">\(-\log(1/3) \approx 1.0986\)</span>. The gradient for each class reflects the imbalance between the uniform prediction (<span class="math inline">\(1/3\)</span>) and the actual class proportions, weighted by the mean feature values.</p>
+</section>
+<section id="writing-the-training-loop" class="level3">
+<h3 class="anchored" data-anchor-id="writing-the-training-loop">1.3 Writing the Training Loop</h3>
+<p>The training loop is structurally identical to <code>train_logistic</code> — the only difference is that <code>W</code> is a matrix instead of a vector.</p>
+<div id="3a396607" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_softmax(X, Y, lr<span class="op">=</span><span class="fl">0.5</span>, epochs<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Full-batch gradient descent for softmax regression.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    X  : (n, d)  design matrix (with bias column)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    Y  : (n, K)  one-hot labels</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">    lr : float   learning rate</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">    epochs : int number of passes</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">    W_history    : list of (d, K) arrays, length epochs+1</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">    loss_history : list of float, length epochs+1</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    d, K <span class="op">=</span> X.shape[<span class="dv">1</span>], Y.shape[<span class="dv">1</span>]</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    W <span class="op">=</span> np.zeros((d, K))</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    W_history    <span class="op">=</span> [W.copy()]</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    loss_history <span class="op">=</span> [ce_loss(X, Y, W)]</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(epochs):</span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> ce_gradient(X, Y, W)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        W    <span class="op">=</span> W <span class="op">-</span> lr <span class="op">*</span> grad          <span class="co"># gradient descent update</span></span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        W_history.append(W.copy())</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        loss_history.append(ce_loss(X, Y, W))</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> W_history, loss_history</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Comparing the Binary and Multi-Class Training Loops
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The update rule <span class="math inline">\(\mathbf{W} \leftarrow \mathbf{W} - \eta \nabla_\mathbf{W}\mathcal{L}\)</span> is exactly the same — NumPy handles the matrix subtraction element-wise. The <code>.copy()</code> is still necessary for the same reason as before: without it, every entry in <code>W_history</code> would point to the same (final) matrix.</p>
+</div>
+</div>
+</section>
+<section id="running-the-optimizer" class="level3">
+<h3 class="anchored" data-anchor-id="running-the-optimizer">1.4 Running the Optimizer</h3>
+<div id="b7aa1378" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>W_hist, loss_hist <span class="op">=</span> train_softmax(X_aug, Y_onehot, lr<span class="op">=</span><span class="fl">0.5</span>, epochs<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>W_final    <span class="op">=</span> W_hist[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>P_final    <span class="op">=</span> softmax(X_aug <span class="op">@</span> W_final)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>pred_multi <span class="op">=</span> np.argmax(P_final, axis<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>accuracy   <span class="op">=</span> <span class="bu">float</span>(np.mean(pred_multi <span class="op">==</span> y_multi))</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Initial loss : </span><span class="sc">{</span>loss_hist[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Final loss   : </span><span class="sc">{</span>loss_hist[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Accuracy     : </span><span class="sc">{</span>accuracy <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Learned W (rows = [bias, w1, w2], cols = classes 0, 1, 2):"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(W_final.<span class="bu">round</span>(<span class="dv">4</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial loss : 1.0986
+Final loss   : 0.1788
+Accuracy     : 95.6%
+
+Learned W (rows = [bias, w1, w2], cols = classes 0, 1, 2):
+[[ 2.1905 -1.0978 -1.0928]
+ [-2.4749  4.3155 -1.8406]
+ [-2.477  -1.7428  4.2199]]</code></pre>
+</div>
+</div>
+<div id="f88b1c2e" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Left: loss curve ---</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(loss_hist, color<span class="op">=</span><span class="st">'steelblue'</span>, lw<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Cross-Entropy Loss over Epochs"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"CE Loss"</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Right: weight convergence ---</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>param_names <span class="op">=</span> [<span class="st">'b'</span>, <span class="st">'$w_1$'</span>, <span class="st">'$w_2$'</span>]</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>class_colors <span class="op">=</span> [<span class="st">'tomato'</span>, <span class="st">'steelblue'</span>, <span class="st">'seagreen'</span>]</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>line_styles  <span class="op">=</span> [<span class="st">'-'</span>, <span class="st">'--'</span>, <span class="st">':'</span>]</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>W_arr <span class="op">=</span> np.array(W_hist)   <span class="co"># (epochs+1, d, K)</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(K):</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(W_arr.shape[<span class="dv">1</span>]):</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>        axes[<span class="dv">1</span>].plot(W_arr[:, j, k], color<span class="op">=</span>class_colors[k],</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>                     ls<span class="op">=</span>line_styles[j], lw<span class="op">=</span><span class="fl">1.2</span>,</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>                     label<span class="op">=</span><span class="ss">f"Class </span><span class="sc">{</span>k<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>param_names[j]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Weight Convergence (per class)"</span>)</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Weight value"</span>)</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(fontsize<span class="op">=</span><span class="dv">7</span>, ncol<span class="op">=</span><span class="dv">3</span>, loc<span class="op">=</span><span class="st">'best'</span>)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="softmax-regression_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The loss decreases monotonically — cross-entropy is convex, so gradient descent is guaranteed to converge (for a small enough learning rate). The weight matrix has <span class="math inline">\(d \times K = 9\)</span> parameters evolving simultaneously. Each class develops its own bias and feature weights:</p>
+<ul>
+<li><strong>Class 0</strong> (origin): should have small or negative weights for <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span>.</li>
+<li><strong>Class 1</strong> (right): should have a large positive <span class="math inline">\(w_1\)</span> and a small <span class="math inline">\(w_2\)</span>.</li>
+<li><strong>Class 2</strong> (upper): should have a small <span class="math inline">\(w_1\)</span> and a large positive <span class="math inline">\(w_2\)</span>.</li>
+</ul>
+</section>
+<section id="visualizing-the-decision-regions" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-decision-regions">1.5 Visualizing the Decision Regions</h3>
+<p>In the binary case, the decision boundary was a single line separating two half-planes. With <span class="math inline">\(K = 3\)</span> classes, each pair of classes has a boundary where <span class="math inline">\(p_j = p_k\)</span>, and the feature space is partitioned into three regions. We visualize this by coloring every point in the plane according to the predicted class.</p>
+<div id="acc84cd3" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_softmax_regions(X_aug, X_raw, y, W, ax, title<span class="op">=</span><span class="st">""</span>, resolution<span class="op">=</span><span class="dv">200</span>):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Fill the background with predicted class regions and overlay data points.</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    x1_min, x1_max <span class="op">=</span> X_raw[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, X_raw[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    x2_min, x2_max <span class="op">=</span> X_raw[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, X_raw[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>    xx1, xx2 <span class="op">=</span> np.meshgrid(np.linspace(x1_min, x1_max, resolution),</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>                           np.linspace(x2_min, x2_max, resolution))</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    X_grid <span class="op">=</span> np.column_stack([np.ones(xx1.size), xx1.ravel(), xx2.ravel()])</span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>    preds <span class="op">=</span> np.argmax(softmax(X_grid <span class="op">@</span> W), axis<span class="op">=</span><span class="dv">1</span>).reshape(xx1.shape)</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Background regions</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a>    cmap_bg <span class="op">=</span> ListedColormap([<span class="st">'#FADADD'</span>, <span class="st">'#D0E8FF'</span>, <span class="st">'#D5F5D5'</span>])</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    ax.contourf(xx1, xx2, preds, levels<span class="op">=</span>[<span class="op">-</span><span class="fl">0.5</span>, <span class="fl">0.5</span>, <span class="fl">1.5</span>, <span class="fl">2.5</span>],</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a>                cmap<span class="op">=</span>cmap_bg, alpha<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Data points</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>    markers <span class="op">=</span> [<span class="st">'s'</span>, <span class="st">'o'</span>, <span class="st">'^'</span>]</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    colors  <span class="op">=</span> [<span class="st">'tomato'</span>, <span class="st">'steelblue'</span>, <span class="st">'seagreen'</span>]</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>    labels  <span class="op">=</span> [<span class="st">'Class 0'</span>, <span class="st">'Class 1'</span>, <span class="st">'Class 2'</span>]</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>        mask <span class="op">=</span> y <span class="op">==</span> k</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>        ax.scatter(X_raw[mask, <span class="dv">0</span>], X_raw[mask, <span class="dv">1</span>],</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>                   marker<span class="op">=</span>markers[k], color<span class="op">=</span>colors[k], edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>                   linewidths<span class="op">=</span><span class="fl">0.4</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span>labels[k])</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="b23a7f80" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">4</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">4</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>snapshot_epochs <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">30</span>, <span class="dv">300</span>]</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, ep <span class="kw">in</span> <span class="bu">zip</span>(axes, snapshot_epochs):</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    draw_softmax_regions(X_aug, X_raw, y_multi, W_hist[ep], ax,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>                         title<span class="op">=</span><span class="ss">f"Epoch </span><span class="sc">{</span>ep<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"Softmax Decision Regions during Training"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="softmax-regression_files/figure-html/cell-11-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At epoch 1, the regions are nearly uniform — the weights have barely moved from zero, so every point receives roughly <span class="math inline">\(p_k \approx 1/3\)</span> for all classes. As training progresses, the three regions tighten around their respective clusters. By epoch 300, each cluster is enclosed in its own region, with the boundaries meeting at a central point — the <strong>Voronoi-like</strong> partition that softmax regression produces in feature space.</p>
+<p>Unlike the binary case where the boundary was a single line, here we see <strong>three pairwise boundaries</strong> (one per pair of classes), each defined by the hyperplane <span class="math inline">\((\mathbf{w}_j - \mathbf{w}_k)^\top \mathbf{x} = 0\)</span>. All three boundaries intersect at a single point, creating a three-way junction.</p>
+</section>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Logistic Regression</th>
+<th>Softmax Regression</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Classes</strong></td>
+<td><span class="math inline">\(K = 2\)</span></td>
+<td><span class="math inline">\(K \geq 2\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Activation</strong></td>
+<td>Sigmoid <span class="math inline">\(\sigma(z)\)</span></td>
+<td>Softmax <span class="math inline">\(\text{softmax}(\mathbf{z})\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Parameters</strong></td>
+<td><span class="math inline">\(\mathbf{w} \in \mathbb{R}^d\)</span> (vector)</td>
+<td><span class="math inline">\(\mathbf{W} \in \mathbb{R}^{d \times K}\)</span> (matrix)</td>
+</tr>
+<tr class="even">
+<td><strong>Loss</strong></td>
+<td>BCE: <span class="math inline">\(-\frac{1}{n}\sum[y\log p + (1{-}y)\log(1{-}p)]\)</span></td>
+<td>CE: <span class="math inline">\(-\frac{1}{n}\sum_i \log p_{i,c_i}\)</span></td>
+</tr>
+<tr class="odd">
+<td><strong>Gradient</strong></td>
+<td><span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{p} - \mathbf{y})\)</span></td>
+<td><span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{P} - \mathbf{Y})\)</span></td>
+</tr>
+<tr class="even">
+<td><strong>Boundary</strong></td>
+<td>Single hyperplane</td>
+<td><span class="math inline">\(\binom{K}{2}\)</span> pairwise hyperplanes</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Softmax regression</strong> generalizes logistic regression to <span class="math inline">\(K\)</span> classes. The sigmoid becomes softmax, the weight vector becomes a matrix, and BCE becomes cross-entropy — but the gradient retains the same <span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{P} - \mathbf{Y})\)</span> structure.</li>
+<li>The <strong>decision boundary</strong> partitions the feature space into <span class="math inline">\(K\)</span> convex regions. Each pairwise boundary is a hyperplane, and all boundaries meet at a central junction — a Voronoi-like partition induced by the linear model.</li>
+<li>The <strong>gradient formula is identical in structure</strong> to the binary case. This is not a coincidence: softmax with cross-entropy is the canonical link for the multinomial distribution, just as sigmoid with BCE is canonical for the Bernoulli.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Bishop, C. M. (2006). <em>Pattern Recognition and Machine Learning</em>. Springer. (Chapter 4.3: Multi-class logistic regression)</li>
+<li>Goodfellow, I., Bengio, Y., and Courville, A. (2016). <em>Deep Learning</em>. MIT Press. (Section 6.2.2.3: Softmax)</li>
+</ul>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf">CS229 Lecture Notes on Supervised Learning</a></li>
+<li><a href="https://d2l.ai/chapter_linear-classification/softmax-regression.html">Softmax Regression (d2l.ai)</a></li>
+<li><a href="https://eli.thegreenplace.net/2016/the-softmax-function-and-its-derivative/">The Softmax Function and Its Derivative (Eli Bendersky)</a></li>
+<li><a href="https://colab.research.google.com/drive/1F7m0OFDT2vu_SKmIYaHBJy4OyRgZ2w_u?usp=sharing">https://colab.research.google.com/drive/1F7m0OFDT2vu_SKmIYaHBJy4OyRgZ2w_u?usp=sharing</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/gli\.konkuk\.ac\.kr\/board\/lectures\/machine-learning");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

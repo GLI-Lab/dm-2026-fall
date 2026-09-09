@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Byungkook Oh">
+
+<title>Machine Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-dd8e0821c47296b3dcb472f524dd5682.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">Machine Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./index.html" aria-current="page"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./exercises/index.html"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./assignments/index.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
+</i> 
+<span class="menu-text">GLI Lab</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/GLI-Lab/machine-learning-course" title="Machine Learning Course GitHub" class="quarto-navigation-tool px-1" aria-label="Machine Learning Course GitHub"><i class="bi bi-github"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#labs-and-homeworks" id="toc-labs-and-homeworks" class="nav-link active" data-scroll-target="#labs-and-homeworks">Labs and Homeworks</a>
+  <ul class="collapse">
+  <li><a href="#labs-in-class-exercises" id="toc-labs-in-class-exercises" class="nav-link" data-scroll-target="#labs-in-class-exercises">Labs (In-Class Exercises)</a></li>
+  <li><a href="#homeworks-graded" id="toc-homeworks-graded" class="nav-link" data-scroll-target="#homeworks-graded">Homeworks (Graded)</a></li>
+  </ul></li>
+  <li><a href="#schedule-materials" id="toc-schedule-materials" class="nav-link" data-scroll-target="#schedule-materials">Schedule &amp; Materials</a></li>
+  <li><a href="#course-policies" id="toc-course-policies" class="nav-link" data-scroll-target="#course-policies">Course Policies</a>
+  <ul class="collapse">
+  <li><a href="#autograder-rules" id="toc-autograder-rules" class="nav-link" data-scroll-target="#autograder-rules">Autograder Rules</a></li>
+  <li><a href="#late-submission-policy" id="toc-late-submission-policy" class="nav-link" data-scroll-target="#late-submission-policy">Late Submission Policy</a></li>
+  <li><a href="#collaboration-academic-integrity" id="toc-collaboration-academic-integrity" class="nav-link" data-scroll-target="#collaboration-academic-integrity">Collaboration &amp; Academic Integrity</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Machine Learning</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Byungkook Oh </p>
+          </div>
+  </div>
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026.05.02</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This site is your central hub for all coding materials: environment setup, in-class Lab notebooks, and Homework starter code.</p>
+<p>This practicum follows a <strong>“From Scratch to Framework”</strong> philosophy. Core algorithms — Linear Regression, MLPs, Self-Attention — are first implemented using only <strong>NumPy</strong> so you understand the mechanics. We then move to <strong>PyTorch</strong> to scale those implementations, leverage GPU acceleration, and explore modern architectures.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Konkuk eCampus
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Konkuk eCampus</strong> is used for official lecture slides, announcements, grade tracking, and homework <code>.py</code> submissions.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Help Us Improve
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This site is actively maintained. If you spot a typo, a broken link, or incorrect code, please reach out via eCampus. Your feedback keeps the materials accurate and up to date.</p>
+</div>
+</div>
+<section id="labs-and-homeworks" class="level2">
+<h2 class="anchored" data-anchor-id="labs-and-homeworks">Labs and Homeworks</h2>
+<p>This practicum is organized into two types of activities: <strong>Labs</strong> for exploration and <strong>Homeworks</strong> for evaluation.</p>
+<section id="labs-in-class-exercises" class="level3">
+<h3 class="anchored" data-anchor-id="labs-in-class-exercises">Labs (In-Class Exercises)</h3>
+<p>Labs accompany each lecture unit. You receive a Jupyter notebook with complete, runnable code. Your job is to run it, read the explanations, and build intuition for the material covered in lecture.</p>
+<p>Every lab notebook has the same structure:</p>
+<ul>
+<li><strong>Objectives</strong> — the specific skills or concepts you will practice. Read this first.</li>
+<li><strong>Background</strong> — a concise theory refresher. Not a replacement for the lecture; just a quick reference.</li>
+<li><strong>Experiments</strong> — executable cells to run, observe, and tinker with.</li>
+</ul>
+<p><strong>Workflow:</strong></p>
+<ol type="1">
+<li><strong>Run and Observe.</strong> Execute cells top to bottom. Trace how data shapes change at each step and how the math from lecture maps to NumPy and PyTorch code.</li>
+<li><strong>Tinker Freely.</strong> Change hyperparameters, swap architectures, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.</li>
+</ol>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Always Run Cells Top to Bottom
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Skipping cells or running them out of order causes later cells to fail due to missing variables or imports. If something breaks unexpectedly, restart the kernel and re-run from the top.</p>
+</div>
+</div>
+</section>
+<section id="homeworks-graded" class="level3">
+<h3 class="anchored" data-anchor-id="homeworks-graded">Homeworks (Graded)</h3>
+<p>There are 8 homework assignments. All deadlines are at <strong>11:59 PM KST</strong>.</p>
+<ul>
+<li><strong>Grading:</strong> Evaluated by an autograder against your submitted <code>.py</code> files. Your score comes from both the provided doctests and <strong>additional hidden test cases</strong>. Passing all local doctests is a good sign, but it does not guarantee full credit.</li>
+<li><strong>Format:</strong> You receive a <code>.py</code> submission file and a <code>.ipynb</code> notebook for experimentation.</li>
+</ul>
+<p><strong>Workflow:</strong></p>
+<ol type="1">
+<li><strong>Explore.</strong> Open <code>hwXX.ipynb</code> and experiment freely. The notebook imports your functions from the <code>.py</code> file, so changes are reflected after a kernel restart.</li>
+<li><strong>Implement.</strong> Find the <code>TODO</code> blocks in the <code>.py</code> file, remove <code>raise NotImplementedError</code>, and write your solution. See the <a href="./assignments/index.html">Assignments Guide</a> for a full walkthrough.</li>
+<li><strong>Test.</strong> Run <code>python -m doctest hwXX.py -v</code> in your terminal before submitting.</li>
+<li><strong>Submit.</strong> Upload <strong>only</strong> the <code>.py</code> files to eCampus. Do not rename them and do not submit the notebook.</li>
+</ol>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Two Things to Watch Out For
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Restart the kernel after editing <code>.py</code> files.</strong> Changes are not picked up until you restart and re-run all cells.</p>
+<p><strong>Remove <code>raise NotImplementedError</code> before submitting.</strong> If this line remains in a function, it will always throw an error — even if your code above it is correct.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="schedule-materials" class="level2">
+<h2 class="anchored" data-anchor-id="schedule-materials">Schedule &amp; Materials</h2>
+<p>The timeline and specific contents below are subject to change as the course progresses. Labs marked as TBD have tentative topics that may be added, removed, or reordered.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Unit</th>
+<th style="text-align: left;">Topic</th>
+<th style="text-align: left;">Labs (Ungraded)</th>
+<th style="text-align: left;">HW (Graded)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><strong>1</strong></td>
+<td style="text-align: left;">Introduction to Machine Learning</td>
+<td style="text-align: left;"><a href="./exercises/lab01/python-basics.html">Lab1</a></td>
+<td style="text-align: left;"><a href="./assignments/hw01/hw01.html">HW01</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>2</strong></td>
+<td style="text-align: left;">Linear Models</td>
+<td style="text-align: left;"><a href="./exercises/lab02/linear-regression.html">Lab2</a></td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>3</strong></td>
+<td style="text-align: left;">Multi-Layer Perceptron</td>
+<td style="text-align: left;"><a href="./exercises/lab03/linear-regression-scratch.html">Lab3</a></td>
+<td style="text-align: left;"><a href="./assignments/hw02/hw02.html">HW02</a></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>4</strong></td>
+<td style="text-align: left;">Model Validation and Generalization</td>
+<td style="text-align: left;"><a href="./exercises/lab04/mlp-regression-scratch.html">Lab4</a></td>
+<td style="text-align: left;">-</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><strong>5</strong></td>
+<td style="text-align: left;">Convolutional Neural Networks</td>
+<td style="text-align: left;"><a href="./exercises/lab05/cnn-architecture.html">Lab5</a></td>
+<td style="text-align: left;">HW03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><strong>6</strong></td>
+<td style="text-align: left;">Recurrent Neural Networks</td>
+<td style="text-align: left;"><a href="./exercises/lab06/rnn-architecture.html">Lab6</a></td>
+<td style="text-align: left;">HW04</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="course-policies" class="level2">
+<h2 class="anchored" data-anchor-id="course-policies">Course Policies</h2>
+<section id="autograder-rules" class="level3">
+<h3 class="anchored" data-anchor-id="autograder-rules">Autograder Rules</h3>
+<p>To avoid losing credit on a correct solution, follow these rules exactly:</p>
+<ul>
+<li><strong>Do not change function signatures.</strong> Keep function names and parameters exactly as given.</li>
+<li><strong>Do not modify docstrings.</strong> The doctests inside them are used for grading.</li>
+<li><strong>Match the output format exactly.</strong> Wrong type, wrong shape, or stray <code>print</code> statements will fail the autograder even if your logic is correct.</li>
+<li><strong>Use only the packages already imported.</strong> Do not add extra <code>import</code> statements.</li>
+</ul>
+</section>
+<section id="late-submission-policy" class="level3">
+<h3 class="anchored" data-anchor-id="late-submission-policy">Late Submission Policy</h3>
+<p>Late submissions are accepted up to 3 days after the deadline:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Days Late</th>
+<th style="text-align: left;">Penalty</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">1 day</td>
+<td style="text-align: left;">−20%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">2 days</td>
+<td style="text-align: left;">−40%</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">3 days</td>
+<td style="text-align: left;">−60%</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">More than 3 days</td>
+<td style="text-align: left;">No credit</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="collaboration-academic-integrity" class="level3">
+<h3 class="anchored" data-anchor-id="collaboration-academic-integrity">Collaboration &amp; Academic Integrity</h3>
+<p>Our goal is for every student to genuinely understand the course material.</p>
+<p><strong>Homeworks are individual.</strong> You may not share code or written solutions with others, regardless of their enrollment status.</p>
+<p><strong>High-level discussion is welcome.</strong> After spending at least 10 minutes on a problem yourself, you may discuss it verbally or sketch ideas on a whiteboard. You may not take away any written or electronic record from those sessions — no notes, no photos, no code, no messages.</p>
+<p><strong>On AI assistance.</strong> You are permitted to use AI tools (ChatGPT, GitHub Copilot, etc.) as a learning aid — to clarify concepts, understand error messages, or explore unfamiliar syntax. However, two things are non-negotiable:</p>
+<ul>
+<li><strong>Understand what you submit.</strong> You must be able to explain every line of your code. If you cannot, that is a violation of academic integrity regardless of how it was written.</li>
+<li><strong>Read the documentation yourself.</strong> AI-generated answers can be wrong, outdated, or misleading. Learning to navigate official documentation (NumPy, PyTorch, Python) directly is a core skill of this course. Treat AI as a starting point, not a final answer.</li>
+</ul>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/gli\.konkuk\.ac\.kr\/board\/lectures\/machine-learning");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

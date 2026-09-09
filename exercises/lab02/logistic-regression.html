@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Byungkook Oh">
+
+<title>Lab2-2. Logistic Regression via Gradient Descent – Machine Learning</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap-dd8e0821c47296b3dcb472f524dd5682.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Machine Learning</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link active" href="../../exercises/index.html" aria-current="page"> 
+<span class="menu-text">Exercises</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../assignments/index.html"> 
+<span class="menu-text">Assignments</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
+</i> 
+<span class="menu-text">GLI Lab</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+    <a href="https://github.com/GLI-Lab/machine-learning-course" title="Machine Learning Course GitHub" class="quarto-navigation-tool px-1" aria-label="Machine Learning Course GitHub"><i class="bi bi-github"></i></a>
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/linear-regression.html">Lab2. Linear Models</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/logistic-regression.html">Logistic Regression</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a href="../../exercises/index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exercises</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Environment Setup</span></a>
+  </div>
+</li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab1. Introduction to ML</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/python-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Python Basics (⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/numpy-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Numpy Basics (⭐⭐)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/matplotlib-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Matplotlib Basics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab01/pandas-basics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Pandas Basics</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Lab2. Linear Models</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/linear-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/logistic-regression.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Logistic Regression</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/classification-metrics.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Classification Metrics</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab02/softmax-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Softmax Regression</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab3. Multi-Layer Perceptron</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/linear-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Linear Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/logistic-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Logistic Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/softmax-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Softmax Regression (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab4. Model Selection and Generalization</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLP Regression (Scratch)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab04/mlp-regression-scratch2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MLP Regression-Improved (Scratch)</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab5. Convolutional NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab05/cnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">CNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab6. Recurrent NNs</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab06/rnn-architecture.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RNN Architecture</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#objectives" id="toc-objectives" class="nav-link active" data-scroll-target="#objectives">Objectives</a></li>
+  <li><a href="#background" id="toc-background" class="nav-link" data-scroll-target="#background">Background</a>
+  <ul class="collapse">
+  <li><a href="#why-no-closed-form-solution" id="toc-why-no-closed-form-solution" class="nav-link" data-scroll-target="#why-no-closed-form-solution">Why No Closed-Form Solution?</a></li>
+  <li><a href="#the-gradient-descent-update-rule" id="toc-the-gradient-descent-update-rule" class="nav-link" data-scroll-target="#the-gradient-descent-update-rule">The Gradient Descent Update Rule</a></li>
+  <li><a href="#bce-loss-and-its-gradient" id="toc-bce-loss-and-its-gradient" class="nav-link" data-scroll-target="#bce-loss-and-its-gradient">BCE Loss and Its Gradient</a></li>
+  <li><a href="#decision-boundary" id="toc-decision-boundary" class="nav-link" data-scroll-target="#decision-boundary">Decision Boundary</a></li>
+  </ul></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">0. Setup</a></li>
+  <li><a href="#logistic-regression-via-gradient-descent" id="toc-logistic-regression-via-gradient-descent" class="nav-link" data-scroll-target="#logistic-regression-via-gradient-descent">1. Logistic Regression via Gradient Descent</a>
+  <ul class="collapse">
+  <li><a href="#generating-synthetic-data" id="toc-generating-synthetic-data" class="nav-link" data-scroll-target="#generating-synthetic-data">1.1 Generating Synthetic Data</a></li>
+  <li><a href="#implementing-the-loss-and-gradient" id="toc-implementing-the-loss-and-gradient" class="nav-link" data-scroll-target="#implementing-the-loss-and-gradient">1.2 Implementing the Loss and Gradient</a></li>
+  <li><a href="#writing-the-training-loop" id="toc-writing-the-training-loop" class="nav-link" data-scroll-target="#writing-the-training-loop">1.3 Writing the Training Loop</a></li>
+  <li><a href="#running-the-optimizer" id="toc-running-the-optimizer" class="nav-link" data-scroll-target="#running-the-optimizer">1.4 Running the Optimizer</a></li>
+  <li><a href="#visualizing-the-loss-curve-and-weight-convergence" id="toc-visualizing-the-loss-curve-and-weight-convergence" class="nav-link" data-scroll-target="#visualizing-the-loss-curve-and-weight-convergence">1.5 Visualizing the Loss Curve and Weight Convergence</a></li>
+  <li><a href="#loss-surface-and-gradient-descent-trajectory" id="toc-loss-surface-and-gradient-descent-trajectory" class="nav-link" data-scroll-target="#loss-surface-and-gradient-descent-trajectory">1.6 Loss Surface and Gradient Descent Trajectory</a></li>
+  <li><a href="#visualizing-the-decision-boundary-at-different-epochs" id="toc-visualizing-the-decision-boundary-at-different-epochs" class="nav-link" data-scroll-target="#visualizing-the-decision-boundary-at-different-epochs">1.7 Visualizing the Decision Boundary at Different Epochs</a></li>
+  <li><a href="#animating-the-decision-boundary" id="toc-animating-the-decision-boundary" class="nav-link" data-scroll-target="#animating-the-decision-boundary">1.8 Animating the Decision Boundary</a></li>
+  </ul></li>
+  <li><a href="#effect-of-learning-rate-on-convergence" id="toc-effect-of-learning-rate-on-convergence" class="nav-link" data-scroll-target="#effect-of-learning-rate-on-convergence">2. Effect of Learning Rate on Convergence</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary">Summary</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  <li><a href="#further-reading" id="toc-further-reading" class="nav-link" data-scroll-target="#further-reading">Further Reading</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/linear-regression.html">Lab2. Linear Models</a></li><li class="breadcrumb-item"><a href="../../exercises/lab02/logistic-regression.html">Logistic Regression</a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title">Lab2-2. Logistic Regression via Gradient Descent</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Byungkook Oh </p>
+          </div>
+  </div>
+    
+  
+    <div>
+    <div class="quarto-title-meta-heading">Modified</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date-modified">2026.05.02</p>
+    </div>
+  </div>
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/GLI-Lab/machine-learning-course/blob/students/exercises/lab02/logistic-regression.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<section id="objectives" class="level2">
+<h2 class="anchored" data-anchor-id="objectives">Objectives</h2>
+<ul>
+<li>Implement <strong>logistic regression</strong> using gradient descent and understand the geometry of the decision boundary.</li>
+<li>Investigate the impact of different <strong>learning rates</strong> on convergence speed and numerical stability.</li>
+<li><strong>Animate</strong> how the decision boundary shifts during training to build visual intuition for the optimization process.</li>
+</ul>
+</section>
+<section id="background" class="level2">
+<h2 class="anchored" data-anchor-id="background">Background</h2>
+<section id="why-no-closed-form-solution" class="level3">
+<h3 class="anchored" data-anchor-id="why-no-closed-form-solution">Why No Closed-Form Solution?</h3>
+<p>Unlike linear regression, which has a closed-form solution (the Normal Equation), logistic regression has <strong>no closed-form solution</strong>. The BCE loss is nonlinear due to the sigmoid, so setting the gradient to zero does not yield an expression you can solve algebraically. Gradient descent — or a variant like Newton’s method — is the only way to find the optimal weights. This is also why gradient descent is so important to master: most models in machine learning, from logistic regression to deep neural networks, can only be trained iteratively.</p>
+</section>
+<section id="the-gradient-descent-update-rule" class="level3">
+<h3 class="anchored" data-anchor-id="the-gradient-descent-update-rule">The Gradient Descent Update Rule</h3>
+<p>Given a differentiable loss function <span class="math inline">\(\mathcal{L}(\mathbf{w})\)</span>, the gradient <span class="math inline">\(\nabla_\mathbf{w} \mathcal{L}\)</span> points in the direction of steepest increase. Moving in the <strong>opposite</strong> direction reduces the loss:</p>
+<p><span class="math display">\[\mathbf{w}^{(t+1)} = \mathbf{w}^{(t)} - \eta \, \nabla_\mathbf{w} \mathcal{L}\!\left(\mathbf{w}^{(t)}\right)\]</span></p>
+<p>where <span class="math inline">\(\eta &gt; 0\)</span> is called the <strong>learning rate</strong> (also written <code>lr</code> in code). This single equation is the core of nearly all modern machine learning optimization.</p>
+</section>
+<section id="bce-loss-and-its-gradient" class="level3">
+<h3 class="anchored" data-anchor-id="bce-loss-and-its-gradient">BCE Loss and Its Gradient</h3>
+<p>Throughout this lab we use a model with two features:</p>
+<p><span class="math display">\[p_i = \sigma(w_1 x_{i1} + w_2 x_{i2} + b)\]</span></p>
+<p>Collecting parameters into <span class="math inline">\(\mathbf{w} = [b,\, w_1,\, w_2]^\top\)</span> and prepending a column of ones to the data gives <span class="math inline">\(p_i = \sigma(\mathbf{w}^\top \mathbf{x}_i)\)</span>. For binary classification with labels <span class="math inline">\(y_i \in \{0, 1\}\)</span>, the <strong>sigmoid function</strong> maps the linear combination to a probability:</p>
+<p><span class="math display">\[\sigma(z) = \frac{1}{1 + e^{-z}}\]</span></p>
+<p>The Binary Cross-Entropy (BCE) loss over <span class="math inline">\(n\)</span> samples is:</p>
+<p><span class="math display">\[\mathcal{L}_{\text{BCE}}(\mathbf{w}) = -\frac{1}{n} \sum_{i=1}^{n} \left[ y_i \log p_i + (1 - y_i) \log(1 - p_i) \right]\]</span></p>
+<p>Let <span class="math inline">\(e_i = p_i - y_i\)</span> denote the prediction error of sample <span class="math inline">\(i\)</span>. The partial derivatives are:</p>
+<p><span class="math display">\[\frac{\partial \mathcal{L}}{\partial b} = \frac{1}{n} \sum_{i=1}^{n} e_i, \qquad \frac{\partial \mathcal{L}}{\partial w_1} = \frac{1}{n} \sum_{i=1}^{n} e_i \, x_{i1}, \qquad \frac{\partial \mathcal{L}}{\partial w_2} = \frac{1}{n} \sum_{i=1}^{n} e_i \, x_{i2}\]</span></p>
+<p>Each partial derivative has the same pattern as in MSE: the mean prediction error, weighted by the corresponding input feature (with the bias term using <span class="math inline">\(1\)</span>). Stacking the three partial derivatives into a gradient vector gives:</p>
+<p><span class="math display">\[\nabla_\mathbf{w} \mathcal{L} = \begin{bmatrix} \frac{\partial \mathcal{L}}{\partial b} \\[4pt] \frac{\partial \mathcal{L}}{\partial w_1} \\[4pt] \frac{\partial \mathcal{L}}{\partial w_2} \end{bmatrix} = \frac{1}{n} \begin{bmatrix} \sum_{i=1}^{n} e_i \cdot 1 \\[4pt] \sum_{i=1}^{n} e_i \, x_{i1} \\[4pt] \sum_{i=1}^{n} e_i \, x_{i2} \end{bmatrix}\]</span></p>
+<p>Since the design matrix <span class="math inline">\(\mathbf{X}\)</span> has rows <span class="math inline">\([1,\, x_{i1},\, x_{i2}]\)</span>, the column <span class="math inline">\(j\)</span> of <span class="math inline">\(\mathbf{X}^\top\)</span> contains the <span class="math inline">\(j\)</span>-th feature values across all samples, so <span class="math inline">\(\mathbf{X}^\top (\mathbf{p} - \mathbf{y}) = \bigl[\sum e_i \cdot 1,\; \sum e_i x_{i1},\; \sum e_i x_{i2}\bigr]^\top\)</span>. In matrix form this is:</p>
+<p><span class="math display">\[\nabla_\mathbf{w} \mathcal{L}_{\text{BCE}} = \frac{1}{n} \mathbf{X}^\top (\mathbf{p} - \mathbf{y})\]</span></p>
+<p>where <span class="math inline">\(\mathbf{p} = \sigma(\mathbf{X}\mathbf{w})\)</span> is the vector of predicted probabilities. This structural similarity with the MSE gradient is not a coincidence; it arises from the choice of the sigmoid with cross-entropy, which together form a <strong>canonical</strong> exponential family model.</p>
+</section>
+<section id="decision-boundary" class="level3">
+<h3 class="anchored" data-anchor-id="decision-boundary">Decision Boundary</h3>
+<p>The decision boundary is the set of all points <span class="math inline">\(\mathbf{x}\)</span> for which <span class="math inline">\(p = 0.5\)</span>, i.e., where the model is maximally uncertain. Since <span class="math inline">\(\sigma(z) = 0.5\)</span> exactly when <span class="math inline">\(z = 0\)</span>, the boundary is defined by:</p>
+<p><span class="math display">\[b + w_1 x_1 + w_2 x_2 = 0\]</span></p>
+<p>In 2D with features <span class="math inline">\(x_1, x_2\)</span>, this resolves to a straight line:</p>
+<p><span class="math display">\[x_2 = -\frac{w_1 x_1 + b}{w_2}\]</span></p>
+<p>As gradient descent updates <span class="math inline">\(\mathbf{w}\)</span>, this line rotates and translates until it correctly separates the two classes.</p>
+</section>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">0. Setup</h2>
+<div id="e74bd498" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.animation <span class="im">as</span> animation</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> HTML</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.datasets <span class="im">import</span> make_blobs</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>sns.set_theme(style<span class="op">=</span><span class="st">'whitegrid'</span>, font_scale<span class="op">=</span><span class="fl">1.2</span>)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="logistic-regression-via-gradient-descent" class="level2">
+<h2 class="anchored" data-anchor-id="logistic-regression-via-gradient-descent">1. Logistic Regression via Gradient Descent</h2>
+<section id="generating-synthetic-data" class="level3">
+<h3 class="anchored" data-anchor-id="generating-synthetic-data">1.1 Generating Synthetic Data</h3>
+<p>We create a 2-feature classification dataset using <code>make_blobs</code> with three cluster centers. The original labels (0, 1, 2) are converted to a binary problem: cluster 0 becomes class 0, and clusters 1 and 2 become class 1. This gives a dataset where the positive class forms two groups on the upper-right side of the feature space, while the negative class sits near the origin.</p>
+<div id="b070046b" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>X_cls, y_raw <span class="op">=</span> make_blobs(</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    n_samples<span class="op">=</span><span class="dv">250</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    centers<span class="op">=</span>[(<span class="dv">0</span>, <span class="dv">0</span>), (<span class="fl">1.0</span>, <span class="fl">0.0</span>), (<span class="fl">0.0</span>, <span class="fl">1.0</span>)],</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    cluster_std<span class="op">=</span>[<span class="fl">0.3</span>, <span class="fl">0.3</span>, <span class="fl">0.3</span>],</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to binary: cluster 0 → class 0, clusters 1 &amp; 2 → class 1</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>y_cls <span class="op">=</span> (y_raw <span class="op">&gt;</span> <span class="dv">0</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the design matrix: prepend a column of ones for the bias term</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># X_cls_aug has shape (250, 3): each row is [1, x1_i, x2_i]</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>n <span class="op">=</span> <span class="bu">len</span>(y_cls)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>X_cls_aug <span class="op">=</span> np.column_stack([np.ones(n), X_cls])</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"X_cls_aug shape: </span><span class="sc">{</span>X_cls_aug<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)   <span class="co"># (250, 3)</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"y_cls shape    : </span><span class="sc">{</span>y_cls<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)        <span class="co"># (250,)</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Class 0: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_cls <span class="op">==</span> <span class="dv">0</span>)<span class="sc">}</span><span class="ss">, Class 1: </span><span class="sc">{</span>np<span class="sc">.</span><span class="bu">sum</span>(y_cls <span class="op">==</span> <span class="dv">1</span>)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>X_cls_aug shape: (250, 3)
+y_cls shape    : (250,)
+Class 0: 84, Class 1: 166</code></pre>
+</div>
+</div>
+<p>The leading column of ones allows us to absorb the bias <span class="math inline">\(b\)</span> into the weight vector <span class="math inline">\(\mathbf{w} = [b, w_1, w_2]^\top\)</span>, so the model becomes <span class="math inline">\(\mathbf{p} = \sigma(\mathbf{X}\mathbf{w})\)</span> with no separate bias term in the code.</p>
+<div id="75d777f0" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Left: original 3-cluster labels ---</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k, (marker, color, label) <span class="kw">in</span> <span class="bu">enumerate</span>(</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    [(<span class="st">'s'</span>, <span class="st">'tomato'</span>, <span class="st">'Cluster 0'</span>), (<span class="st">'o'</span>, <span class="st">'steelblue'</span>, <span class="st">'Cluster 1'</span>), (<span class="st">'^'</span>, <span class="st">'seagreen'</span>, <span class="st">'Cluster 2'</span>)]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>):</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    mask <span class="op">=</span> y_raw <span class="op">==</span> k</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].scatter(X_cls[mask, <span class="dv">0</span>], X_cls[mask, <span class="dv">1</span>], marker<span class="op">=</span>marker, color<span class="op">=</span>color,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                    edgecolors<span class="op">=</span><span class="st">'k'</span>, linewidths<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span>label, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Original Clusters (3 classes)"</span>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].legend()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Right: binary labels ---</span></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>                marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>                linewidths<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span><span class="st">'Class 1'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>                marker<span class="op">=</span><span class="st">'s'</span>, color<span class="op">=</span><span class="st">'tomato'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>                linewidths<span class="op">=</span><span class="fl">0.4</span>, label<span class="op">=</span><span class="st">'Class 0'</span>, alpha<span class="op">=</span><span class="fl">0.7</span>)</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Binary Classification (0 vs rest)"</span>)</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend()</span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-4-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The left panel shows the three original clusters; the right panel shows the binary grouping we will use for logistic regression. The two positive-class clusters (upper and right) should be separable from the negative class (center) by a linear decision boundary — roughly along the line <span class="math inline">\(x_1 + x_2 = \text{const}\)</span>.</p>
+</section>
+<section id="implementing-the-loss-and-gradient" class="level3">
+<h3 class="anchored" data-anchor-id="implementing-the-loss-and-gradient">1.2 Implementing the Loss and Gradient</h3>
+<p>We implement the loss and gradient following the formulas from the Background section. Recall that for our model <span class="math inline">\(p_i = \sigma(b + w_1 x_{i1} + w_2 x_{i2})\)</span>, the prediction error of sample <span class="math inline">\(i\)</span> is <span class="math inline">\(e_i = p_i - y_i\)</span>, and the three partial derivatives are:</p>
+<p><span class="math display">\[\frac{\partial \mathcal{L}}{\partial b} = \frac{1}{n} \sum e_i, \qquad \frac{\partial \mathcal{L}}{\partial w_1} = \frac{1}{n} \sum e_i \, x_{i1}, \qquad \frac{\partial \mathcal{L}}{\partial w_2} = \frac{1}{n} \sum e_i \, x_{i2}\]</span></p>
+<p>We first implement this element-wise to see each step clearly, then show the equivalent matrix form.</p>
+<div id="4c1cef00" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sigmoid(z):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Numerically stable sigmoid: clips z to avoid overflow in exp.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">    σ(z) = 1 / (1 + e^{-z})</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="fl">1.0</span> <span class="op">/</span> (<span class="fl">1.0</span> <span class="op">+</span> np.exp(<span class="op">-</span>np.clip(z, <span class="op">-</span><span class="dv">500</span>, <span class="dv">500</span>)))</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bce_loss(X, y, w):</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co">    Compute the Binary Cross-Entropy loss.</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co">    L = -(1/n) * sum[ y * log(p) + (1-y) * log(1-p) ]</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    p   <span class="op">=</span> sigmoid(X <span class="op">@</span> w)</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    eps <span class="op">=</span> <span class="fl">1e-12</span>                  <span class="co"># numerical guard against log(0)</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="op">-</span><span class="bu">float</span>(np.mean(y <span class="op">*</span> np.log(p <span class="op">+</span> eps) <span class="op">+</span> (<span class="dv">1</span> <span class="op">-</span> y) <span class="op">*</span> np.log(<span class="dv">1</span> <span class="op">-</span> p <span class="op">+</span> eps)))</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bce_gradient_elementwise(X, y, w):</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a><span class="co">    Compute each partial derivative separately.</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="co">    X columns: [1, x1, x2], w: [b, w1, w2]</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)</span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> sigmoid(X <span class="op">@</span> w)              <span class="co"># predicted probabilities, shape (n,)</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    e <span class="op">=</span> p <span class="op">-</span> y                        <span class="co"># prediction errors, shape (n,)</span></span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>    dL_db  <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> np.<span class="bu">sum</span>(e)           <span class="co"># Σ e_i * 1</span></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>    dL_dw1 <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> np.<span class="bu">sum</span>(e <span class="op">*</span> X[:, <span class="dv">1</span>]) <span class="co"># Σ e_i * x_i1</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>    dL_dw2 <span class="op">=</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> np.<span class="bu">sum</span>(e <span class="op">*</span> X[:, <span class="dv">2</span>]) <span class="co"># Σ e_i * x_i2</span></span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array([dL_db, dL_dw1, dL_dw2])</span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> bce_gradient(X, y, w):</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="co">    Same result in one line using matrix multiplication.</span></span>
+<span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a><span class="co">    (1/n) * X^T @ (p - y)  computes all three partial derivatives at once.</span></span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a>    n <span class="op">=</span> <span class="bu">len</span>(y)</span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> sigmoid(X <span class="op">@</span> w)           <span class="co"># predicted probabilities, shape (n,)</span></span>
+<span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> (<span class="fl">1.0</span> <span class="op">/</span> n) <span class="op">*</span> (X.T <span class="op">@</span> (p <span class="op">-</span> y))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>Let us verify that both implementations produce the same gradient:</p>
+<div id="0df9b20a" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>w_init <span class="op">=</span> np.zeros(<span class="dv">3</span>)  <span class="co"># [b=0, w1=0, w2=0]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>grad_elem   <span class="op">=</span> bce_gradient_elementwise(X_cls_aug, y_cls, w_init)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>grad_matrix <span class="op">=</span> bce_gradient(X_cls_aug, y_cls, w_init)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Initial BCE       : </span><span class="sc">{</span>bce_loss(X_cls_aug, y_cls, w_init)<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Gradient (element): dL/db=</span><span class="sc">{</span>grad_elem[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, dL/dw1=</span><span class="sc">{</span>grad_elem[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, dL/dw2=</span><span class="sc">{</span>grad_elem[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Gradient (matrix) : dL/db=</span><span class="sc">{</span>grad_matrix[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">, dL/dw1=</span><span class="sc">{</span>grad_matrix[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">, dL/dw2=</span><span class="sc">{</span>grad_matrix[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Match             : </span><span class="sc">{</span>np<span class="sc">.</span>allclose(grad_elem, grad_matrix)<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial BCE       : 0.6931
+Gradient (element): dL/db=-0.1640, dL/dw1=-0.1765, dL/dw2=-0.1654
+Gradient (matrix) : dL/db=-0.1640, dL/dw1=-0.1765, dL/dw2=-0.1654
+Match             : True</code></pre>
+</div>
+</div>
+<p>At the initial weights <span class="math inline">\(\mathbf{w} = \mathbf{0}\)</span>, the sigmoid outputs <span class="math inline">\(p = 0.5\)</span> for every sample, so the model is maximally uncertain. The gradient for <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span> should be negative (pointing toward <em>decreasing</em> the loss), pushing the weights in the direction that separates the two classes. The matrix form <code>X.T @ (p - y)</code> computes all three partial derivatives in a single operation, which is both faster and more concise.</p>
+</section>
+<section id="writing-the-training-loop" class="level3">
+<h3 class="anchored" data-anchor-id="writing-the-training-loop">1.3 Writing the Training Loop</h3>
+<p>The training loop applies the update rule at every epoch and records both the weights and the loss so we can inspect the full trajectory afterward.</p>
+<div id="34bfded3" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> train_logistic(X, y, lr<span class="op">=</span><span class="fl">0.5</span>, epochs<span class="op">=</span><span class="dv">500</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Full-batch gradient descent for logistic regression.</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">    Parameters</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">    ----------</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">    lr     : float  -- learning rate (step size)</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="co">    epochs : int    -- number of full passes over the data</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">    -------</span></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="co">    w_history   : ndarray of shape (epochs+1, d)</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">                  weights at every epoch, including the initial values</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">    loss_history: list of float, length epochs+1</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> np.zeros(X.shape[<span class="dv">1</span>])</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    w_history    <span class="op">=</span> [w.copy()]</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    loss_history <span class="op">=</span> [bce_loss(X, y, w)]</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(epochs):</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        grad <span class="op">=</span> bce_gradient(X, y, w)</span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>        w    <span class="op">=</span> w <span class="op">-</span> lr <span class="op">*</span> grad           <span class="co"># gradient descent update</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>        w_history.append(w.copy())</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        loss_history.append(bce_loss(X, y, w))</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.array(w_history), loss_history</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Why <code>w.copy()</code>?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>NumPy arrays are mutable objects. Writing <code>w_history.append(w)</code> would append a <strong>reference</strong> to <code>w</code>, so every element in the list would point to the same array and reflect the final value of <code>w</code>. Calling <code>.copy()</code> creates a snapshot of the current values before the next update overwrites them.</p>
+</div>
+</div>
+</section>
+<section id="running-the-optimizer" class="level3">
+<h3 class="anchored" data-anchor-id="running-the-optimizer">1.4 Running the Optimizer</h3>
+<div id="68f99921" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>w_cls_hist, loss_cls_hist <span class="op">=</span> train_logistic(X_cls_aug, y_cls, lr<span class="op">=</span><span class="fl">0.5</span>, epochs<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>w_final     <span class="op">=</span> w_cls_hist[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>pred_labels <span class="op">=</span> (sigmoid(X_cls_aug <span class="op">@</span> w_final) <span class="op">&gt;=</span> <span class="fl">0.5</span>).astype(<span class="bu">int</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>accuracy    <span class="op">=</span> <span class="bu">float</span>(np.mean(pred_labels <span class="op">==</span> y_cls))</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Initial loss : </span><span class="sc">{</span>loss_cls_hist[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Final loss   : </span><span class="sc">{</span>loss_cls_hist[<span class="op">-</span><span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Accuracy     : </span><span class="sc">{</span>accuracy <span class="op">*</span> <span class="dv">100</span><span class="sc">:.1f}</span><span class="ss">%"</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Learned b    : </span><span class="sc">{</span>w_final[<span class="dv">0</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Learned w_1  : </span><span class="sc">{</span>w_final[<span class="dv">1</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Learned w_2  : </span><span class="sc">{</span>w_final[<span class="dv">2</span>]<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Initial loss : 0.6931
+Final loss   : 0.2536
+Accuracy     : 89.2%
+Learned b    : -1.3700
+Learned w_1  : 3.9207
+Learned w_2  : 4.0708</code></pre>
+</div>
+</div>
+<p><strong>Expected output:</strong></p>
+<pre><code>Initial loss : ~0.6931
+Final loss   : ~0.1XXX
+Accuracy     : ~95%+
+Learned b    : &lt;0
+Learned w_1  : &gt;0
+Learned w_2  : &gt;0</code></pre>
+<p>The weights <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span> should both be positive: Class 1 lives in the upper-right region (both coordinates tend to be large and positive), so a positive weight on each feature increases <span class="math inline">\(\mathbf{w}^\top \mathbf{x}\)</span> and pushes <span class="math inline">\(p\)</span> toward 1. The bias <span class="math inline">\(b\)</span> should be negative, shifting the decision boundary so that the origin (where Class 0 is centered) falls on the negative side.</p>
+</section>
+<section id="visualizing-the-loss-curve-and-weight-convergence" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-loss-curve-and-weight-convergence">1.5 Visualizing the Loss Curve and Weight Convergence</h3>
+<div id="1b4a18ec" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Left panel: loss curve ---</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].plot(loss_cls_hist, color<span class="op">=</span><span class="st">'steelblue'</span>, lw<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"BCE Loss over Epochs"</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_ylabel(<span class="st">"BCE"</span>)</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Right panel: weight convergence ---</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>labels <span class="op">=</span> [<span class="st">'b (bias)'</span>, <span class="st">'$w_1$'</span>, <span class="st">'$w_2$'</span>]</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> [<span class="st">'tomato'</span>, <span class="st">'steelblue'</span>, <span class="st">'seagreen'</span>]</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> j, (label, col) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(labels, colors)):</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].plot(w_cls_hist[:, j], color<span class="op">=</span>col, lw<span class="op">=</span><span class="fl">1.5</span>, label<span class="op">=</span>label)</span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Weight Convergence"</span>)</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_ylabel(<span class="st">"Weight value"</span>)</span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-9-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="loss-surface-and-gradient-descent-trajectory" class="level3">
+<h3 class="anchored" data-anchor-id="loss-surface-and-gradient-descent-trajectory">1.6 Loss Surface and Gradient Descent Trajectory</h3>
+<p>To visualize what gradient descent is doing geometrically, we plot the loss as a function of <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span> while fixing the bias <span class="math inline">\(b\)</span> at its optimal value. Unlike the MSE loss surface (which is a perfect paraboloid), the BCE loss surface is convex but not quadratic — notice the slightly different curvature compared to the linear regression case.</p>
+<div id="6a1b3a7f" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fix b at the trained value, sweep w1 and w2</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>b_fixed <span class="op">=</span> w_final[<span class="dv">0</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>w1_vals <span class="op">=</span> np.linspace(w_final[<span class="dv">1</span>] <span class="op">-</span> <span class="dv">5</span>, w_final[<span class="dv">1</span>] <span class="op">+</span> <span class="dv">5</span>, <span class="dv">120</span>)</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>w2_vals <span class="op">=</span> np.linspace(w_final[<span class="dv">2</span>] <span class="op">-</span> <span class="dv">5</span>, w_final[<span class="dv">2</span>] <span class="op">+</span> <span class="dv">5</span>, <span class="dv">120</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>W1, W2 <span class="op">=</span> np.meshgrid(w1_vals, w2_vals)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>Loss_grid <span class="op">=</span> np.zeros_like(W1)</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(W1.shape[<span class="dv">0</span>]):</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(W1.shape[<span class="dv">1</span>]):</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>        w_test <span class="op">=</span> np.array([b_fixed, W1[i, j], W2[i, j]])</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>        Loss_grid[i, j] <span class="op">=</span> bce_loss(X_cls_aug, y_cls, w_test)</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>fig <span class="op">=</span> plt.figure(figsize<span class="op">=</span>(<span class="dv">15</span>, <span class="dv">6</span>))</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Left: 3D loss surface ---</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>ax3d <span class="op">=</span> fig.add_subplot(<span class="dv">121</span>, projection<span class="op">=</span><span class="st">'3d'</span>)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>surf <span class="op">=</span> ax3d.plot_surface(W1, W2, Loss_grid, cmap<span class="op">=</span><span class="st">'viridis'</span>, alpha<span class="op">=</span><span class="fl">0.85</span>, linewidth<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="co"># GD trajectory on the surface</span></span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>traj_losses <span class="op">=</span> [bce_loss(X_cls_aug, y_cls, np.array([b_fixed, w_cls_hist[i, <span class="dv">1</span>], w_cls_hist[i, <span class="dv">2</span>]]))</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>               <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(w_cls_hist))]</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a>ax3d.plot(w_cls_hist[:, <span class="dv">1</span>], w_cls_hist[:, <span class="dv">2</span>], traj_losses,</span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a>          color<span class="op">=</span><span class="st">'tomato'</span>, lw<span class="op">=</span><span class="dv">2</span>, zorder<span class="op">=</span><span class="dv">10</span>)</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>ax3d.scatter(w_cls_hist[<span class="dv">0</span>, <span class="dv">1</span>], w_cls_hist[<span class="dv">0</span>, <span class="dv">2</span>], traj_losses[<span class="dv">0</span>],</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>             color<span class="op">=</span><span class="st">'tomato'</span>, s<span class="op">=</span><span class="dv">80</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, zorder<span class="op">=</span><span class="dv">11</span>, label<span class="op">=</span><span class="st">'Start'</span>)</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a>ax3d.scatter(w_cls_hist[<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], w_cls_hist[<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>], traj_losses[<span class="op">-</span><span class="dv">1</span>],</span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a>             color<span class="op">=</span><span class="st">'red'</span>, s<span class="op">=</span><span class="dv">80</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, marker<span class="op">=</span><span class="st">'*'</span>, zorder<span class="op">=</span><span class="dv">11</span>, label<span class="op">=</span><span class="st">'End'</span>)</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>ax3d.set_xlabel(<span class="st">"$w_1$"</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>ax3d.set_ylabel(<span class="st">"$w_2$"</span>)</span>
+<span id="cb13-32"><a href="#cb13-32" aria-hidden="true" tabindex="-1"></a>ax3d.set_zlabel(<span class="st">"BCE"</span>)</span>
+<span id="cb13-33"><a href="#cb13-33" aria-hidden="true" tabindex="-1"></a>ax3d.set_title(<span class="st">"Loss Surface (b fixed)"</span>)</span>
+<span id="cb13-34"><a href="#cb13-34" aria-hidden="true" tabindex="-1"></a>ax3d.view_init(elev<span class="op">=</span><span class="dv">30</span>, azim<span class="op">=-</span><span class="dv">120</span>)</span>
+<span id="cb13-35"><a href="#cb13-35" aria-hidden="true" tabindex="-1"></a>ax3d.legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb13-36"><a href="#cb13-36" aria-hidden="true" tabindex="-1"></a>fig.colorbar(surf, ax<span class="op">=</span>ax3d, shrink<span class="op">=</span><span class="fl">0.6</span>)</span>
+<span id="cb13-37"><a href="#cb13-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-38"><a href="#cb13-38" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Right: 2D contour + trajectory ---</span></span>
+<span id="cb13-39"><a href="#cb13-39" aria-hidden="true" tabindex="-1"></a>ax2d <span class="op">=</span> fig.add_subplot(<span class="dv">122</span>)</span>
+<span id="cb13-40"><a href="#cb13-40" aria-hidden="true" tabindex="-1"></a>cont <span class="op">=</span> ax2d.contour(W1, W2, Loss_grid, levels<span class="op">=</span><span class="dv">20</span>, cmap<span class="op">=</span><span class="st">'viridis'</span>)</span>
+<span id="cb13-41"><a href="#cb13-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-42"><a href="#cb13-42" aria-hidden="true" tabindex="-1"></a><span class="co"># GD trajectory</span></span>
+<span id="cb13-43"><a href="#cb13-43" aria-hidden="true" tabindex="-1"></a>ax2d.plot(w_cls_hist[:, <span class="dv">1</span>], w_cls_hist[:, <span class="dv">2</span>], <span class="st">'o-'</span>, color<span class="op">=</span><span class="st">'tomato'</span>,</span>
+<span id="cb13-44"><a href="#cb13-44" aria-hidden="true" tabindex="-1"></a>          markersize<span class="op">=</span><span class="dv">2</span>, lw<span class="op">=</span><span class="fl">1.2</span>, alpha<span class="op">=</span><span class="fl">0.8</span>)</span>
+<span id="cb13-45"><a href="#cb13-45" aria-hidden="true" tabindex="-1"></a>ax2d.scatter(w_cls_hist[<span class="dv">0</span>, <span class="dv">1</span>], w_cls_hist[<span class="dv">0</span>, <span class="dv">2</span>],</span>
+<span id="cb13-46"><a href="#cb13-46" aria-hidden="true" tabindex="-1"></a>             color<span class="op">=</span><span class="st">'tomato'</span>, s<span class="op">=</span><span class="dv">80</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, zorder<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="st">'Start'</span>)</span>
+<span id="cb13-47"><a href="#cb13-47" aria-hidden="true" tabindex="-1"></a>ax2d.scatter(w_cls_hist[<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>], w_cls_hist[<span class="op">-</span><span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb13-48"><a href="#cb13-48" aria-hidden="true" tabindex="-1"></a>             color<span class="op">=</span><span class="st">'red'</span>, s<span class="op">=</span><span class="dv">80</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>, marker<span class="op">=</span><span class="st">'*'</span>, zorder<span class="op">=</span><span class="dv">5</span>, label<span class="op">=</span><span class="st">'End'</span>)</span>
+<span id="cb13-49"><a href="#cb13-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-50"><a href="#cb13-50" aria-hidden="true" tabindex="-1"></a>ax2d.set_xlabel(<span class="st">"$w_1$"</span>)</span>
+<span id="cb13-51"><a href="#cb13-51" aria-hidden="true" tabindex="-1"></a>ax2d.set_ylabel(<span class="st">"$w_2$"</span>)</span>
+<span id="cb13-52"><a href="#cb13-52" aria-hidden="true" tabindex="-1"></a>ax2d.set_title(<span class="st">"Loss Contours + GD Trajectory"</span>)</span>
+<span id="cb13-53"><a href="#cb13-53" aria-hidden="true" tabindex="-1"></a>ax2d.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb13-54"><a href="#cb13-54" aria-hidden="true" tabindex="-1"></a>fig.colorbar(cont, ax<span class="op">=</span>ax2d)</span>
+<span id="cb13-55"><a href="#cb13-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-56"><a href="#cb13-56" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb13-57"><a href="#cb13-57" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-10-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The contour plot on the right shows the gradient descent trajectory as a path from the origin toward the minimum. Each step moves perpendicular to the contour lines (in the direction of steepest descent). The elliptical shape of the contours reflects the different scales and correlations between <span class="math inline">\(w_1\)</span> and <span class="math inline">\(w_2\)</span>.</p>
+<p>Note that this is a 2D slice of the full 3-dimensional parameter space (<span class="math inline">\(b\)</span>, <span class="math inline">\(w_1\)</span>, <span class="math inline">\(w_2\)</span>). We fix <span class="math inline">\(b\)</span> at its trained value to make the surface plottable, but during actual training <span class="math inline">\(b\)</span> was also changing simultaneously. The trajectory shown is therefore an approximation — the true path lives in 3D and is projected onto this slice.</p>
+</section>
+<section id="visualizing-the-decision-boundary-at-different-epochs" class="level3">
+<h3 class="anchored" data-anchor-id="visualizing-the-decision-boundary-at-different-epochs">1.7 Visualizing the Decision Boundary at Different Epochs</h3>
+<div id="985f538e" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> draw_decision_boundary(X_aug, y, w, ax, title<span class="op">=</span><span class="st">""</span>, line_color<span class="op">=</span><span class="st">'k'</span>):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Scatter-plot the data and draw the linear decision boundary.</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="co">    X_aug columns: [bias_col, x1, x2]; w = [w_bias, w1, w2].</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X_aug[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>], X_aug[y <span class="op">==</span> <span class="dv">1</span>, <span class="dv">2</span>],</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>               marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>               linewidths<span class="op">=</span><span class="fl">0.4</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">'Class 1'</span>)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    ax.scatter(X_aug[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>], X_aug[y <span class="op">==</span> <span class="dv">0</span>, <span class="dv">2</span>],</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>               marker<span class="op">=</span><span class="st">'s'</span>, color<span class="op">=</span><span class="st">'tomato'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>               linewidths<span class="op">=</span><span class="fl">0.4</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">'Class 0'</span>)</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    x1_min <span class="op">=</span> X_aug[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    x1_max <span class="op">=</span> X_aug[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    x1_grid <span class="op">=</span> np.linspace(x1_min, x1_max, <span class="dv">300</span>)</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">abs</span>(w[<span class="dv">2</span>]) <span class="op">&gt;</span> <span class="fl">1e-8</span>:</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Decision boundary: w[0] + w[1]*x1 + w[2]*x2 = 0</span></span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">#   =&gt; x2 = -(w[1]*x1 + w[0]) / w[2]</span></span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>        x2_bd <span class="op">=</span> <span class="op">-</span>(w[<span class="dv">1</span>] <span class="op">*</span> x1_grid <span class="op">+</span> w[<span class="dv">0</span>]) <span class="op">/</span> w[<span class="dv">2</span>]</span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>        ax.plot(x1_grid, x2_bd, color<span class="op">=</span>line_color, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="st">'Decision boundary'</span>)</span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>    ax.set_title(title)</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">8</span>)</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c234a7d9" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">4</span>, figsize<span class="op">=</span>(<span class="dv">18</span>, <span class="dv">4</span>), sharex<span class="op">=</span><span class="va">True</span>, sharey<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>snapshot_epochs <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">30</span>, <span class="dv">300</span>]</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax, ep <span class="kw">in</span> <span class="bu">zip</span>(axes, snapshot_epochs):</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    draw_decision_boundary(X_cls_aug, y_cls, w_cls_hist[ep], ax,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>                           title<span class="op">=</span><span class="ss">f"Epoch </span><span class="sc">{</span>ep<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plt.suptitle(<span class="st">"Decision Boundary Evolution during Training"</span>, fontsize<span class="op">=</span><span class="dv">13</span>, y<span class="op">=</span><span class="fl">1.02</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-12-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>At epoch 1, the boundary is nearly horizontal (random-looking) because the weights have barely moved from zero. By epoch 30, it has already found the approximate orientation. By epoch 300, it has settled into its final position, separating the origin cluster from the two positive-class clusters.</p>
+</section>
+<section id="animating-the-decision-boundary" class="level3">
+<h3 class="anchored" data-anchor-id="animating-the-decision-boundary">1.8 Animating the Decision Boundary</h3>
+<p>Seeing the boundary move frame-by-frame is one of the best ways to build intuition for what gradient descent is actually optimizing. The animation below replays the first 300 epochs, sampling every 3rd epoch to keep the file size reasonable.</p>
+<p>This cell uses <code>matplotlib.animation.FuncAnimation</code> and renders the result as an HTML5 video via <code>to_jshtml()</code>. It works in both JupyterLab and Google Colab. In a static Quarto HTML export the animation will not auto-play; only the first frame will be visible. Run the cell interactively to see the full animation.</p>
+<div id="80cb3352" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fig_a, ax_a <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">6</span>, <span class="dv">5</span>))</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>x1_lo <span class="op">=</span> X_cls[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>x1_hi <span class="op">=</span> X_cls[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>x2_lo <span class="op">=</span> X_cls[:, <span class="dv">1</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>x2_hi <span class="op">=</span> X_cls[:, <span class="dv">1</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>x1_anim <span class="op">=</span> np.linspace(x1_lo, x1_hi, <span class="dv">300</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> animate(frame):</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    ax_a.cla()</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    ep <span class="op">=</span> frame <span class="op">*</span> <span class="dv">3</span>                      <span class="co"># sample every 3rd epoch</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    w  <span class="op">=</span> w_cls_hist[ep]</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    loss_val <span class="op">=</span> loss_cls_hist[ep]</span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    ax_a.scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>                 marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>                 linewidths<span class="op">=</span><span class="fl">0.4</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">'Class 1'</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    ax_a.scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>                 marker<span class="op">=</span><span class="st">'s'</span>, color<span class="op">=</span><span class="st">'tomato'</span>, edgecolors<span class="op">=</span><span class="st">'k'</span>,</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>                 linewidths<span class="op">=</span><span class="fl">0.4</span>, alpha<span class="op">=</span><span class="fl">0.7</span>, label<span class="op">=</span><span class="st">'Class 0'</span>)</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">abs</span>(w[<span class="dv">2</span>]) <span class="op">&gt;</span> <span class="fl">1e-8</span>:</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>        x2_bd <span class="op">=</span> <span class="op">-</span>(w[<span class="dv">1</span>] <span class="op">*</span> x1_anim <span class="op">+</span> w[<span class="dv">0</span>]) <span class="op">/</span> w[<span class="dv">2</span>]</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>        ax_a.plot(x1_anim, x2_bd, <span class="st">'k-'</span>, lw<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    ax_a.set_xlim(x1_lo, x1_hi)</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    ax_a.set_ylim(x2_lo, x2_hi)</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    ax_a.set_title(<span class="ss">f"Epoch </span><span class="sc">{</span>ep<span class="sc">:3d}</span><span class="ss">  |  BCE = </span><span class="sc">{</span>loss_val<span class="sc">:.4f}</span><span class="ss">"</span>)</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    ax_a.set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    ax_a.set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    ax_a.legend(loc<span class="op">=</span><span class="st">'upper left'</span>, fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    ax_a.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>n_frames <span class="op">=</span> <span class="bu">len</span>(w_cls_hist) <span class="op">//</span> <span class="dv">3</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>anim <span class="op">=</span> animation.FuncAnimation(fig_a, animate, frames<span class="op">=</span>n_frames,</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>                                interval<span class="op">=</span><span class="dv">80</span>, repeat<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>plt.close(fig_a)</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>HTML(anim.to_jshtml())</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="effect-of-learning-rate-on-convergence" class="level2">
+<h2 class="anchored" data-anchor-id="effect-of-learning-rate-on-convergence">2. Effect of Learning Rate on Convergence</h2>
+<p>The learning rate <span class="math inline">\(\eta\)</span> controls how large each update step is. Choosing the right value is critical: too small and training takes forever; too large and the updates overshoot, causing oscillation or divergence. We now compare three representative values.</p>
+<div id="36ac6da6" class="cell" data-execution_count="13">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>learning_rates <span class="op">=</span> [<span class="fl">0.01</span>, <span class="fl">0.5</span>, <span class="fl">3.0</span>]</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>lr_colors      <span class="op">=</span> [<span class="st">'tomato'</span>, <span class="st">'steelblue'</span>, <span class="st">'seagreen'</span>]</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>lr_results     <span class="op">=</span> {}</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr <span class="kw">in</span> learning_rates:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    wh, lh <span class="op">=</span> train_logistic(X_cls_aug, y_cls, lr<span class="op">=</span>lr, epochs<span class="op">=</span><span class="dv">300</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    lr_results[lr] <span class="op">=</span> {<span class="st">'w_hist'</span>: wh, <span class="st">'loss_hist'</span>: lh}</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">13</span>, <span class="dv">5</span>))</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Left: BCE loss curves (linear scale) ---</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, col <span class="kw">in</span> <span class="bu">zip</span>(learning_rates, lr_colors):</span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">0</span>].plot(lr_results[lr][<span class="st">'loss_hist'</span>], color<span class="op">=</span>col,</span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>                 label<span class="op">=</span><span class="ss">f'lr = </span><span class="sc">{</span>lr<span class="sc">}</span><span class="ss">'</span>, lw<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a><span class="co"># --- Right: BCE loss curves (log scale) ---</span></span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, col <span class="kw">in</span> <span class="bu">zip</span>(learning_rates, lr_colors):</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    axes[<span class="dv">1</span>].semilogy(lr_results[lr][<span class="st">'loss_hist'</span>], color<span class="op">=</span>col,</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>                     label<span class="op">=</span><span class="ss">f'lr = </span><span class="sc">{</span>lr<span class="sc">}</span><span class="ss">'</span>, lw<span class="op">=</span><span class="fl">1.5</span>)</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> ax <span class="kw">in</span> axes:</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>    ax.set_xlabel(<span class="st">"Epoch"</span>)</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    ax.set_ylabel(<span class="st">"BCE Loss"</span>)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a>    ax.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].set_title(<span class="st">"Loss Curves (Linear Scale)"</span>)</span>
+<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">1</span>].set_title(<span class="st">"Loss Curves (Log Scale)"</span>)</span>
+<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-14-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The log-scale plot on the right makes it easier to compare convergence speed across many orders of magnitude. A straight line on a log-scale plot indicates <strong>exponential decay</strong>, which is the ideal convergence behavior.</p>
+<p><strong>What you should observe:</strong></p>
+<ul>
+<li><code>lr = 0.01</code> converges very slowly. After 300 epochs the loss is still far from its minimum.</li>
+<li><code>lr = 0.5</code> hits the sweet spot. The loss drops steeply and levels off near the minimum.</li>
+<li><code>lr = 3.0</code> may oscillate wildly or produce <code>nan</code> values, signaling divergence.</li>
+</ul>
+<p>We can also compare the final decision boundaries produced by each learning rate:</p>
+<div id="055b346a" class="cell" data-execution_count="14">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">6</span>))</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>ax.scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">1</span>, <span class="dv">1</span>],</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>           marker<span class="op">=</span><span class="st">'o'</span>, color<span class="op">=</span><span class="st">'steelblue'</span>, alpha<span class="op">=</span><span class="fl">0.45</span>, label<span class="op">=</span><span class="st">'Class 1'</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>ax.scatter(X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">0</span>], X_cls[y_cls <span class="op">==</span> <span class="dv">0</span>, <span class="dv">1</span>],</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>           marker<span class="op">=</span><span class="st">'s'</span>, color<span class="op">=</span><span class="st">'tomato'</span>,    alpha<span class="op">=</span><span class="fl">0.45</span>, label<span class="op">=</span><span class="st">'Class 0'</span>, zorder<span class="op">=</span><span class="dv">3</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>x1_range <span class="op">=</span> np.linspace(X_cls[:, <span class="dv">0</span>].<span class="bu">min</span>() <span class="op">-</span> <span class="fl">0.5</span>, X_cls[:, <span class="dv">0</span>].<span class="bu">max</span>() <span class="op">+</span> <span class="fl">0.5</span>, <span class="dv">300</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> lr, col <span class="kw">in</span> <span class="bu">zip</span>(learning_rates, lr_colors):</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    w <span class="op">=</span> lr_results[lr][<span class="st">'w_hist'</span>][<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> np.<span class="bu">abs</span>(w[<span class="dv">2</span>]) <span class="op">&gt;</span> <span class="fl">1e-8</span>:</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        x2_bd <span class="op">=</span> <span class="op">-</span>(w[<span class="dv">1</span>] <span class="op">*</span> x1_range <span class="op">+</span> w[<span class="dv">0</span>]) <span class="op">/</span> w[<span class="dv">2</span>]</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>        ax.plot(x1_range, x2_bd, color<span class="op">=</span>col, lw<span class="op">=</span><span class="dv">2</span>, label<span class="op">=</span><span class="ss">f'lr = </span><span class="sc">{</span>lr<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Final Decision Boundaries (Epoch 300)"</span>)</span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>ax.set_xlabel(<span class="st">"$x_1$"</span>)</span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>ax.set_ylabel(<span class="st">"$x_2$"</span>)</span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>ax.legend(fontsize<span class="op">=</span><span class="dv">9</span>)</span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>ax.grid(<span class="va">True</span>, linestyle<span class="op">=</span><span class="st">'--'</span>, alpha<span class="op">=</span><span class="fl">0.4</span>)</span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="logistic-regression_files/figure-html/cell-15-output-1.png" class="img-fluid figure-img"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>What Happens When the Learning Rate Is Too Large?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>With <code>lr = 3.0</code> you may observe the loss oscillating wildly or printing <code>nan</code>. When this happens, the weights grow without bound, sigmoid receives extreme inputs, and the log in the BCE loss becomes numerically undefined. You can test this by printing <code>lr_results[3.0]['loss_hist'][:10]</code> and observing how quickly the loss explodes.</p>
+<p>When <span class="math inline">\(\eta\)</span> is small enough, the opposite happens: as you approach the minimum the gradient shrinks toward zero, so the update size automatically becomes smaller even without changing <span class="math inline">\(\eta\)</span>. Gradient descent has a built-in braking mechanism — but only if the learning rate is small enough to let you get close in the first place.</p>
+<p>If your model does not converge, the first thing to try is reducing the learning rate by a factor of 10.</p>
+</div>
+</div>
+</section>
+<section id="summary" class="level2">
+<h2 class="anchored" data-anchor-id="summary">Summary</h2>
+<ul>
+<li><strong>Gradient descent</strong> iteratively minimizes a loss by updating <span class="math inline">\(\mathbf{w} \leftarrow \mathbf{w} - \eta \nabla_\mathbf{w} \mathcal{L}\)</span>. Unlike linear regression, logistic regression has no closed-form solution, so gradient descent is the only option.</li>
+<li>For <strong>logistic regression</strong>, the BCE gradient is <span class="math inline">\(\frac{1}{n}\mathbf{X}^\top(\mathbf{p} - \mathbf{y})\)</span>. Each component of the gradient is the mean prediction error weighted by the corresponding feature. The elegant form comes from the natural pairing of sigmoid and cross-entropy.</li>
+<li>The <strong>learning rate</strong> is the most sensitive hyperparameter. A small <span class="math inline">\(\eta\)</span> gives slow but stable convergence; a large <span class="math inline">\(\eta\)</span> risks oscillation or divergence. Plotting the loss on a log scale is the clearest way to diagnose the behavior.</li>
+<li>The <strong>decision boundary</strong> of logistic regression is always a hyperplane. During training it rotates and translates continuously; animating this motion reveals what gradient descent is geometrically doing in the feature space.</li>
+</ul>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<ul>
+<li>Bishop, C. M. (2006). <em>Pattern Recognition and Machine Learning</em>. Springer.</li>
+<li>Goodfellow, I., Bengio, Y., and Courville, A. (2016). <em>Deep Learning</em>. MIT Press.</li>
+</ul>
+</section>
+<section id="further-reading" class="level2">
+<h2 class="anchored" data-anchor-id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="https://cs229.stanford.edu/notes2022fall/main_notes.pdf">CS229 Lecture Notes on Supervised Learning</a></li>
+<li><a href="https://www.youtube.com/watch?v=IHZwWFHWa-w">Gradient Descent, How Neural Networks Learn (3Blue1Brown)</a></li>
+<li><a href="https://matplotlib.org/stable/api/animation_api.html">Matplotlib Animation API</a></li>
+<li><a href="https://distill.pub/2017/momentum/">Visualizing Gradient Descent (distill.pub)</a></li>
+<li><a href="https://colab.research.google.com/drive/1F7m0OFDT2vu_SKmIYaHBJy4OyRgZ2w_u?usp=sharing">https://colab.research.google.com/drive/1F7m0OFDT2vu_SKmIYaHBJy4OyRgZ2w_u?usp=sharing</a></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/gli\.konkuk\.ac\.kr\/board\/lectures\/machine-learning");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
