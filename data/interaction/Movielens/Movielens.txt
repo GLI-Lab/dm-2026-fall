@@ -1,0 +1,91 @@
+MovieLens 100K Dataset
+======================
+
+Source
+------
+https://grouplens.org/datasets/movielens/100k/
+
+Download: ml-100k.zip (about 5 MB)
+If the browser shows a security warning, choose [Advanced] -> [Proceed].
+
+Collected by GroupLens Research, University of Minnesota, through the
+MovieLens web site between 19 Sep 1997 and 22 Apr 1998.
+
+License: research and educational use is allowed. Redistribution of the
+data requires separate permission, and commercial use is not allowed.
+
+
+Files
+-----
+u.data      100,000 rows   interaction log
+u.item        1,682 rows   movie metadata
+u.user          943 rows   user metadata
+u.genre          19 rows   genre names
+u.occupation     21 rows   occupation names
+u.info                     row counts
+
+
+u.data
+------
+Tab separated, no header.
+
+    user_id     anonymised user id
+    item_id     the movie this user rated
+    rating      1-5
+    timestamp   unix seconds
+
+    Example:
+        196   242   3   881250949
+
+
+u.item
+------
+Pipe (|) separated, latin-1 encoded, no header.
+
+    movie_id        unique id
+    title           title with release year
+    release_date    e.g. 01-Jan-1995
+    video_release   mostly empty
+    imdb_url        link to IMDb
+    + 19 binary genre flags (unknown, Action, Adventure, Animation,
+      Children's, Comedy, Crime, Documentary, Drama, Fantasy, Film-Noir,
+      Horror, Musical, Mystery, Romance, Sci-Fi, Thriller, War, Western)
+
+    Example:
+        1|Toy Story (1995)|01-Jan-1995||http://us.imdb.com/...|0|0|0|1|1|...
+
+
+u.user
+------
+Pipe (|) separated, no header.
+
+    user_id     anonymised user id
+    age         7 to 73
+    gender      M / F
+    occupation  21 categories (technician, writer, student, ...)
+    zip_code
+
+    Example:
+        1|24|M|technician|85711
+
+
+Statistics
+----------
+    interactions          100,000
+    users                     943
+    movies                  1,682
+
+    rating values          1 to 5   (explicit only, no implicit signal)
+    ratings per user       min 20, average 106
+
+    density                 6.30%
+
+    period          1997-09-20 to 1998-04-22
+
+
+Citation
+--------
+F. Maxwell Harper and Joseph A. Konstan. 2015.
+The MovieLens Datasets: History and Context.
+ACM Transactions on Interactive Intelligent Systems 5, 4, Article 19.
+https://doi.org/10.1145/2827872
