@@ -7,6 +7,19 @@ Public site: <https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall>
   
 ---
 
+## 브랜치
+
+| 브랜치 | 역할 |
+|---|---|
+| `main` | `.qmd` 원본, `_freeze/`, 워크플로 |
+| `gh-pages` | `quarto publish` 결과 (공개 사이트) |
+| `students` | 학생용 `.ipynb` + `pixi.toml` + `data/` (`README-students.md` → `README.md`) |
+| `data` | `data/` 미러 (`data/**` 변경 시에만 갱신) |
+
+`main`에 push하면 `gh-pages`와 `students`가 자동 갱신됩니다.
+
+---
+
 ## 1. 사전 요구사항
  
 | 도구 | 용도 | 확인 |
@@ -19,8 +32,8 @@ Public site: <https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall>
 ## 2. 저장소 받기
 
 ```zsh
-git clone git@github.com:GLI-Lab/{{COURSE_SLUG}}.git
-cd {{COURSE_SLUG}}
+git clone git@github.com:GLI-Lab/dm-2026-fall.git
+cd dm-2026-fall
  
 # 이 저장소에서만 적용되는 커밋 정보 (--global 없이)
 git config user.name "GLI-Lab" 
@@ -62,22 +75,22 @@ pixi run quarto preview      # 파일을 저장하면 해당 문서만 다시 �
 
 ```bash
 # 수업서버 Preview 서버 시작 (파일 변경 시 자동 렌더링)
-pm2 start pixi --name "{{COURSE_SLUG}}" -- run quarto preview --port 4000 --host 0.0.0.0
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4000 --host 0.0.0.0
 # 수업서버 Preview 서버 시작 (변경 감지 없음)
-pm2 start pixi --name "{{COURSE_SLUG}}" -- run quarto preview --port 4000 --host 0.0.0.0 --no-watch-inputs
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4000 --host 0.0.0.0 --no-watch-inputs
 ```
 
-접속: `http://<서버IP>:{{PORT}}`
+접속: `http://<서버IP>:4000`
 
 ```bash
 # 재시작 / 제거
-pm2 restart {{COURSE_SLUG}}
-pm2 delete {{COURSE_SLUG}}
+pm2 restart dm-2026-fall
+pm2 delete dm-2026-fall
 
 # 상태 확인
 pm2 status
-pm2 show {{COURSE_SLUG}}
-pm2 logs {{COURSE_SLUG}} --lines 100
+pm2 show dm-2026-fall
+pm2 logs dm-2026-fall --lines 100
 ```
 
 서버 재부팅 후에도 살아 있게 하려면:
@@ -105,4 +118,3 @@ git push
 ```
 
 즉, `qmd`만 수정하고 렌더 결과를 갱신하지 않으면 원본과 산출물이 서로 어긋날 수 있습니다.
-

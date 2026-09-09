@@ -1,44 +1,59 @@
-# Machine Learning Course (for students)
+# Data Mining Course (for students)
 
-The lab environment is set up with **pixi**.
+Konkuk University, Fall 2026.
 
-## Workflow
+Hands-on labs and homework starter code. The lab environment is set up with **pixi**.
 
-### 1. First-time setup
+Course site: <https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall>
 
-Install Pixi:
+This branch (`students`) contains Jupyter notebooks (`.ipynb`), helper `.py` files, shared datasets, and the pixi environment. Lab contents, deadlines, and policies are on the course site.
 
-- https://pixi.sh/latest/getting_started/installation/
+## Repository layout
 
-Clone the student branch and enter the repo:
-
-```bash
-git clone -b students https://github.com/GLI-Lab/machine-learning-course.git
-cd machine-learning-course
+```
+dm-2026-fall/                 # clone of the students branch
+├── pixi.toml                 # dependency declarations
+├── pixi.lock                 # exact pinned versions
+├── data/                     # shared datasets (paths are from the repo root)
+├── exercises/                # lab notebooks
+└── assignments/              # homework starter code
 ```
 
-Install the environment:
+Always start Jupyter **from the repository root** so that `data/` paths resolve correctly.
 
-Pixi reads the project configuration from `pixi.toml` (and the lock file, if present) and installs the required packages automatically.
+## 1. First-time setup
+
+Install Pixi: <https://pixi.sh/latest/getting_started/installation/>
+
+Windows: use **WSL2**, then follow the Linux steps inside Ubuntu. See the [environment setup](https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup.html) page for details.
+
+Clone this branch and enter the repo:
+
+```bash
+git clone -b students https://github.com/GLI-Lab/dm-2026-fall.git
+cd dm-2026-fall
+```
+
+Install the environment. Pixi reads `pixi.toml` and `pixi.lock` and installs the pinned packages:
 
 ```bash
 pixi install
 ```
 
-Run Jupyter Lab:
-
-This runs the `jupyter` task defined in the Pixi project and starts Jupyter Lab with the course environment activated.
+Start JupyterLab (defined as the `lab` task in `pixi.toml`):
 
 ```bash
-pixi run jupyter
+pixi run lab
 ```
 
-Open the URL shown in the terminal in your browser.
+Copy the URL printed in the terminal into your browser (port 8888). In VS Code, open the repo folder and select the kernel at `.pixi/envs/default/bin/python`.
 
-### 2. Update course materials
+## 2. Update course materials
 
-From the repo root, run:
+From the repo root, on the `students` branch:
 
 ```bash
-git pull   # updates from origin/students when you're on the students branch
+git pull
 ```
+
+If `pixi.toml` or `pixi.lock` changed, run `pixi install` again.

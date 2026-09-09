@@ -1,10 +1,10 @@
 ---
-title: "Machine Learning"
+title: "Data Mining"
 ---
 
 This site is your central hub for all coding materials: environment setup, in-class Lab notebooks, and Homework starter code.
 
-This practicum follows a **"From Scratch to Framework"** philosophy. Core algorithms — Linear Regression, MLPs, Self-Attention — are first implemented using only **NumPy** so you understand the mechanics. We then move to **PyTorch** to scale those implementations, leverage GPU acceleration, and explore modern architectures.
+This practicum is about **data pattern mining**: discovering frequent, sequential, structural, and relational patterns in data. The representation you choose — records, matrices, transactions, sequences, or graphs — determines which patterns you can find. Labs and homeworks implement that idea in Python.
 
 ::: {.callout-note}
 ## Konkuk eCampus
@@ -34,8 +34,8 @@ Every lab notebook has the same structure:
 
 **Workflow:**
 
-1. **Run and Observe.** Execute cells top to bottom. Trace how data shapes change at each step and how the math from lecture maps to NumPy and PyTorch code.
-2. **Tinker Freely.** Change hyperparameters, swap architectures, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.
+1. **Run and Observe.** Execute cells top to bottom. Trace how each representation makes some patterns easy to see — and hides others.
+2. **Tinker Freely.** Change a representation, a similarity measure, or a frequency threshold, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.
 
 ::: {.callout-warning}
 ## Always Run Cells Top to Bottom
@@ -71,12 +71,8 @@ The timeline and specific contents below are subject to change as the course pro
 
 | Unit | Topic | Labs (Ungraded) | HW (Graded) |
 |:---|:---|:---|:---|
-| **1** | Introduction to Machine Learning | [Lab1](/exercises/lab01/python-basics.html) | [HW01](/assignments/hw01/hw01.html) |
-| **2** | Linear Models | [Lab2](/exercises/lab02/linear-regression.html) | - | [HW02](/assignments/hw02/hw02.html) |
-| **3** | Multi-Layer Perceptron | [Lab3](/exercises/lab03/linear-regression-scratch.html) | [HW02](/assignments/hw02/hw02.html) |
-| **4** | Model Validation and Generalization | [Lab4](/exercises/lab04/mlp-regression-scratch.html) | - | - |
-| **5** | Convolutional Neural Networks | [Lab5](/exercises/lab05/cnn-architecture.html) | HW03 |
-| **6** | Recurrent Neural Networks | [Lab6](/exercises/lab06/rnn-architecture.html) | HW04 |
+| **0** | Python Prerequisites | [Lab0](/exercises/lab00/python-basics.html) | - |
+| **1** | Data Representations | [Lab1](/exercises/lab01/lab01.html) | TBD |
 
 
 ## Course Policies
@@ -112,4 +108,4 @@ Our goal is for every student to genuinely understand the course material.
 **On AI assistance.** You are permitted to use AI tools (ChatGPT, GitHub Copilot, etc.) as a learning aid — to clarify concepts, understand error messages, or explore unfamiliar syntax. However, two things are non-negotiable:
 
 - **Understand what you submit.** You must be able to explain every line of your code. If you cannot, that is a violation of academic integrity regardless of how it was written.
-- **Read the documentation yourself.** AI-generated answers can be wrong, outdated, or misleading. Learning to navigate official documentation (NumPy, PyTorch, Python) directly is a core skill of this course. Treat AI as a starting point, not a final answer.
+- **Read the documentation yourself.** AI-generated answers can be wrong, outdated, or misleading. Learning to navigate official documentation (NumPy, pandas, Python) directly is a core skill of this course. Treat AI as a starting point, not a final answer.
