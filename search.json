@@ -708,7 +708,7 @@
     "href": "exercises/index.html#datasets",
     "title": "Exercises Guide",
     "section": "Datasets",
-    "text": "Datasets\nLabs share a data/ folder at the top level of the course repository. Quarto is configured so that every notebook runs with the project root as its working directory, so paths such as data/transaction/groceries.csv work from any lab.\n\n\n\n\n\n\n\n\nFolder\nDataset\nUsed in\n\n\n\n\n(seaborn)\nTitanic\nLab 1, Part 1 (loaded in code; not stored under data/)\n\n\ndata/text/20newsgroups/\n20 Newsgroups\nLab 1, Part 2\n\n\n(NetworkX)\nZachary’s Karate Club\nLab 1, Part 3 (built-in graph)\n\n\ndata/graph/Cora/\nCora citation network\nLab 1 graph helpers (optional, larger graph)\n\n\ndata/graph/OGB/ogbn_arxiv/\nogbn-arxiv\nLab 1 graph helpers (optional, larger graph)\n\n\ndata/interaction/Movielens/\nMovieLens 100K\nLab 1, Part 4\n\n\ndata/transaction/groceries.csv\nGroceries market baskets\nLab 1, Part 5\n\n\n\n\n\n\n\n\n\nImportantSome Datasets Must Be Downloaded Once\n\n\n\nMovieLens 100K is not shipped with the repository. Download it from GroupLens and place u.data, u.item, and u.user under data/interaction/Movielens/. Lab 1 Part 4 will not run until those files are present.\n20 Newsgroups and Groceries are already under data/. Titanic and Karate Club are loaded from libraries, so no extra files are required.",
+    "text": "Datasets\nLabs share a data/ folder at the top level of the course repository. Quarto is configured so that every notebook runs with the project root as its working directory, so paths such as data/transaction/groceries.csv work from any lab.\n\n\n\n\n\n\n\n\nFolder\nDataset\nUsed in\n\n\n\n\n(seaborn)\nTitanic\nLab 1, Part 1 (loaded in code; not stored under data/)\n\n\ndata/text/20newsgroups/\n20 Newsgroups\nLab 1, Part 2\n\n\n(NetworkX)\nZachary’s Karate Club\nLab 1, Part 3 (built-in graph)\n\n\ndata/interaction/Movielens/\nMovieLens 100K\nLab 1, Part 4\n\n\ndata/transaction/groceries.csv\nGroceries market baskets\nLab 1, Part 5\n\n\n\n\n\n\n\n\n\nImportantSome Datasets Must Be Downloaded Once\n\n\n\nMovieLens 100K is not shipped with the repository. Download it from GroupLens and place u.data, u.item, and u.user under data/interaction/Movielens/. Lab 1 Part 4 will not run until those files are present.\n20 Newsgroups and Groceries are already under data/. Titanic and Karate Club are loaded from libraries, so no extra files are required.",
     "crumbs": [
       "Exercises"
     ]
@@ -748,7 +748,7 @@
     "href": "assignments/index.html",
     "title": "Assignments Guide",
     "section": "",
-    "text": "There will be one homework (HW) for each topical unit of the course, due soon after we finish that unit. These are intended to build your conceptual analysis skills plus your implementation skills in Python. All deadlines are at 11:59 PM KST.\n\n\n\nHW\nTitle\nDue\n\n\n\n\nHW01\nNumerical Programming with NumPy\n26.03.29\n\n\nHW02\nLinear and Logistic Regression via Gradient Descent\n26.04.05\n\n\nHW03\nFeedforward Neural Network with PyTorch\nTBA\n\n\nHW04\nConvolutional Neural Network with PyTorch\nTBA\n\n\nHW05\nRecurrent Neural Network with PyTorch\nTBA\n\n\nHW06\nAutoencoder\nTBA\n\n\nHW07\nSVM and Kernel Methods\nTBA\n\n\nHW08\nDecision Tree and Ensemble Methods\nTBA",
+    "text": "There will be one homework (HW) for each topical unit of the course, due soon after we finish that unit. These are intended to build your conceptual analysis skills plus your implementation skills in Python. All deadlines are at 11:59 PM KST.\n\n\n\nHW\nTitle\nDue\n\n\n\n\nTBA\nTBA\nTBA",
     "crumbs": [
       "Assignments"
     ]
@@ -758,7 +758,7 @@
     "href": "assignments/index.html#homeworks",
     "title": "Assignments Guide",
     "section": "",
-    "text": "There will be one homework (HW) for each topical unit of the course, due soon after we finish that unit. These are intended to build your conceptual analysis skills plus your implementation skills in Python. All deadlines are at 11:59 PM KST.\n\n\n\nHW\nTitle\nDue\n\n\n\n\nHW01\nNumerical Programming with NumPy\n26.03.29\n\n\nHW02\nLinear and Logistic Regression via Gradient Descent\n26.04.05\n\n\nHW03\nFeedforward Neural Network with PyTorch\nTBA\n\n\nHW04\nConvolutional Neural Network with PyTorch\nTBA\n\n\nHW05\nRecurrent Neural Network with PyTorch\nTBA\n\n\nHW06\nAutoencoder\nTBA\n\n\nHW07\nSVM and Kernel Methods\nTBA\n\n\nHW08\nDecision Tree and Ensemble Methods\nTBA",
+    "text": "There will be one homework (HW) for each topical unit of the course, due soon after we finish that unit. These are intended to build your conceptual analysis skills plus your implementation skills in Python. All deadlines are at 11:59 PM KST.\n\n\n\nHW\nTitle\nDue\n\n\n\n\nTBA\nTBA\nTBA",
     "crumbs": [
       "Assignments"
     ]
@@ -768,7 +768,7 @@
     "href": "assignments/index.html#what-youll-receive",
     "title": "Assignments Guide",
     "section": "What You’ll Receive",
-    "text": "What You’ll Receive\nFor each assignment, you will receive starter code consisting of two types of files.\n\nhwXX.py (or multiple hwXX_partN.py files): Submission file(s). Write your solutions here.\n\nex, hw0_split.py, hw0_knn.py\n\nhwXX.ipynb: Experimentation notebook. Use this to explore, test, and debug your code interactively.",
+    "text": "What You’ll Receive\nFor each assignment, you will receive starter code consisting of two types of files.\n\nhwXX.py (or multiple hwXX_partN.py files): Submission file(s). Write your solutions here.\nhwXX.ipynb: Experimentation notebook. Use this to explore, test, and debug your code interactively.",
     "crumbs": [
       "Assignments"
     ]
