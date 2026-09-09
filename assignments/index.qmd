@@ -8,21 +8,13 @@ There will be one homework (HW) for each topical unit of the course, due soon af
 
 | HW | Title | Due |
 |:---|:-----|:-----|
-| [HW01](hw01/hw01.html) | Numerical Programming with NumPy | 26.03.29 |
-| [HW02](hw02/hw02.html) | Linear and Logistic Regression via Gradient Descent | 26.04.05 |
-| [HW03](hw03/hw03.html) | Feedforward Neural Network with PyTorch | TBA |
-| [HW04](hw04/hw04.html) | Convolutional Neural Network with PyTorch | TBA |
-| [HW05](hw05/hw05.html) | Recurrent Neural Network with PyTorch | TBA |
-| [HW06](hw06/hw06.html) | Autoencoder | TBA |
-| [HW07](hw07/hw07.html) | SVM and Kernel Methods | TBA |
-| [HW08](hw08/hw08.html) | Decision Tree and Ensemble Methods | TBA |
+| TBA | TBA | TBA |
 
 ## What You'll Receive
 
 For each assignment, you will receive starter code consisting of two types of files.
 
 - `hwXX.py` (or multiple `hwXX_partN.py` files): **Submission file(s).** Write your solutions here.
-  - ex, `hw0_split.py`, `hw0_knn.py`
 - `hwXX.ipynb`: **Experimentation notebook.** Use this to explore, test, and debug your code interactively.
 
 ## Workflow

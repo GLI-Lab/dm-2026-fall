@@ -80,19 +80,4 @@ website:
         - section: "Assignments"
           href: assignments/index.qmd
           contents:
-            - text: "HW1 (~26.03.29)"
-              href: assignments/hw01/hw01.qmd
-            - text: "HW2 (~26.04.05)"
-              href: assignments/hw02/hw02.qmd
-            - text: "HW3 (~TBA)"
-              href: assignments/hw03/hw03.qmd
-            - text: "HW4 (~TBA)"
-              href: assignments/hw04/hw04.qmd
-            - text: "HW5 (~TBA)"
-              href: assignments/hw05/hw05.qmd
-            - text: "HW6 (~TBA)"
-              href: assignments/hw06/hw06.qmd
-            - text: "HW7 (~TBA)"
-              href: assignments/hw07/hw07.qmd
-            - text: "HW8 (~TBA)"
-              href: assignments/hw08/hw08.qmd
+            - text: "TBA"

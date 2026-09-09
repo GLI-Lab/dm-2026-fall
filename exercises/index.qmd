@@ -51,8 +51,6 @@ Labs share a `data/` folder at the **top level of the course repository**. Quart
 | *(seaborn)* | Titanic | Lab 1, Part 1 (loaded in code; not stored under `data/`) |
 | `data/text/20newsgroups/` | 20 Newsgroups | Lab 1, Part 2 |
 | *(NetworkX)* | Zachary's Karate Club | Lab 1, Part 3 (built-in graph) |
-| `data/graph/Cora/` | Cora citation network | Lab 1 graph helpers (optional, larger graph) |
-| `data/graph/OGB/ogbn_arxiv/` | ogbn-arxiv | Lab 1 graph helpers (optional, larger graph) |
 | `data/interaction/Movielens/` | MovieLens 100K | Lab 1, Part 4 |
 | `data/transaction/groceries.csv` | Groceries market baskets | Lab 1, Part 5 |
 
