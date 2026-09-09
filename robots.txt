@@ -1,1 +1,1 @@
-Sitemap: https://gli.konkuk.ac.kr/board/lectures/machine-learning/sitemap.xml
+Sitemap: https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/sitemap.xml

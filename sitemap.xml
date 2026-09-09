@@ -1,115 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab06/rnn-architecture.html</loc>
-    <lastmod>2026-09-09T01:47:34.964Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/lab00/python-basics.html</loc>
+    <lastmod>2026-09-09T05:07:36.834Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab04/mlp-regression-scratch.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/lab00/numpy-basics.html</loc>
+    <lastmod>2026-09-09T05:07:36.834Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab01/matplotlib-basics.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/lab01/lab01.html</loc>
+    <lastmod>2026-09-09T05:07:36.834Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab01/pandas-basics.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/index.html</loc>
+    <lastmod>2026-09-09T05:07:36.833Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab02/linear-regression.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/assignments/index.html</loc>
+    <lastmod>2026-09-09T05:07:36.777Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab02/classification-metrics.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/index.html</loc>
+    <lastmod>2026-09-09T05:07:36.837Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab03/logistic-regression-scratch.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/README-students.html</loc>
+    <lastmod>2026-09-09T05:07:36.721Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab03/linear-regression-scratch.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup.html</loc>
+    <lastmod>2026-09-09T05:07:36.833Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/index.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/lab00/pandas-basics.html</loc>
+    <lastmod>2026-09-09T05:07:36.834Z</lastmod>
   </url>
   <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw05/hw05.html</loc>
-    <lastmod>2026-09-09T01:47:34.959Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw07/hw07.html</loc>
-    <lastmod>2026-09-09T01:47:34.960Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw08/hw08.html</loc>
-    <lastmod>2026-09-09T01:47:34.960Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw03/hw03.html</loc>
-    <lastmod>2026-09-09T01:47:34.959Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/index.html</loc>
-    <lastmod>2026-09-09T01:47:34.960Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/index.html</loc>
-    <lastmod>2026-09-09T01:47:34.966Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw04/hw04.html</loc>
-    <lastmod>2026-09-09T01:47:34.959Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw02/hw02.html</loc>
-    <lastmod>2026-09-09T01:47:34.959Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw01/hw01.html</loc>
-    <lastmod>2026-09-09T01:47:34.959Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/assignments/hw06/hw06.html</loc>
-    <lastmod>2026-09-09T01:47:34.960Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/README-students.html</loc>
-    <lastmod>2026-09-09T01:47:34.907Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab05/cnn-architecture.html</loc>
-    <lastmod>2026-09-09T01:47:34.964Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab03/softmax-regression-scratch.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab02/softmax-regression.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab02/logistic-regression.html</loc>
-    <lastmod>2026-09-09T01:47:34.963Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/environment-setup.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab01/numpy-basics.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab01/python-basics.html</loc>
-    <lastmod>2026-09-09T01:47:34.962Z</lastmod>
-  </url>
-  <url>
-    <loc>https://gli.konkuk.ac.kr/board/lectures/machine-learning/exercises/lab04/mlp-regression-scratch2.html</loc>
-    <lastmod>2026-09-09T01:47:34.964Z</lastmod>
+    <loc>https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/lab00/matplotlib-basics.html</loc>
+    <lastmod>2026-09-09T05:07:36.833Z</lastmod>
   </url>
 </urlset>
