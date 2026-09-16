@@ -1,0 +1,228 @@
+---
+title: "Lab 01. Exploring Data Representations"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+A dataset does not have only one useful representation.
+
+In this lab, we examine how the same underlying data can be represented as
+records, sequences, matrices, vectors, and graphs.
+
+> **Before choosing an algorithm, choose a representation.**
+
+# Part 3. Graph Data
+
+We use **Zachary's Karate Club** to examine how the same graph changes when
+we represent it differently.
+
+```{python}
+#| label: setup-graph
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab01")
+if not (_lab / "lab01_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab01_setup
+
+import networkx as nx
+import pandas as pd
+
+from lab01_graph import (
+    plot_karate_graph,
+    plot_adjacency_matrix,
+)
+```
+
+## 3.1 Load the Data
+
+Zachary's Karate Club is a small social network.
+
+- Node = club member
+- Edge = relationship between two members
+
+`load_karate()` reads `data/graph/karate/nodes.csv` and `edges.csv`. If those
+files are missing, it writes them from NetworkX `karate_club_graph()`.
+
+```{python}
+from data.loader import load_karate
+
+G = load_karate()
+
+type(G), G.number_of_nodes(), G.number_of_edges()
+```
+
+## 3.2 Inspect Basic Graph Structure
+
+A graph contains **nodes**, **edges**, and their attributes.
+We can also inspect how each node is connected to other nodes.
+
+```{python}
+G.nodes[0]
+```
+
+```{python}
+G.edges[0, 1]
+```
+
+```{python}
+G.degree[0]
+```
+
+```{python}
+list(G.neighbors(0))
+```
+
+```{python}
+G.has_edge(0, 1)
+```
+
+`degree` gives the number of edges connected to a node, while `neighbors()`
+returns the nodes directly connected to it.
+
+**Think:** What information does a graph store?  
+A graph stores nodes, their attributes, and the connections between nodes.
+
+## 3.3 Representation 1: Graph Visualization
+
+The **graph** can be visualized using nodes and edges.
+
+Each node represents a club member, and each line represents a relationship
+between two members.
+
+```{python}
+#| fig-cap: "Karate Club graph visualization"
+
+plot_karate_graph(G)
+```
+
+**Think:** What information is easy to see in a graph visualization?  
+We can visually inspect neighborhoods, highly connected nodes, and groups of
+nodes that appear close together.
+
+## 3.4 Representation 2: Edge List
+
+The same graph can be represented as a **list of connected node pairs**.
+
+`G.edges()` returns the graph's connections. We place these pairs into a table
+with one edge per row.
+
+```{python}
+edge_list = pd.DataFrame(
+    G.edges(),
+    columns=["source", "target"],
+)
+
+type(edge_list), edge_list.shape
+```
+
+```{python}
+edge_list.head(10)
+```
+
+The table has the following meaning:
+
+- Row = edge
+- `source` = one endpoint
+- `target` = the other endpoint
+
+Because this graph is undirected, `source` and `target` do not indicate
+direction.
+
+For example, the following code shows all edges connected to node `31`.
+
+```{python}
+list(G.edges(31))
+```
+
+**Think:** Does the edge list contain different graph information from the
+graph visualization?  
+No. A line in the visualization becomes a `(source, target)` pair in the
+table.
+
+## 3.5 Representation 3: Adjacency List
+
+The same graph can also be represented by **listing the neighbors of each node**.
+
+For each node, `G.neighbors()` gives the nodes directly connected to it.
+
+```{python}
+adjacency_list = {
+    node: list(G.neighbors(node))
+    for node in G.nodes()
+}
+
+type(adjacency_list), len(adjacency_list)
+```
+
+```{python}
+for node in list(adjacency_list)[:10]:
+    print(node, ":", adjacency_list[node])
+```
+
+Each key is a node, and its value is the list of neighboring nodes.
+
+**Think:** How is the same connection represented here?  
+If node `1` appears in the neighbor list of node `0`, then nodes `0` and `1`
+are connected by an edge.
+
+## 3.6 Representation 4: Adjacency Matrix
+
+The same graph can also be represented as a **nodes × nodes matrix**.
+
+`nx.to_numpy_array()` converts the graph into a matrix. Here, `weight=None`
+means that we only represent whether an edge exists, so the matrix contains
+binary values.
+
+```{python}
+A = nx.to_numpy_array(
+    G,
+    weight=None,
+    dtype=int,
+)
+
+type(A), A.shape
+```
+
+We add node labels to the rows and columns so that the matrix is easier to
+inspect.
+
+```{python}
+A_numeric = pd.DataFrame(
+    A,
+    index=[f"N{i}" for i in range(A.shape[0])],
+    columns=[f"N{i}" for i in range(A.shape[1])],
+)
+
+A_numeric.iloc[:10, :10]
+```
+
+A value of `1` means that two nodes are connected, while `0` means that there
+is no direct edge.
+
+The same adjacency matrix can also be visualized using color.
+
+```{python}
+#| fig-cap: "Karate Club binary adjacency matrix"
+
+plot_adjacency_matrix(
+    A,
+    n=12,
+)
+```
+
+**Think:** Is this different information from the graph visualization, edge
+list, or adjacency list?  
+No. The same connections are represented in matrix form.

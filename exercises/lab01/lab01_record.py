@@ -1,114 +1,43 @@
 """
 lab01_record.py
 
-Helper functions for Lab 01 — Record Data.
+Helper functions for Lab 01-1 — Record Data.
 
-Design rule
------------
-- .py  : load data and construct representations
-- .qmd : inspect returned objects, visualize them, and interpret them
-
-Dataset
--------
-Titanic
+Original Titanic rows are loaded by data.loader.
+This helper constructs representations and draws figures.
 """
 
 from __future__ import annotations
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
-import seaborn as sns
-
-from sklearn.preprocessing import MultiLabelBinarizer
 
 
-def load_titanic() -> pd.DataFrame:
-    """Load the Titanic dataset and keep the columns used in this lab."""
-    titanic = sns.load_dataset("titanic")
-
-    return titanic[
-        [
-            "survived",
-            "pclass",
-            "sex",
-            "age",
-            "fare",
-            "embarked",
-            "alone",
-        ]
-    ].copy()
-
-
-def build_numeric_matrix(
-    titanic: pd.DataFrame,
+def fill_titanic_missing_values(
+    df: pd.DataFrame,
 ) -> pd.DataFrame:
-    """Titanic records -> numerical feature matrix."""
-    X = titanic[
-        [
-            "age",
-            "fare",
-            "pclass",
-            "sex",
-            "embarked",
-            "alone",
-        ]
-    ].copy()
+    """Fill missing values used in this lab."""
+    data = df.copy()
 
-    X["age"] = X["age"].fillna(
-        X["age"].median()
-    )
+    if "age" in data.columns:
+        data["age"] = data["age"].fillna(
+            data["age"].median()
+        )
 
-    X["embarked"] = X["embarked"].fillna(
-        X["embarked"].mode()[0]
-    )
+    if "embarked" in data.columns:
+        data["embarked"] = data["embarked"].fillna(
+            data["embarked"].mode()[0]
+        )
 
-    X = pd.get_dummies(
-        X,
-        columns=[
-            "pclass",
-            "sex",
-            "embarked",
-            "alone",
-        ],
-        dtype=int,
-    )
-
-    return X
+    return data
 
 
 def build_transactions(
-    titanic: pd.DataFrame,
+    data: pd.DataFrame,
 ) -> pd.Series:
-    """Titanic records -> transaction representation."""
-    data = titanic.copy()
-
-    data["embarked"] = data["embarked"].fillna(
-        data["embarked"].mode()[0]
-    )
-
-    data["age_group"] = pd.cut(
-        data["age"],
-        bins=[0, 12, 18, 35, 60, np.inf],
-        labels=[
-            "child",
-            "teen",
-            "young_adult",
-            "adult",
-            "senior",
-        ],
-    )
-
-    data["fare_group"] = pd.qcut(
-        data["fare"],
-        q=4,
-        labels=[
-            "low",
-            "medium",
-            "high",
-            "very_high",
-        ],
-    )
+    """Convert passenger rows into transaction items."""
 
     def to_transaction(row):
         items = [
@@ -133,23 +62,6 @@ def build_transactions(
     return data.apply(
         to_transaction,
         axis=1,
-    )
-
-
-def build_binary_item_matrix(
-    transactions: pd.Series,
-) -> pd.DataFrame:
-    """Transaction representation -> binary item matrix."""
-    mlb = MultiLabelBinarizer()
-
-    X = mlb.fit_transform(
-        transactions
-    )
-
-    return pd.DataFrame(
-        X,
-        index=transactions.index,
-        columns=mlb.classes_,
     )
 
 
@@ -181,3 +93,156 @@ def build_bipartite_graph(
             )
 
     return G
+
+
+def plot_bipartite_graph(
+    G: nx.Graph,
+) -> None:
+    """Visualize a passenger-attribute bipartite graph."""
+    passenger_nodes = [
+        node
+        for node, data in G.nodes(data=True)
+        if data["node_type"] == "passenger"
+    ]
+
+    attribute_nodes = [
+        node
+        for node, data in G.nodes(data=True)
+        if data["node_type"] == "attribute"
+    ]
+
+    attribute_order = [
+        "pclass",
+        "sex",
+        "embarked",
+        "alone",
+        "age_group",
+        "fare_group",
+    ]
+
+    def attribute_key(node):
+        prefix = node.split("=")[0]
+        if prefix in attribute_order:
+            group = attribute_order.index(prefix)
+        else:
+            group = len(attribute_order)
+        return (group, node)
+
+    attribute_nodes = sorted(
+        attribute_nodes,
+        key=attribute_key,
+    )
+
+    pos = {}
+
+    passenger_y = np.linspace(
+        0.9,
+        -0.9,
+        len(passenger_nodes),
+    )
+
+    for y, node in zip(
+        passenger_y,
+        passenger_nodes,
+    ):
+        pos[node] = (-0.5, y)
+
+    attribute_y = np.linspace(
+        0.95,
+        -0.95,
+        len(attribute_nodes),
+    )
+
+    for y, node in zip(
+        attribute_y,
+        attribute_nodes,
+    ):
+        pos[node] = (0.5, y)
+
+    fig, ax = plt.subplots(
+        figsize=(7, 5.5)
+    )
+
+    nx.draw_networkx_edges(
+        G,
+        pos,
+        edge_color="lightgray",
+        alpha=0.6,
+        ax=ax,
+    )
+
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        nodelist=passenger_nodes,
+        node_size=340,
+        node_color="skyblue",
+        ax=ax,
+    )
+
+    nx.draw_networkx_nodes(
+        G,
+        pos,
+        nodelist=attribute_nodes,
+        node_size=340,
+        node_color="salmon",
+        node_shape="s",
+        ax=ax,
+    )
+
+    passenger_label_pos = {
+        node: (-0.44, pos[node][1])
+        for node in passenger_nodes
+    }
+
+    attribute_label_pos = {
+        node: (0.44, pos[node][1])
+        for node in attribute_nodes
+    }
+
+    nx.draw_networkx_labels(
+        G,
+        passenger_label_pos,
+        labels={
+            node: node
+            for node in passenger_nodes
+        },
+        font_size=7,
+        horizontalalignment="left",
+        ax=ax,
+    )
+
+    nx.draw_networkx_labels(
+        G,
+        attribute_label_pos,
+        labels={
+            node: node
+            for node in attribute_nodes
+        },
+        font_size=7,
+        horizontalalignment="right",
+        ax=ax,
+    )
+
+    ax.text(
+        -0.5,
+        1.05,
+        "Passengers",
+        ha="center",
+        fontsize=9,
+    )
+
+    ax.text(
+        0.5,
+        1.05,
+        "Attribute-value items",
+        ha="center",
+        fontsize=9,
+    )
+
+    ax.set_xlim(-0.78, 0.78)
+    ax.set_ylim(-1.05, 1.1)
+    ax.axis("off")
+
+    plt.tight_layout()
+    plt.show()

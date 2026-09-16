@@ -1,210 +1,132 @@
 """
 lab01_graph.py
 
-Helper functions for Lab 01 — Graph Data.
+Helper functions for Lab 01-3 — Graph Data.
 
-Design rule
------------
-- .py  : load data and construct representations
-- .qmd : inspect returned objects, visualize them, and interpret them
-
-Datasets
---------
-Zachary's Karate Club (34 nodes, NetworkX built-in)
-Cora citation network (2,708 nodes, PyTorch Geometric)
-ogbn-arxiv citation network (169,343 nodes, Open Graph Benchmark)
-
-Notes
------
-Cora and ogbn-arxiv require extra packages::
-
-    pip install torch torch_geometric ogb
-
-The first call downloads each dataset (about 1-2 minutes).
+Original Karate Club files are stored by data.loader.
+This helper draws figures from the loaded graph.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
-import pandas as pd
 
-# exercises/lab01/thisfile.py → parents[2] is the project root
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-
+from matplotlib.colors import ListedColormap
 
 RANDOM_STATE = 42
 
 
-def _allow_pyg_globals() -> None:
-    """Allowlist PyG classes for torch.load (required since PyTorch 2.6).
-
-    PyTorch 2.6 changed the default of ``torch.load`` to weights-only safe
-    mode, which rejects the PyG classes used inside saved dataset files.
-    """
-    try:
-        import torch
-        from torch_geometric.data.data import DataEdgeAttr, DataTensorAttr
-        from torch_geometric.data.storage import GlobalStorage
-    except ImportError as exc:
-        raise ImportError(
-            "Loading Cora / ogbn-arxiv requires torch and torch_geometric. "
-            "Install them with: pip install torch torch_geometric"
-        ) from exc
-
-    torch.serialization.add_safe_globals(
-        [DataEdgeAttr, DataTensorAttr, GlobalStorage]
-    )
-
-
-def load_karate() -> nx.Graph:
-    """Load Zachary's Karate Club graph (34 nodes, 78 edges)."""
-    return nx.karate_club_graph()
-
-
-def build_edge_list(
+def plot_karate_graph(
     G: nx.Graph,
-) -> pd.DataFrame:
-    """Graph -> edge-list representation."""
-    return pd.DataFrame(
-        G.edges(),
-        columns=["source", "target"],
-    )
-
-
-def build_adjacency_list(
-    G: nx.Graph,
-) -> dict:
-    """Graph -> adjacency-list representation."""
-    return {
-        node: list(G.neighbors(node))
+) -> None:
+    """Visualize the graph with node layout and club membership colors."""
+    node_colors = [
+        "skyblue"
+        if G.nodes[node]["club"] == "Mr. Hi"
+        else "salmon"
         for node in G.nodes()
-    }
+    ]
 
-
-def adjacency(
-    G: nx.Graph,
-) -> np.ndarray:
-    """Graph -> binary adjacency matrix (nodes x nodes)."""
-    return nx.to_numpy_array(
+    pos = nx.spring_layout(
         G,
-        weight=None,
-        dtype=int,
+        seed=RANDOM_STATE,
     )
 
+    plt.figure(
+        figsize=(8, 6)
+    )
 
-def load_cora(
+    nx.draw(
+        G,
+        pos,
+        node_color=node_colors,
+        with_labels=True,
+        node_size=500,
+        edge_color="gray",
+    )
+
+    plt.show()
+
+
+def plot_adjacency_matrix(
+    A: np.ndarray,
     *,
-    root: str = str(_PROJECT_ROOT / "data" / "graph" / "Cora"),
-):
-    """Load the Cora citation network.
-
-    Returns
-    -------
-    (dataset, data) : PyG ``Planetoid`` dataset and its single graph object.
-    """
-    _allow_pyg_globals()
-    from torch_geometric.datasets import Planetoid
-
-    dataset = Planetoid(
-        root=root,
-        name="Cora",
+    n: int = 12,
+) -> None:
+    """Visualize a binary adjacency matrix."""
+    n = min(
+        n,
+        A.shape[0],
+        A.shape[1],
     )
 
-    return dataset, dataset[0]
+    A_small = A[:n, :n]
 
-
-def load_arxiv(
-    *,
-    root: str = str(_PROJECT_ROOT / "data" / "graph" / "OGB"),
-):
-    """Load the ogbn-arxiv citation network.
-
-    Returns
-    -------
-    (dataset, data) : OGB node-property-prediction dataset and its graph.
-    """
-    _allow_pyg_globals()
-
-    try:
-        from ogb.nodeproppred import PygNodePropPredDataset
-    except ImportError as exc:
-        raise ImportError(
-            "load_arxiv() requires ogb. Install it with: pip install ogb"
-        ) from exc
-
-    dataset = PygNodePropPredDataset(
-        name="ogbn-arxiv",
-        root=root,
+    cmap = ListedColormap(
+        [
+            "#F7F7F7",
+            "#87CEEB",
+        ]
     )
 
-    return dataset, dataset[0]
-
-
-def to_networkx_undirected(
-    data,
-) -> nx.Graph:
-    """Convert a PyG graph object into an undirected NetworkX graph."""
-    import torch_geometric.utils as pyg_utils
-
-    return pyg_utils.to_networkx(
-        data,
-        to_undirected=True,
+    fig, ax = plt.subplots(
+        figsize=(7, 7)
     )
 
-
-def largest_component(
-    G: nx.Graph,
-) -> nx.Graph:
-    """Return the subgraph induced by the largest connected component.
-
-    Useful for whole-graph layouts of networks like Cora, where many small
-    disconnected fragments would otherwise clutter the drawing.
-    """
-    largest_cc = max(
-        nx.connected_components(G),
-        key=len,
+    ax.imshow(
+        A_small,
+        cmap=cmap,
+        vmin=0,
+        vmax=1,
+        interpolation="nearest",
     )
 
-    return G.subgraph(largest_cc)
+    for i in range(n):
+        for j in range(n):
+            ax.text(
+                j,
+                i,
+                str(A_small[i, j]),
+                ha="center",
+                va="center",
+                fontsize=8,
+            )
 
+    ax.set_xticks(range(n))
+    ax.set_yticks(range(n))
 
-def khop_subgraph(
-    data,
-    *,
-    center: int = 0,
-    hops: int = 2,
-) -> tuple[nx.Graph, list]:
-    """Extract the k-hop neighborhood of one node as a NetworkX graph.
-
-    ``hops=2`` keeps the center node, its neighbors, and their neighbors
-    ("friends of friends"), so a huge graph can be inspected locally.
-
-    Returns
-    -------
-    (G_sub, labels) : the subgraph and per-node class labels for coloring.
-    """
-    from torch_geometric.utils import k_hop_subgraph
-
-    sub_nodes, sub_edge_index, _, _ = k_hop_subgraph(
-        center,
-        hops,
-        data.edge_index,
-        relabel_nodes=True,
+    ax.set_xticklabels(
+        [f"N{i}" for i in range(n)]
+    )
+    ax.set_yticklabels(
+        [f"N{i}" for i in range(n)]
     )
 
-    G_sub = nx.Graph()
-    G_sub.add_nodes_from(
-        range(sub_nodes.size(0))
+    ax.set_xticks(
+        np.arange(-0.5, n, 1),
+        minor=True,
     )
-    G_sub.add_edges_from(
-        sub_edge_index.t().tolist()
+    ax.set_yticks(
+        np.arange(-0.5, n, 1),
+        minor=True,
     )
 
-    labels = data.y[
-        sub_nodes
-    ].squeeze().tolist()
+    ax.grid(
+        which="minor",
+        color="#D9D9D9",
+        linewidth=0.6,
+    )
 
-    return G_sub, labels
+    ax.tick_params(
+        which="minor",
+        bottom=False,
+        left=False,
+    )
+
+    ax.set_xlabel("Node")
+    ax.set_ylabel("Node")
+
+    plt.tight_layout()
+    plt.show()

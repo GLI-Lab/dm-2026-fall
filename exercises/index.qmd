@@ -29,14 +29,13 @@ Get comfortable with the Python stack used throughout the course before working 
 
 **Lab 1: Exploring Data Representations**
 
-One notebook, five data types. For each type you will construct several representations of the *same* underlying data and compare what each one reveals.
+Five notebooks, five data types. For each type you will construct several representations of the *same* underlying data and compare what each one reveals. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).
 
-- [Lab 1](lab01/lab01.html): Exploring Data Representations
-  - Part 1. Record data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)
-  - Part 2. Text data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)
-  - Part 3. Graph data — Zachary's Karate Club (visualization, edge list, adjacency list, adjacency matrix)
-  - Part 4. Interaction data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
-  - Part 5. Transaction data — Groceries (baskets, long table, binary matrix, co-occurrence graph)
+- [Lab 1-1](lab01/lab01-1-record.html): Record Data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)
+- [Lab 1-2](lab01/lab01-2-text.html): Text Data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)
+- [Lab 1-3](lab01/lab01-3-graph.html): Graph Data — Zachary's Karate Club (visualization, edge list, adjacency list, adjacency matrix)
+- [Lab 1-4](lab01/lab01-4-interaction.html): Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
+- [Lab 1-5](lab01/lab01-5-transaction.html): Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)
 
 **Later labs (TBD)**
 
@@ -44,22 +43,24 @@ Additional labs will be posted as the corresponding lecture units are covered.
 
 ## Datasets
 
-Labs share a `data/` folder at the **top level of the course repository**. Quarto is configured so that every notebook runs with the project root as its working directory, so paths such as `data/transaction/groceries.csv` work from any lab.
+Original files live in the repository `data/` folder, not beside each notebook. Labs import `data.loader`, which finds those files and downloads anything that is missing. See `data/README.md` for paths and sources.
 
-| Folder | Dataset | Used in |
+| Path | Dataset | Used in |
 |:---|:---|:---|
-| *(seaborn)* | Titanic | Lab 1, Part 1 (loaded in code; not stored under `data/`) |
-| `data/text/20newsgroups/` | 20 Newsgroups | Lab 1, Part 2 |
-| *(NetworkX)* | Zachary's Karate Club | Lab 1, Part 3 (built-in graph) |
-| `data/interaction/Movielens/` | MovieLens 100K | Lab 1, Part 4 |
-| `data/transaction/groceries.csv` | Groceries market baskets | Lab 1, Part 5 |
+| `data/record/titanic.csv` | Titanic | Lab 1-1 (`load_titanic()`; seaborn if missing) |
+| `data/text/20newsgroups/` | 20 Newsgroups | Lab 1-2 (`load_20newsgroups()`; sklearn cache if missing) |
+| `data/graph/karate/` | Zachary's Karate Club | Lab 1-3 (`load_karate()`; NetworkX if missing) |
+| `data/interaction/Movielens/` | MovieLens 100K | Lab 1-4 (`load_movielens_100k()`; kagglehub if missing) |
+| `data/transaction/groceries_kaggle.csv` | Groceries baskets from Kaggle | Lab 1-5 (`load_groceries()`; kagglehub if missing) |
 
 ::: {.callout-important}
-## Some Datasets Must Be Downloaded Once
+## Datasets Are Downloaded on First Run
 
-**MovieLens 100K** is not shipped with the repository. Download it from [GroupLens](https://grouplens.org/datasets/movielens/100k/) and place `u.data`, `u.item`, and `u.user` under `data/interaction/Movielens/`. Lab 1 Part 4 will not run until those files are present.
+You do not need to copy files into the lab folder. Run the load cell; if the file is already under `data/`, nothing is downloaded.
 
-**20 Newsgroups** and **Groceries** are already under `data/`. Titanic and Karate Club are loaded from libraries, so no extra files are required.
+**MovieLens 100K** is not shipped with the repository. If `u.data`, `u.item`, and `u.user` are missing, Lab 1-4 downloads them with `kagglehub` from [Kaggle](https://www.kaggle.com/datasets/trishna8/movielens-100k-dataset) into `data/interaction/Movielens/`. MovieLens 100K may not be redistributed without separate permission from GroupLens.
+
+**20 Newsgroups** is cached under `data/text/20newsgroups/` on first run. **Groceries** uses the Kaggle long-format file `data/transaction/groceries_kaggle(raw).csv`, grouped into baskets as `data/transaction/groceries_kaggle.csv`. If the processed file is missing, Lab 1-5 downloads [heeraldedhia/groceries-dataset](https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset) with `kagglehub`. Titanic and Karate Club are written under `data/` the first time they are loaded.
 :::
 
 ## What You Will Receive
@@ -72,10 +73,11 @@ Each prerequisite lab is a single guided notebook with explanations and complete
 
 ### Lab 1 and later
 
-Starting with Lab 1, each lab is split so that **construction** and **interpretation** stay separate:
+Starting with Lab 1, each lab lives in its own folder (`exercises/lab01/`, …) and is split so that **construction** and **interpretation** stay separate:
 
-- `labXX.qmd`: The notebook you read and run. It inspects returned objects, visualizes them, and asks you to interpret the results.
-- `labXX_*.py`: Helper modules that load data and *construct* representations. You do not need to rewrite these to complete the lab; you import them and study what they return.
+- `lab01-1-record.qmd`, `lab01-2-text.qmd`, `lab01-3-graph.qmd`, `lab01-4-interaction.qmd`, `lab01-5-transaction.qmd`: The notebooks you read and run. Each loads data with `data.loader`, inspects returned objects, visualizes them, and asks you to interpret the results.
+- `lab01_*.py`: Helper modules beside the notebooks that *construct* representations and draw figures. You do not need to rewrite these to complete the lab; you import them and study what they return.
+- `data.loader`: Locates original files under the repository `data/` folder and downloads them if they are missing.
 
 For Lab 1 the helpers are `lab01_record.py`, `lab01_text.py`, `lab01_graph.py`, `lab01_interaction.py`, and `lab01_transaction.py`.
 
@@ -89,7 +91,7 @@ Follow the [Python Environment Setup](environment-setup.html) guide before openi
 
 ### Step 2: Open the Lab Notebook
 
-Launch the notebook using JupyterLab, VS Code, or Google Colab. Each lab opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
+Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from `exercises/lab01/` so that helper modules import cleanly; `lab01_setup.py` also puts the repository root on `sys.path` so `from data.loader import ...` works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
 
 ::: {.callout-note}
 ## Running Cells in Order
@@ -123,10 +125,10 @@ Each prerequisite notebook follows a skill-oriented layout:
 
 ### Lab 1
 
-Lab 1 is organized by **data type**, not by algorithm:
+Lab 1 is organized by **data type**, one notebook per type:
 
-- **Overview** states the theme of the lab: one dataset, many representations.
-- **Parts 1–5** each load one dataset, build several representations, and visualize or inspect them. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).
+- **Overview** restates the theme of the lab: one dataset, many representations.
+- **Lab 1-1 through Lab 1-5** each load one dataset, build several representations, and visualize or inspect them.
 - **Think** prompts at the end of a part ask you to say what was *stored* in the original data versus what was *derived* (for example, an item–item co-occurrence graph).
 
-When a lab imports a `labXX_*.py` module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.
+When a lab imports `data.loader`, treat that as the place where original files are found and loaded. When it imports a `lab01_*.py` module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.

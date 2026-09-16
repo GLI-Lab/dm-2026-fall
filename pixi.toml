@@ -5,7 +5,7 @@ name = "data-mining-course"
 platforms = ["linux-64", "osx-arm64", "win-64"]
 version = "0.1.0"
 
-[dependencies]
+[dependencies]  # conda-forge에 있으면
 python = "3.12.*"
 
 numpy = "*"                  # W2-W15
@@ -19,9 +19,12 @@ networkx = ">=3.1"           # W5, W10 Louvain, W12 PageRank/HITS, W15
 mlxtend = "*"                # W7 apriori, fpgrowth, association_rules
 gensim = ">=4.3.3"           # W14 Word2Vec, W15 DeepWalk/Node2Vec
 jupyterlab = "*"             # notebooks, and Quarto executes .qmd cells through it
+kagglehub = ">=1.0.2,<2"
 
 [tasks]
 lab = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"
 
 [environments]
 default = []
+
+[pypi-dependencies]  # conda-forge에 없거나, PyPI 전용 빌드가 필요할 때

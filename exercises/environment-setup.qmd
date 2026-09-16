@@ -85,7 +85,7 @@ dm-2026-fall/                  # course repository root
 └── exercises/                 # lab notebooks
 ```
 
-Always start Jupyter **from the repository root** so that `data/` paths resolve correctly.
+Shared datasets live in `data/` at the repository root. Lab 1 notebooks import `data.loader`, which always looks there; `lab01_setup.py` puts the repo root on `sys.path` even when the working directory is `exercises/lab01/`.
 
 ### Step 2: Install All Required Packages
 

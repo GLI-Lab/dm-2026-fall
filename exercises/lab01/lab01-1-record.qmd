@@ -1,0 +1,274 @@
+---
+title: "Lab 01. Exploring Data Representations"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+A dataset does not have only one useful representation.
+
+In this lab, we examine how the same underlying data can be represented as
+records, sequences, matrices, vectors, and graphs.
+
+> **Before choosing an algorithm, choose a representation.**
+
+# Part 1. Record Data
+
+We use the **Titanic dataset** to examine how the same passenger records
+change when we represent them differently.
+
+The Titanic dataset contains passenger information such as class, sex, age,
+fare, and survival status. For this lab, we select a subset of numerical and
+categorical attributes.
+
+```{python}
+#| label: setup-record
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab01")
+if not (_lab / "lab01_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab01_setup
+
+import numpy as np
+import pandas as pd
+
+from sklearn.preprocessing import MultiLabelBinarizer
+
+from lab01_record import (
+    fill_titanic_missing_values,
+    build_transactions,
+    build_bipartite_graph,
+    plot_bipartite_graph,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 1.1 Load the Data
+
+`load_titanic()` reads `data/record/titanic.csv`. If that file is missing, it
+downloads the seaborn Titanic table and saves it there.
+
+```{python}
+from data.loader import load_titanic
+
+titanic_raw = load_titanic()
+
+type(titanic_raw), titanic_raw.shape
+```
+
+```{python}
+titanic_raw.columns.tolist()
+```
+
+```{python}
+selected_columns = [
+    "survived",
+    "pclass",
+    "sex",
+    "age",
+    "fare",
+    "embarked",
+    "alone",
+]
+
+titanic = titanic_raw[selected_columns].copy()
+
+type(titanic), titanic.shape
+```
+
+```{python}
+titanic.head()
+```
+
+```{python}
+titanic["survived"].value_counts()
+```
+
+## 1.2 Representation 1: Numerical Feature Matrix
+
+The same passenger records can be represented as **numerical vectors**.
+
+`survived` is excluded because it represents the outcome rather than an input
+feature.
+
+```{python}
+X_numeric = titanic.drop(
+    columns=["survived"]
+).copy()
+```
+
+Missing values in `age` and `embarked` are filled before conversion.
+
+```{python}
+X_numeric = fill_titanic_missing_values(
+    X_numeric
+)
+```
+
+`pd.get_dummies()` converts categorical values into binary (0/1) indicator
+columns.
+
+```{python}
+X_numeric = pd.get_dummies(
+    X_numeric,
+    columns=[
+        "pclass",
+        "sex",
+        "embarked",
+        "alone",
+    ],
+    dtype=int,
+)
+
+type(X_numeric), X_numeric.shape
+```
+
+```{python}
+X_numeric.head()
+```
+
+**Think:** Is this a different dataset?  
+No. The passengers are the same. Only their representation has changed from
+mixed data types to numerical values.
+
+## 1.3 Representation 2: Transaction Representation
+
+The same passenger can also be represented as a **set of attribute-value
+items**.
+
+`pd.cut()` and `pd.qcut()` discretize continuous values into categories.
+
+```{python}
+titanic_tx = fill_titanic_missing_values(
+    titanic.copy()
+)
+
+titanic_tx["age_group"] = pd.cut(
+    titanic_tx["age"],
+    bins=[0, 12, 18, 35, 60, np.inf],
+    labels=[
+        "child",
+        "teen",
+        "young_adult",
+        "adult",
+        "senior",
+    ],
+)
+
+titanic_tx["fare_group"] = pd.qcut(
+    titanic_tx["fare"],
+    q=4,
+    labels=[
+        "low",
+        "medium",
+        "high",
+        "very_high",
+    ],
+)
+```
+
+`build_transactions()` converts each passenger into a set of attribute-value
+items.
+
+```{python}
+transactions = build_transactions(
+    titanic_tx
+)
+
+type(transactions), type(transactions.iloc[0])
+```
+
+```{python}
+for i, items in transactions.head().items():
+    print(i, ":", items)
+```
+
+**Think:** What changed from the original record representation?  
+The passenger is now represented as a set of attribute-value items.
+
+## 1.4 Representation 3: Binary Item Matrix
+
+The transaction representation can be converted into a **binary matrix**.
+
+`MultiLabelBinarizer` converts each passenger's set of items into binary
+(0/1) columns, one for each possible item.
+
+```{python}
+mlb = MultiLabelBinarizer()
+
+X_items = mlb.fit_transform(
+    transactions
+)
+
+item_matrix = pd.DataFrame(
+    X_items,
+    index=transactions.index,
+    columns=mlb.classes_,
+)
+
+type(item_matrix), item_matrix.shape
+```
+
+```{python}
+item_matrix.head()
+```
+
+The matrix has the following meaning:
+
+- Row = passenger
+- Column = attribute-value item
+- Value = 1 if the passenger has that item
+- Value = 0 if the passenger does not have that item
+
+**Think:** Does the binary matrix contain new information?  
+No. It represents the same transaction information in matrix form.
+
+## 1.5 Representation 4: Passenger-Attribute Bipartite Graph
+
+The same transaction data can also be represented as a **bipartite graph**.
+
+We create two kinds of nodes:
+
+- Passenger nodes
+- Attribute-value nodes
+
+An edge connects a passenger to an attribute-value item that belongs to that
+passenger.
+
+```{python}
+G = build_bipartite_graph(
+    transactions,
+    n_show=6,
+)
+
+type(G)
+```
+
+```{python}
+G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+list(G.edges())[:10]
+```
+
+```{python}
+#| fig-cap: "Passenger-attribute bipartite graph"
+#| fig-width: 7
+#| fig-height: 5.5
+
+plot_bipartite_graph(G)
+```

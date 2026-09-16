@@ -24,13 +24,14 @@ This practicum is organized into two types of activities: **Labs** for explorati
 
 ### Labs (In-Class Exercises)
 
-Labs accompany each lecture unit. You receive a Jupyter notebook with complete, runnable code. Your job is to run it, read the explanations, and build intuition for the material covered in lecture.
+Labs accompany each lecture unit. You receive Jupyter notebooks with complete, runnable code. Your job is to run them, read the explanations, and build intuition for the material covered in lecture.
 
-Every lab notebook has the same structure:
+Lab 0 notebooks follow a skill-oriented layout:
 
-- **Objectives** — the specific skills or concepts you will practice. Read this first.
-- **Background** — a concise theory refresher. Not a replacement for the lecture; just a quick reference.
-- **Experiments** — executable cells to run, observe, and tinker with.
+- **Objectives** — the specific Python skills you will practice. Read this first.
+- Short concept notes and numbered examples — executable cells to run, observe, and tinker with.
+
+Starting with Lab 1, each unit lives in its own folder (`exercises/lab01/`, …) and is split by **data type** — one notebook per type. `data.loader` locates and downloads the original files under the repository `data/` folder; helper `.py` files beside the notebooks construct representations. **Think** prompts ask what was stored in the original data versus what was derived.
 
 **Workflow:**
 
@@ -71,8 +72,8 @@ The timeline and specific contents below are subject to change as the course pro
 
 | Unit | Topic | Labs (Ungraded) | HW (Graded) |
 |:---|:---|:---|:---|
-| **0** | Python Prerequisites | [Lab0](/exercises/lab00/python-basics.html) | - |
-| **1** | Data Representations | [Lab1](/exercises/lab01/lab01.html) | TBD |
+| **0** | Python Prerequisites | [Lab0-1](/exercises/lab00/python-basics.html) · [Lab0-2](/exercises/lab00/numpy-basics.html) · [Lab0-3](/exercises/lab00/matplotlib-basics.html) · [Lab0-4](/exercises/lab00/pandas-basics.html) | - |
+| **1** | Data Representations | [Lab1-1](/exercises/lab01/lab01-1-record.html) · [Lab1-2](/exercises/lab01/lab01-2-text.html) · [Lab1-3](/exercises/lab01/lab01-3-graph.html) · [Lab1-4](/exercises/lab01/lab01-4-interaction.html) · [Lab1-5](/exercises/lab01/lab01-5-transaction.html) | TBD |
 
 
 ## Course Policies

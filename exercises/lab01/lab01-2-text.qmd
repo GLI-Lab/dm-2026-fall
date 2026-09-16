@@ -1,0 +1,326 @@
+---
+title: "Lab 01. Exploring Data Representations"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+A dataset does not have only one useful representation.
+
+In this lab, we examine how the same underlying data can be represented as
+records, sequences, matrices, vectors, and graphs.
+
+> **Before choosing an algorithm, choose a representation.**
+
+
+# Part 2. Text Data
+
+We use **20 Newsgroups** to examine how the same text collection changes
+when we represent it differently.
+
+20 Newsgroups contains documents from multiple topics.
+For this lab, we select four categories and sample the same number of documents from each category to create a balanced subset.
+
+```{python}
+#| label: setup-text
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab01")
+if not (_lab / "lab01_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab01_setup
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+
+from lab01_text import (
+    RANDOM_STATE,
+    build_count_matrix,
+    build_similarity_graph,
+    build_tfidf_matrix,
+    compute_cosine_similarity,
+    tokenize_documents,
+    categorical_node_colors,
+)
+```
+
+## 2.1 Load the Data
+
+`load_20newsgroups()` caches the corpus under `data/text/20newsgroups/`.
+The sampling step is a practical choice for this lab. The original dataset
+is kept unchanged, while we use a smaller subset to make inspection and
+visualization easier.
+
+```{python}
+from data.loader import load_20newsgroups
+
+categories = [
+    "comp.graphics",
+    "misc.forsale",
+    "rec.sport.baseball",
+    "sci.space",
+]
+
+news = load_20newsgroups(
+    categories=categories,
+    random_state=RANDOM_STATE,
+)
+
+print("Before sampling:")
+print(news.shape)
+
+news = (
+    news
+    .groupby("label")
+    .sample(
+        n=100,
+        random_state=RANDOM_STATE,
+    )
+    .reset_index(drop=True)
+)
+
+news["doc_id"] = [
+    f"doc_{i:04d}"
+    for i in range(len(news))
+]
+
+print("After sampling:")
+print(news.shape)
+```
+
+```{python}
+news.head()
+```
+
+```{python}
+news["label"].value_counts()
+```
+
+## 2.2 Inspect Raw Text
+
+```{python}
+print(news.loc[0, "text"][:1200])
+```
+
+**Think:** What is one object in this dataset?  
+Each row corresponds to one document. The same object can therefore be viewed
+as both a record and a document.
+
+## 2.3 Representation 1: Token Sequence
+
+```{python}
+tokens = tokenize_documents(news["text"])
+
+type(tokens), type(tokens[0])
+```
+
+```{python}
+tokens[0][:30]
+```
+
+**Think:** What information is preserved in a token-sequence representation?  
+The order of tokens is preserved, so we can still distinguish which words
+appear before or after others.
+
+## 2.4 Representation 2: Document-Term Count Matrix
+
+A document-term matrix represents a collection of documents as a table.
+- Each **row** represents one document.
+- Each **column** represents one term (word).
+- Each **value** represents how many times the term appears in the document.
+
+For example:
+
+| | space | computer | baseball |
+|---|---:|---:|---:|
+| Document 1 | 3 | 1 | 0 |
+| Document 2 | 0 | 2 | 4 |
+
+This representation converts unstructured text into a numerical matrix that
+can be used by machine learning and data mining algorithms.
+
+Here we limit the vocabulary size and remove very rare/common terms
+to obtain a more interpretable document-term matrix.
+
+```{python}
+X_count, count_vectorizer = build_count_matrix(
+    news["text"],
+    max_features=3000,
+    min_df=2,
+    max_df=0.95,
+    stop_words="english",
+)
+
+type(X_count), X_count.shape
+```
+
+```{python}
+X_count.nnz
+```
+
+```{python}
+terms = count_vectorizer.get_feature_names_out()
+
+term_counts = np.asarray(X_count.sum(axis=0)).ravel()
+top_terms = term_counts.argsort()[-10:][::-1]
+
+pd.DataFrame(
+    X_count[:6, top_terms].toarray(),
+    index=news.loc[:5, "doc_id"],
+    columns=terms[top_terms],
+)
+```
+
+```{python}
+#| fig-cap: "Sparse document-term count matrix"
+
+plt.figure(figsize=(8, 4))
+plt.spy(X_count[:100, :500], markersize=1)
+plt.xlabel("terms")
+plt.ylabel("documents")
+plt.show()
+```
+
+**Think:** Why is this matrix sparse?  
+Each document contains only a small subset of the entire vocabulary. Therefore,
+most document-term entries are zero.
+
+## 2.5 Representation 3: TF-IDF Vector Space
+
+Unlike count representation, TF-IDF gives higher weights to terms that are
+important within a document but less frequent across the corpus.
+
+```{python}
+X_tfidf, tfidf_vectorizer = build_tfidf_matrix(
+    news["text"],
+    max_features=3000,
+    min_df=2,
+    max_df=0.95,
+    stop_words="english",
+)
+
+type(X_tfidf), X_tfidf.shape, X_tfidf.nnz
+```
+
+The shape is similar to the count matrix, but the values now have a different
+meaning: each row is a TF-IDF document vector.
+
+**Think:** Can the representation change even when the matrix shape stays the same?  
+Yes. The rows and columns can remain the same while the meaning of each value
+changes from a raw count to a TF-IDF weight.
+
+## 2.6 Cosine Similarity
+
+Cosine similarity measures the similarity between two document vectors.
+
+After converting documents into TF-IDF vectors, each document can be viewed as
+a point in a high-dimensional vector space.
+
+Cosine similarity compares the direction of two document vectors.
+If two documents have similar word usage patterns, their vectors point in a
+similar direction.
+
+The value is between 0 and 1 for TF-IDF vectors:
+
+- close to 1 → the two documents have similar word usage patterns.
+- close to 0 → the two documents have different word usage patterns.
+
+Unlike comparing raw word counts, cosine similarity focuses on the direction
+of document vectors rather than their length, making it useful for comparing
+documents with different sizes.
+
+```{python}
+scores = compute_cosine_similarity(
+    X_tfidf,
+    query_index=0,
+)
+
+scores.shape
+```
+
+```{python}
+scores[0] = -1
+top_idx = scores.argsort()[-5:][::-1]
+
+news.loc[top_idx, ["doc_id", "label"]].assign(
+    cosine_similarity=scores[top_idx]
+)
+```
+
+```{python}
+i = top_idx[0]
+
+print("similarity:", round(float(scores[i]), 3))
+print("label:", news.loc[i, "label"])
+print(news.loc[i, "text"][:600])
+```
+
+**Think:** Was this similarity stored in the original dataset?  
+No. It is a derived quantity created by representing documents with TF-IDF
+vectors and comparing them with cosine similarity.
+
+## 2.7 Representation 4: Document Similarity Graph
+
+We create a new graph where documents are connected based on their similarity
+in the TF-IDF vector space.
+
+```{python}
+G = build_similarity_graph(
+    X_tfidf,
+    doc_ids=news["doc_id"],
+    labels=news["label"],
+    k=3,
+    max_docs=80,
+)
+
+type(G)
+```
+
+```{python}
+G.number_of_nodes(), G.number_of_edges()
+```
+
+```{python}
+list(G.edges(data=True))[:10]
+```
+
+```{python}
+pos = nx.spring_layout(
+    G,
+    seed=RANDOM_STATE,
+)
+
+node_colors = categorical_node_colors(
+    G,
+    attribute="label",
+)
+
+plt.figure(figsize=(8, 6))
+nx.draw_networkx_edges(G, pos, alpha=0.25)
+nx.draw_networkx_nodes(
+    G,
+    pos,
+    node_size=70,
+    node_color=node_colors,
+    cmap="tab10",
+)
+plt.axis("off")
+plt.show()
+```
+
+**Think:** Were these edges present in the original 20 Newsgroups dataset?  
+No. They are derived edges. We created them by choosing a TF-IDF
+representation, cosine similarity, and a k-nearest-neighbor rule.

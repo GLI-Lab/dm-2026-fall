@@ -1,0 +1,299 @@
+---
+title: "Lab 01. Exploring Data Representations"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+A dataset does not have only one useful representation.
+
+In this lab, we examine how the same underlying data can be represented as
+records, sequences, matrices, vectors, and graphs.
+
+> **Before choosing an algorithm, choose a representation.**
+
+
+# Part 5. Transaction Data
+
+We use the **Groceries transaction dataset** to examine how one collection
+of shopping baskets can be represented in several different ways.
+
+The dataset contains grocery transactions, where each row represents one
+shopping basket and contains the items purchased together.
+
+**Dataset:** [Groceries on Kaggle](https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset).
+The Kaggle file is one row per item. `load_groceries()` looks under the
+repository `data/transaction/` folder. If the processed baskets are missing,
+it downloads the long-format file with `kagglehub` as
+`groceries_kaggle(raw).csv` and groups rows by `Member_number` and `Date`
+into `groceries_kaggle.csv`.
+
+For market basket analysis, transactions are commonly represented as a
+binary transaction-item matrix, where `1` means that an item appears in a
+transaction and `0` means that it does not.
+
+```{python}
+#| label: setup-transaction
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab01")
+if not (_lab / "lab01_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab01_setup
+
+import matplotlib.pyplot as plt
+import networkx as nx
+import numpy as np
+import pandas as pd
+
+from lab01_transaction import (
+    RANDOM_STATE,
+    build_item_cooccurrence_graph,
+    build_transaction_item_matrix,
+    compute_item_support,
+    to_long_table,
+)
+```
+
+## 5.1 Load the Data
+
+```{python}
+from data.loader import load_groceries
+
+groceries = load_groceries()
+
+type(groceries), groceries.shape
+```
+
+```{python}
+groceries.head()
+```
+
+Inspect one basket directly.
+
+```{python}
+groceries.loc[0, "items"]
+```
+
+**Think:** What is one object in this dataset?  
+One object is a transaction (basket), represented as a collection of items
+purchased together.
+
+## 5.2 Representation 1: Basket / Item-Set View
+
+Unlike record data, transactions do not have a fixed number of attributes.
+Each basket can contain a different number of items.
+
+```{python}
+for i in range(3):
+    print(
+        groceries.loc[i, "transaction_id"],
+        "->",
+        groceries.loc[i, "items"],
+    )
+```
+
+**Think:** How is this different from ordinary record data?  
+Different transactions can contain different numbers of items, so there is no
+fixed set of attribute columns in the raw basket representation.
+
+## 5.3 Representation 2: Long Table
+
+The same baskets can be expanded into a table with one row for each
+transaction-item occurrence.
+
+```{python}
+groceries_long = to_long_table(groceries)
+
+type(groceries_long), groceries_long.shape
+```
+
+```{python}
+groceries_long.head(12)
+```
+
+The same `transaction_id` now appears repeatedly because one transaction can
+contain several items.
+
+**Think:** Did the underlying purchases change?  
+No. Only the representation changed from one row per basket to one row per
+transaction-item occurrence.
+
+## 5.4 Representation 3: Transaction-Item Binary Matrix
+
+```{python}
+X_transaction, item_names = build_transaction_item_matrix(groceries)
+
+type(X_transaction), X_transaction.shape
+```
+
+```{python}
+X_transaction.nnz
+```
+
+The matrix has the following meaning:
+
+- Row = transaction
+- Column = item
+- Value = `1` if the item is in the transaction
+- Zero = the item is not in the transaction
+
+View a small part of the matrix using the most frequent items.
+
+```{python}
+item_counts = np.asarray(X_transaction.sum(axis=0)).ravel()
+top_item_idx = item_counts.argsort()[-10:][::-1]
+
+pd.DataFrame(
+    X_transaction[:8, top_item_idx].toarray(),
+    index=groceries.loc[:7, "transaction_id"],
+    columns=item_names[top_item_idx],
+)
+```
+
+Now inspect the sparse structure visually.
+
+```{python}
+#| fig-cap: "Sparse transaction-item binary matrix"
+
+plt.figure(figsize=(8, 4))
+plt.spy(X_transaction[:120, :120], markersize=1)
+plt.xlabel("items")
+plt.ylabel("transactions")
+plt.show()
+```
+
+**Think:** Why is this matrix sparse?  
+Each basket contains only a small subset of all available items. Therefore,
+most transaction-item entries are zero.
+
+## 5.5 Item Support
+
+Once we have a binary transaction-item matrix, the support of an item becomes
+a simple summary of how frequently that item appears across transactions.
+
+```{python}
+item_support = compute_item_support(
+    X_transaction,
+    item_names,
+)
+
+item_support.head(10)
+```
+
+**Think:** What does a support of `0.10` mean for an item?  
+It means that the item appears in 10% of all transactions.
+
+This is the same basic notion of support used later in frequent itemset and
+association-rule mining. In this first lab, we stop at the representation and
+simple summary rather than running Apriori.
+
+## 5.6 Representation 4: Item Co-occurrence Graph
+
+We can also represent items as a graph.
+
+- Node = item
+- Edge = strong co-occurrence relationship between two items
+- Edge weight = Jaccard similarity 
+
+It measures the similarity between two items based on how often they
+appear together relative to how often either item appears.
+
+A higher value indicates a stronger relationship between two items.
+
+For visualization, we use the most frequent items and connect each item to
+its strongest co-occurring neighbors.
+
+```{python}
+G_items = build_item_cooccurrence_graph(
+    X_transaction,
+    item_names,
+    top_n_items=15,
+    k=2,
+)
+
+type(G_items)
+```
+
+Inspect the graph before drawing it.
+
+```{python}
+G_items.number_of_nodes(), G_items.number_of_edges()
+```
+
+```{python}
+list(G_items.edges(data=True))[:10]
+```
+
+```{python}
+pos = nx.spring_layout(
+    G_items,
+    seed=RANDOM_STATE,
+    k=1.2,
+    iterations=200,
+    weight=None,
+)
+
+node_labels = {
+    node: G_items.nodes[node]["item"]
+    for node in G_items.nodes
+}
+
+edge_labels = {
+    (u, v): f"{data['weight']:.2f}"
+    for u, v, data in G_items.edges(data=True)
+}
+
+plt.figure(figsize=(10, 7))
+
+# Draw edges
+nx.draw_networkx_edges(
+    G_items,
+    pos,
+    width=1.0,
+    alpha=0.35,
+)
+
+# Draw nodes
+nx.draw_networkx_nodes(
+    G_items,
+    pos,
+    node_size=1100,
+)
+
+# Draw node labels
+nx.draw_networkx_labels(
+    G_items,
+    pos,
+    labels=node_labels,
+    font_size=8,
+)
+
+# Draw Jaccard similarity on each edge
+nx.draw_networkx_edge_labels(
+    G_items,
+    pos,
+    edge_labels=edge_labels,
+    font_size=7,
+    rotate=False,
+)
+
+plt.axis("off")
+plt.show()
+```
+
+**Think:** Were these item-item edges explicitly stored in the original data?  
+No. The original data only records which items occurred in each transaction.
+The item-item graph is a derived representation created by computing item
+similarity using co-occurrence information and Jaccard similarity.
