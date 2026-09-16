@@ -23,7 +23,7 @@ Always start Jupyter **from the repository root** so that `data/` paths resolve 
 
 ## 1. First-time setup
 
-Install Pixi: <https://pixi.sh/latest/getting_started/installation/>
+Install Pixi: <https://pixi.prefix.dev/latest/installation/>
 
 Windows: use **WSL2**, then follow the Linux steps inside Ubuntu. See the [environment setup](https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup.html) page for details.
 
