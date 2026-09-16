@@ -1,32 +1,15 @@
 """
 lab01_interaction.py
 
-Helper functions for Lab 01 — Interaction Data.
+Helper functions for Lab 01-4 — Interaction Data.
 
-Design rule
------------
-- .py  : load data and construct representations
-- .qmd : inspect returned objects, visualize them, and interpret them
-
-Dataset
--------
-MovieLens 100K (GroupLens, University of Minnesota)
-100,000 ratings (1-5) from 943 users on 1,682 movies.
-
-Place the unzipped files under the shared project ``data/`` folder:
-
-    data/interaction/Movielens/u.data
-    data/interaction/Movielens/u.item
-    data/interaction/Movielens/u.user
-
-Source: https://grouplens.org/datasets/movielens/100k/
+Original MovieLens files are located and loaded by data.loader.
+This helper constructs representations and draws figures.
 """
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Optional, Sequence
-
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import pandas as pd
@@ -36,128 +19,6 @@ from sklearn.neighbors import NearestNeighbors
 
 
 RANDOM_STATE = 42
-
-# exercises/lab01/thisfile.py → parents[2] is the project root
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_DATA_DIR = _PROJECT_ROOT / "data" / "interaction" / "Movielens"
-
-ML100K_PAGE = "https://grouplens.org/datasets/movielens/100k/"
-
-DOWNLOAD_HELP = f"""
-MovieLens 100K was not found. Download it once, then re-run.
-
-  1. Open
-
-         {ML100K_PAGE}
-
-  2. Download 'ml-100k.zip' (about 5 MB).
-     If the browser shows a security warning, choose Advanced -> Proceed.
-
-  3. Unzip it and put the files here:
-
-         {{target}}
-
-     u.data, u.item and u.user must be directly inside that folder
-     (not nested one level deeper).
-
-MovieLens is free for research and educational use, but redistribution
-requires separate permission, so the data is not shipped with this lab.
-"""
-
-
-def movielens_dir(*, data_dir: Optional[Path | str] = None) -> Path:
-    """Return the MovieLens folder, or explain how to download it."""
-    target = Path(data_dir) if data_dir is not None else DEFAULT_DATA_DIR
-
-    if not (target / "u.data").exists():
-        raise FileNotFoundError(DOWNLOAD_HELP.format(target=target))
-
-    return target
-
-
-def _resolve(data_dir: Optional[Path | str], filename: str) -> Path:
-    """Return the path to a MovieLens file."""
-    return movielens_dir(data_dir=data_dir) / filename
-
-ML100K_GENRES = (
-    "unknown",
-    "Action",
-    "Adventure",
-    "Animation",
-    "Children's",
-    "Comedy",
-    "Crime",
-    "Documentary",
-    "Drama",
-    "Fantasy",
-    "Film-Noir",
-    "Horror",
-    "Musical",
-    "Mystery",
-    "Romance",
-    "Sci-Fi",
-    "Thriller",
-    "War",
-    "Western",
-)
-
-
-def load_movielens_100k(
-    *,
-    data_dir: Optional[Path | str] = None,
-    min_user_ratings: int = 0,
-    min_item_ratings: int = 0,
-) -> pd.DataFrame:
-    """Load the rating log and return one row per (user, item) interaction."""
-    df = pd.read_csv(
-        _resolve(data_dir, "u.data"),
-        sep="\t",
-        names=["user_id", "item_id", "rating", "timestamp"],
-        engine="python",
-    )
-
-    if min_item_ratings > 0:
-        keep = df["item_id"].value_counts()
-        df = df[df["item_id"].isin(keep[keep >= min_item_ratings].index)]
-
-    if min_user_ratings > 0:
-        keep = df["user_id"].value_counts()
-        df = df[df["user_id"].isin(keep[keep >= min_user_ratings].index)]
-
-    df["datetime"] = pd.to_datetime(df["timestamp"], unit="s")
-
-    return df.reset_index(drop=True)
-
-
-def load_movies(*, data_dir: Optional[Path | str] = None) -> pd.DataFrame:
-    """Load movie metadata, returning one row per item with a genre list."""
-    columns = ["item_id", "title", "release_date", "video_release", "imdb_url"]
-    columns += list(ML100K_GENRES)
-
-    df = pd.read_csv(
-        _resolve(data_dir, "u.item"),
-        sep="|",
-        names=columns,
-        encoding="latin-1",
-        engine="python",
-    )
-
-    flags = df[list(ML100K_GENRES)].to_numpy(dtype=bool)
-    df["genres"] = [
-        [g for g, on in zip(ML100K_GENRES, row) if on] for row in flags
-    ]
-
-    return df[["item_id", "title", "release_date", "genres"]]
-
-
-def load_users(*, data_dir: Optional[Path | str] = None) -> pd.DataFrame:
-    """Load user demographics, returning one row per user."""
-    return pd.read_csv(
-        _resolve(data_dir, "u.user"),
-        sep="|",
-        names=["user_id", "age", "gender", "occupation", "zip_code"],
-        engine="python",
-    )
 
 
 def sample_interactions(
@@ -188,201 +49,207 @@ def sample_interactions(
     return subset.sort_values([user_col, item_col]).reset_index(drop=True)
 
 
-def build_utility_matrix(
-    ratings: pd.DataFrame,
-    *,
-    user_col: str = "user_id",
-    item_col: str = "item_id",
-    value_col: Optional[str] = "rating",
-) -> tuple[sparse.csr_matrix, np.ndarray, np.ndarray]:
-    """Construct a sparse user-item utility matrix from an interaction log."""
-    users = np.sort(ratings[user_col].unique())
-    items = np.sort(ratings[item_col].unique())
+def build_utility_table(ratings):
+    """Pivot unique user-item ratings into a small table with NaN for missing pairs."""
+    return ratings.pivot(
+        index="user_id", columns="item_id", values="rating",
+    ).sort_index().sort_index(axis=1)
 
-    user_pos = pd.Series(np.arange(len(users)), index=users)
-    item_pos = pd.Series(np.arange(len(items)), index=items)
 
-    rows = user_pos.loc[ratings[user_col]].to_numpy()
-    cols = item_pos.loc[ratings[item_col]].to_numpy()
-    vals = (
-        np.ones(len(ratings), dtype=float)
-        if value_col is None
-        else ratings[value_col].to_numpy(dtype=float)
-    )
 
+def build_utility_matrix(ratings):
+    """Return the sparse rating matrix and its ordered user/item IDs."""
+    if ratings.duplicated(subset=["user_id", "item_id"]).any():
+        raise ValueError("Choose how to handle repeated user-item ratings first.")
+
+    user_ids = np.sort(ratings["user_id"].unique())
+    item_ids = np.sort(ratings["item_id"].unique())
+    user_pos = pd.Series(np.arange(len(user_ids)), index=user_ids)
+    item_pos = pd.Series(np.arange(len(item_ids)), index=item_ids)
+
+    rows = user_pos.loc[ratings["user_id"]].to_numpy()
+    cols = item_pos.loc[ratings["item_id"]].to_numpy()
+    values = ratings["rating"].to_numpy(dtype=float)
     X = sparse.csr_matrix(
-        (vals, (rows, cols)),
-        shape=(len(users), len(items)),
+        (values, (rows, cols)),
+        shape=(len(user_ids), len(item_ids)),
     )
-
-    return X, users, items
-
-
-def binarize_utility_matrix(
-    X: sparse.spmatrix,
-    *,
-    threshold: float = 4.0,
-) -> sparse.csr_matrix:
-    """Keep only interactions at or above ``threshold`` and set their value to 1."""
-    X = sparse.csr_matrix(X, copy=True)
-    X.data = (X.data >= threshold).astype(float)
-    X.eliminate_zeros()
-    return X
+    return X, user_ids, item_ids
 
 
-def matrix_density(X: sparse.spmatrix) -> float:
-    """Return the fraction of observed entries in a sparse matrix."""
-    n_rows, n_cols = X.shape
-    return float(X.nnz) / float(n_rows * n_cols)
+def matrix_density(X):
+    """Return the stored-entry count divided by the number of cells."""
+    n_users, n_items = X.shape
+    return X.nnz / (n_users * n_items)
 
 
-def build_bipartite_graph(
-    ratings: pd.DataFrame,
-    *,
-    user_col: str = "user_id",
-    item_col: str = "item_id",
-    weight_col: Optional[str] = "rating",
-    titles: Optional[pd.Series] = None,
-    n_users: Optional[int] = 30,
-    random_state: int = RANDOM_STATE,
-) -> nx.Graph:
-    """Construct a bipartite user-item graph from an interaction log."""
-    if n_users is not None:
-        rng = np.random.default_rng(random_state)
-        chosen = rng.choice(
-            ratings[user_col].unique(),
-            size=min(n_users, ratings[user_col].nunique()),
-            replace=False,
-        )
-        ratings = ratings[ratings[user_col].isin(chosen)]
+def binarize_utility_matrix(X, *, threshold=4.0):
+    """Keep observed ratings at or above the positive-rating threshold."""
+    X_binary = sparse.csr_matrix(X, copy=True)
+    X_binary.data = (X_binary.data >= threshold).astype(float)
+    X_binary.eliminate_zeros()
+    return X_binary
 
+
+def build_bipartite_graph(ratings, *, titles=None):
+    """Represent each observed rating as a weighted user-item edge."""
     G = nx.Graph()
-
-    for user in ratings[user_col].unique():
+    for user in ratings["user_id"].unique():
         G.add_node(f"u{user}", bipartite=0, kind="user", label=f"u{user}")
-
-    for item in ratings[item_col].unique():
+    for item in ratings["item_id"].unique():
         title = None if titles is None else titles.get(item)
         G.add_node(
-            f"i{item}",
-            bipartite=1,
-            kind="item",
+            f"i{item}", bipartite=1, kind="item",
             label=str(title) if title is not None else f"i{item}",
         )
-
     for row in ratings.itertuples(index=False):
-        weight = 1.0 if weight_col is None else float(getattr(row, weight_col))
-        G.add_edge(
-            f"u{getattr(row, user_col)}",
-            f"i{getattr(row, item_col)}",
-            weight=weight,
-        )
-
+        G.add_edge(f"u{row.user_id}", f"i{row.item_id}", weight=float(row.rating))
     return G
 
 
-def biadjacency_matrix(
-    G: nx.Graph,
-    *,
-    weight: Optional[str] = "weight",
-) -> tuple[sparse.csr_matrix, list[str], list[str]]:
-    """Return the users x items block of a bipartite graph's adjacency matrix."""
-    users = sorted(n for n, d in G.nodes(data=True) if d.get("bipartite") == 0)
-    items = sorted(n for n, d in G.nodes(data=True) if d.get("bipartite") == 1)
-
-    B = nx.bipartite.biadjacency_matrix(
-        G,
-        row_order=users,
-        column_order=items,
-        weight=weight,
-    )
-
-    return sparse.csr_matrix(B), users, items
-
-
-def project_onto_users(
-    G: nx.Graph,
-    *,
-    min_shared: int = 1,
-) -> nx.Graph:
-    """Fold a bipartite graph into a user-user graph weighted by shared items."""
-    users = [n for n, d in G.nodes(data=True) if d.get("bipartite") == 0]
-    P = nx.bipartite.weighted_projected_graph(G, users)
-
-    if min_shared > 1:
-        weak = [
-            (u, v)
-            for u, v, d in P.edges(data=True)
-            if d.get("weight", 0) < min_shared
-        ]
-        P.remove_edges_from(weak)
-
+def project_onto_users(G, *, min_shared=1):
+    """Connect users by the number of items both have rated."""
+    user_nodes = [n for n, d in G.nodes(data=True) if d["bipartite"] == 0]
+    P = nx.bipartite.weighted_projected_graph(G, user_nodes)
+    weak_edges = [
+        (u, v) for u, v, d in P.edges(data=True)
+        if d["weight"] < min_shared
+    ]
+    P.remove_edges_from(weak_edges)
     return P
 
 
-def compute_item_similarity(
-    X: sparse.spmatrix,
-    *,
-    query_index: Optional[int] = None,
-):
-    """Compute item-item cosine similarity from a user-item matrix."""
+def compute_item_similarity(X, *, query_index):
+    """Compare one item against every item using user-based vectors."""
     X_items = sparse.csr_matrix(X).T.tocsr()
-
-    if query_index is None:
-        return cosine_similarity(X_items)
     return cosine_similarity(X_items[query_index], X_items).ravel()
 
 
-def build_item_knn_graph(
-    X: sparse.spmatrix,
-    *,
-    item_ids: Optional[Sequence[int]] = None,
-    titles: Optional[pd.Series] = None,
-    k: int = 3,
-    max_items: int = 80,
-) -> nx.Graph:
-    """Construct a k-nearest-neighbor item graph using cosine similarity.
-
-    Restricted to the ``max_items`` most-interacted items, so that the graph
-    is built from columns that actually have enough signal to compare.
-    """
+def build_item_knn_graph(X, *, item_ids, titles=None, k=3, max_items=80):
+    """Connect popular items using cosine similarity between item rows."""
     X_items = sparse.csr_matrix(X).T.tocsr()
-
-    if item_ids is None:
-        item_ids = np.arange(X_items.shape[0])
     item_ids = np.asarray(item_ids)
 
     popularity = np.asarray((X_items > 0).sum(axis=1)).ravel()
     keep = np.argsort(popularity)[::-1][:max_items]
     keep = np.sort(keep)
-
     X_items = X_items[keep]
     item_ids = item_ids[keep]
     n_items = X_items.shape[0]
 
-    if n_items == 0:
-        return nx.Graph()
-
     G = nx.Graph()
-    for i in range(n_items):
-        item_id = item_ids[i]
+    for i, item_id in enumerate(item_ids):
         title = None if titles is None else titles.get(item_id)
         G.add_node(
-            i,
-            item_id=int(item_id),
+            i, item_id=int(item_id),
             title=str(title) if title is not None else str(item_id),
         )
+    if n_items == 0:
+        return G
 
-    model = NearestNeighbors(
-        n_neighbors=min(k + 1, n_items),
-        metric="cosine",
-    )
+    model = NearestNeighbors(n_neighbors=min(k + 1, n_items), metric="cosine")
     model.fit(X_items)
     distances, indices = model.kneighbors(X_items)
 
     for i in range(n_items):
-        for distance, j in zip(distances[i, 1:], indices[i, 1:]):
-            similarity = 1.0 - float(distance)
-            G.add_edge(i, int(j), weight=similarity)
-
+        other_items = [
+            (distance, int(j))
+            for distance, j in zip(distances[i], indices[i])
+            if j != i
+        ][:k]
+        for distance, j in other_items:
+            G.add_edge(i, j, weight=1.0 - float(distance))
     return G
+
+
+def build_biadjacency_matrix(G, user_ids, item_ids):
+    """Return the rating-weighted graph matrix using the supplied user/item order."""
+    row_nodes = [f"u{user}" for user in user_ids]
+    col_nodes = [f"i{item}" for item in item_ids]
+    B = sparse.csr_matrix(
+        nx.bipartite.biadjacency_matrix(
+            G, row_order=row_nodes, column_order=col_nodes, weight="weight",
+        )
+    )
+    return B, row_nodes, col_nodes
+
+
+
+def plot_bipartite_graph(G):
+    """Draw users and movies in two columns without changing the graph."""
+    user_nodes = [n for n, d in G.nodes(data=True) if d["bipartite"] == 0]
+    item_nodes = [n for n, d in G.nodes(data=True) if d["bipartite"] == 1]
+
+    pos = nx.bipartite_layout(G, user_nodes)
+
+    fig, ax = plt.subplots(figsize=(11, 8))
+
+    nx.draw_networkx_edges(G, pos, alpha=0.25, edge_color="#AAAAAA", width=1.0, ax=ax)
+    nx.draw_networkx_nodes(G, pos, nodelist=user_nodes, node_color="tab:blue",
+                           node_size=900, label="user", ax=ax)
+    nx.draw_networkx_nodes(G, pos, nodelist=item_nodes, node_color="tab:orange",
+                           node_size=900, node_shape="s", label="item", ax=ax)
+
+    nx.draw_networkx_labels(
+        G, pos,
+        labels={n: G.nodes[n]["label"] for n in user_nodes},
+        font_size=9, font_color="white", font_weight="bold", ax=ax,
+    )
+
+    for node in item_nodes:
+        x, y = pos[node]
+        ax.text(x + 0.10, y, G.nodes[node]["label"][:24],
+                fontsize=10, va="center", ha="left")
+
+    ax.legend(scatterpoints=1, fontsize=11, frameon=False, ncol=2, markerscale=0.7,
+              loc="lower center", bbox_to_anchor=(0.5, 1.01),
+              handletextpad=0.8, columnspacing=2.5)
+    ax.set_xlim(-1.25, 1.45)
+    ax.axis("off")
+    return plt.gcf(), plt.gca()
+
+
+def plot_user_projection(P):
+    """Draw a user projection with shared-item counts on the edges."""
+    pos = nx.circular_layout(P)
+
+    plt.figure(figsize=(10, 9))
+    nx.draw_networkx_edges(P, pos, width=1.3, alpha=0.4, edge_color="#AAAAAA")
+    nx.draw_networkx_nodes(P, pos, node_color="tab:blue", node_size=1700)
+    nx.draw_networkx_labels(P, pos, font_size=11, font_color="white",
+                            font_weight="bold")
+    nx.draw_networkx_edge_labels(
+        P, pos,
+        edge_labels={(u, v): d["weight"] for u, v, d in P.edges(data=True)},
+        font_size=9, label_pos=0.28, rotate=False,
+    )
+    plt.margins(0.14)
+    plt.axis("off")
+    return plt.gcf(), plt.gca()
+
+
+def plot_item_similarity_graph(G_items):
+    """Draw an item graph with shortened titles and similarity labels."""
+    def short_title(title):
+        title = title.split(" (")[0]
+        return title if len(title) <= 17 else title[:16] + "."
+
+    pos = nx.kamada_kawai_layout(G_items)
+
+    plt.figure(figsize=(10, 7))
+    nx.draw_networkx_edges(G_items, pos, width=1.0, alpha=0.5, edge_color="#AAAAAA")
+    nx.draw_networkx_nodes(G_items, pos, node_size=700, node_color="tab:orange")
+
+    nx.draw_networkx_labels(
+        G_items, pos,
+        labels={n: short_title(G_items.nodes[n]["title"]) for n in G_items.nodes},
+        font_size=8,
+    )
+    nx.draw_networkx_edge_labels(
+        G_items, pos,
+        edge_labels={(u, v): f"{d['weight']:.2f}" for u, v, d in G_items.edges(data=True)},
+        font_size=6.5, label_pos=0.5, rotate=False,
+    )
+    plt.margins(0.14)
+    plt.axis("off")
+    return plt.gcf(), plt.gca()

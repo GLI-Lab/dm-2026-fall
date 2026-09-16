@@ -1,27 +1,13 @@
 """
 lab01_transaction.py
 
-Helper functions for Lab 01 — Transaction Data.
+Helper functions for Lab 01-5 — Transaction Data.
 
-Design rule
------------
-- .py  : load data and construct representations
-- .qmd : inspect returned objects, visualize them, and interpret them
-
-Dataset
--------
-Groceries Market Basket Dataset
-
-The loader supports two common Kaggle-style forms:
-1) basket format: one transaction per CSV row, items spread across columns
-2) long format: Member_number, Date, itemDescription
+Original Groceries files are located, downloaded, and grouped by data.loader.
+This helper constructs representations from the loaded baskets.
 """
 
 from __future__ import annotations
-
-from pathlib import Path
-from typing import Optional
-import csv
 
 import networkx as nx
 import numpy as np
@@ -29,75 +15,7 @@ import pandas as pd
 from scipy import sparse
 from sklearn.preprocessing import MultiLabelBinarizer
 
-# exercises/lab01/thisfile.py → parents[2] is the project root
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_GROCERIES_PATH = _PROJECT_ROOT / "data" / "transaction" / "groceries.csv"
-
-
-def load_groceries(path: str | Path | None = None) -> pd.DataFrame:
-    """
-    Load Groceries data and return one row per transaction.
-
-    Returns
-    -------
-    pandas.DataFrame
-        Columns:
-        - transaction_id
-        - items : list[str]
-    """
-    path = Path(path) if path is not None else DEFAULT_GROCERIES_PATH
-
-    if not path.exists():
-        raise FileNotFoundError(f"Groceries file not found: {path}")
-
-    # First try the common long-format Kaggle version.
-    try:
-        raw = pd.read_csv(path)
-
-        required = {"Member_number", "Date", "itemDescription"}
-        if required.issubset(raw.columns):
-            grouped = (
-                raw.groupby(["Member_number", "Date"], sort=False)["itemDescription"]
-                .apply(lambda s: list(dict.fromkeys(s.dropna().astype(str))))
-                .reset_index()
-            )
-
-            grouped["transaction_id"] = [
-                f"txn_{i:05d}" for i in range(len(grouped))
-            ]
-            grouped = grouped.rename(columns={"itemDescription": "items"})
-
-            return grouped[["transaction_id", "items"]]
-    except Exception:
-        pass
-
-    # Basket format: one CSV row = one transaction, variable number of items.
-    transactions = []
-
-    with path.open("r", encoding="utf-8-sig", newline="") as f:
-        reader = csv.reader(f)
-
-        for row in reader:
-            items = [
-                item.strip()
-                for item in row
-                if item is not None and item.strip() != ""
-            ]
-
-            if items:
-                transactions.append(items)
-
-    if not transactions:
-        raise ValueError(f"No transactions could be read from: {path}")
-
-    return pd.DataFrame(
-        {
-            "transaction_id": [
-                f"txn_{i:05d}" for i in range(len(transactions))
-            ],
-            "items": transactions,
-        }
-    )
+RANDOM_STATE = 42
 
 
 def to_long_table(transactions: pd.DataFrame) -> pd.DataFrame:

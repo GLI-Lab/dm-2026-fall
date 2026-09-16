@@ -1,16 +1,10 @@
 """
 lab01_text.py
 
-Helper functions for Lab 01 — Text Data.
+Helper functions for Lab 01-2 — Text Data.
 
-Design rule
------------
-- .py  : load data and construct representations
-- .qmd : inspect returned objects, visualize them, and interpret them
-
-Dataset
--------
-20 Newsgroups
+Original 20 Newsgroups documents are loaded by data.loader.
+This helper constructs representations from the loaded documents.
 """
 
 from __future__ import annotations
@@ -20,87 +14,12 @@ from typing import Iterable, Optional, Sequence
 import networkx as nx
 import pandas as pd
 from scipy import sparse
-from sklearn.datasets import fetch_20newsgroups
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.neighbors import NearestNeighbors
-from pathlib import Path
-
-# exercises/lab01/thisfile.py → parents[2] is the project root
-_PROJECT_ROOT = Path(__file__).resolve().parents[2]
-DEFAULT_20NG_ROOT = _PROJECT_ROOT / "data" / "text" / "20newsgroups"
 
 
 RANDOM_STATE = 42
-
-DEFAULT_20NG_CATEGORIES = (
-    "comp.graphics",
-    "misc.forsale",
-    "rec.sport.baseball",
-    "sci.space",
-)
-
-
-def load_20newsgroups(
-    *,
-    root: str | Path = DEFAULT_20NG_ROOT,
-    categories: Optional[Sequence[str]] = DEFAULT_20NG_CATEGORIES,
-    subset: str = "train",
-    n_per_class: Optional[int] = 100,
-    remove: Sequence[str] = ("headers", "footers", "quotes"),
-    random_state: int = RANDOM_STATE,
-) -> pd.DataFrame:
-    """Load 20 Newsgroups and cache the dataset under ``root``."""
-
-    root = Path(root)
-    root.mkdir(parents=True, exist_ok=True)
-
-    data = fetch_20newsgroups(
-        data_home=root,
-        subset=subset,
-        categories=list(categories) if categories is not None else None,
-        remove=tuple(remove),
-        shuffle=True,
-        random_state=random_state,
-        download_if_missing=True,
-    )
-
-    label_names = dict(enumerate(data.target_names))
-
-    df = pd.DataFrame(
-        {
-            "text": data.data,
-            "label": [label_names[i] for i in data.target],
-        }
-    )
-
-    df["text"] = df["text"].fillna("").astype(str)
-    df = df[df["text"].str.strip().str.len() > 0].copy()
-
-    if n_per_class is not None:
-        sampled = []
-        for _, group in df.groupby("label", sort=True):
-            sampled.append(
-                group.sample(
-                    n=min(n_per_class, len(group)),
-                    random_state=random_state,
-                )
-            )
-
-        df = pd.concat(sampled, ignore_index=True)
-
-    df = df.sample(
-        frac=1.0,
-        random_state=random_state,
-    ).reset_index(drop=True)
-
-    df.insert(
-        0,
-        "doc_id",
-        [f"20ng_{i:04d}" for i in range(len(df))],
-    )
-
-    return df[["doc_id", "label", "text"]]
 
 
 def tokenize_documents(texts: Iterable[str]) -> list[list[str]]:
@@ -115,41 +34,24 @@ def tokenize_documents(texts: Iterable[str]) -> list[list[str]]:
 
 def build_count_matrix(
     texts: Iterable[str],
-    *,
-    max_features: Optional[int] = 3000,
-    min_df: int | float = 2,
-    max_df: int | float = 0.95,
-    stop_words: Optional[str | Sequence[str]] = "english",
-    ngram_range: tuple[int, int] = (1, 1),
+    **kwargs,
 ) -> tuple[sparse.csr_matrix, CountVectorizer]:
     """Construct a sparse document-term count matrix."""
     vectorizer = CountVectorizer(
-        max_features=max_features,
-        min_df=min_df,
-        max_df=max_df,
-        stop_words=stop_words,
-        ngram_range=ngram_range,
+        **kwargs
     )
+
     X = vectorizer.fit_transform(list(texts)).tocsr()
     return X, vectorizer
 
 
 def build_tfidf_matrix(
     texts: Iterable[str],
-    *,
-    max_features: Optional[int] = 3000,
-    min_df: int | float = 2,
-    max_df: int | float = 0.95,
-    stop_words: Optional[str | Sequence[str]] = "english",
-    ngram_range: tuple[int, int] = (1, 1),
+    **kwargs,
 ) -> tuple[sparse.csr_matrix, TfidfVectorizer]:
     """Construct a sparse TF-IDF document-term matrix."""
     vectorizer = TfidfVectorizer(
-        max_features=max_features,
-        min_df=min_df,
-        max_df=max_df,
-        stop_words=stop_words,
-        ngram_range=ngram_range,
+        **kwargs
     )
     X = vectorizer.fit_transform(list(texts)).tocsr()
     return X, vectorizer
@@ -176,6 +78,7 @@ def build_similarity_graph(
 ) -> nx.Graph:
     """Construct a k-nearest-neighbor document graph using cosine similarity."""
     X = sparse.csr_matrix(X)
+
     n_docs = min(max_docs, X.shape[0])
     X = X[:n_docs]
 
@@ -210,3 +113,21 @@ def build_similarity_graph(
             G.add_edge(i, int(j), weight=similarity)
 
     return G
+
+
+def categorical_node_colors(
+    G: nx.Graph,
+    attribute: str = "label",
+):
+    """
+    Convert categorical node attributes into numeric color indices.
+
+    This is a visualization helper, not part of graph construction.
+    """
+
+    values = [
+        G.nodes[node].get(attribute)
+        for node in G.nodes
+    ]
+
+    return pd.Categorical(values).codes
