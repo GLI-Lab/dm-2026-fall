@@ -1,0 +1,432 @@
+---
+title: "Lab 02-1. Data Preprocessing: Cleaning, Aggregation, and Sampling"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+Real-world data often contain missing values, duplicate records, and unusual
+values that should be examined before analysis.
+
+In this lab, we use the **Titanic dataset** to practice data cleaning,
+aggregation, and sampling.
+
+::: {.callout-important}
+## Implement in `lab02_1.py` first
+
+This notebook calls functions from `lab02_1.py`. Find each
+`# ========== TODO ==========` block, remove `raise NotImplementedError`,
+and write your implementation. Restart the kernel after editing the `.py`
+file, then run this notebook from the top.
+
+Check your functions with:
+
+```bash
+python -m doctest lab02_1.py -v
+```
+:::
+
+```{python}
+#| label: setup-preprocessing
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab02")
+if not (_lab / "lab02_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab02_setup
+
+import numpy as np
+import pandas as pd
+
+from data.loader import load_titanic
+
+from lab02_1 import (
+    drop_duplicate_rows,
+    fill_missing_with_mode,
+    iqr_outlier_bounds,
+    plot_fare_outliers,
+    plot_missing_counts,
+    stratified_sample_by_class,
+    summarize_by_class_and_sex,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 1.1 Load the Data
+
+`load_titanic()` reads `data/record/titanic.csv`. If that file is missing, it
+downloads the seaborn Titanic table and saves it there.
+
+```{python}
+titanic = load_titanic()
+
+type(titanic), titanic.shape
+```
+
+```{python}
+titanic.head()
+```
+
+Each row represents one passenger, and each column represents an attribute.
+
+## 1.2 Missing Values
+
+Missing values occur when some attribute values are not recorded.
+
+```{python}
+titanic[[
+    "age",
+    "embarked",
+    "deck",
+]].isna().sum()
+```
+
+```{python}
+#| fig-cap: "Missing values in selected Titanic attributes"
+
+plot_missing_counts(
+    titanic
+)
+```
+
+For a numerical attribute, one simple approach is to replace missing values
+with the median.
+
+```{python}
+titanic_clean = titanic.copy()
+
+age_median = titanic_clean["age"].median()
+
+titanic_clean["age"] = (
+    titanic_clean["age"]
+    .fillna(age_median)
+)
+
+print(
+    "Missing age:",
+    titanic_clean["age"].isna().sum(),
+)
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `fill_missing_with_mode()` in `lab02_1.py`.
+It should replace missing values in `embarked` with the most frequent
+category.
+
+**Hint:** `Series.mode()` returns the most frequent value, and
+`Series.fillna()` replaces missing values.
+
+```{python}
+#| eval: false
+
+titanic_clean, embarked_mode = fill_missing_with_mode(
+    titanic_clean,
+    column="embarked",
+)
+
+print(
+    "Mode:",
+    embarked_mode,
+)
+
+print(
+    "Missing embarked:",
+    titanic_clean["embarked"].isna().sum(),
+)
+```
+
+:::
+
+**Think:** Why do `age` and `embarked` use different replacement values?
+
+## 1.3 Duplicate Records
+
+Duplicate records can make the same observation count more than once.
+
+The Titanic dataset does not include a passenger ID that can be used here to
+verify true duplicate passengers. To demonstrate duplicate detection, we
+intentionally copy three rows and append them to a small subset of the data.
+
+```{python}
+titanic_with_duplicates = pd.concat(
+    [
+        titanic.iloc[:8],
+        titanic.iloc[[1, 3, 5]],
+    ],
+    ignore_index=True,
+)
+
+titanic_with_duplicates
+```
+
+Rows 8, 9, and 10 are copies of rows 1, 3, and 5.
+
+By default, `duplicated()` compares all columns except the index.
+The first occurrence is marked as `False`, and later identical rows are
+marked as `True`.
+
+```{python}
+duplicate_mask = (
+    titanic_with_duplicates
+    .duplicated()
+)
+
+duplicate_mask
+```
+
+The `True` values indicate rows that have already appeared earlier.
+
+```{python}
+titanic_with_duplicates[
+    duplicate_mask
+]
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `drop_duplicate_rows()` in `lab02_1.py`.
+It should count duplicate rows and return a DataFrame with them removed.
+
+**Hint:** Use `duplicated().sum()` and `drop_duplicates()`.
+
+```{python}
+#| eval: false
+
+titanic_without_duplicates, duplicate_count = drop_duplicate_rows(
+    titanic_with_duplicates
+)
+
+print(
+    "Duplicate rows:",
+    duplicate_count,
+)
+
+print(
+    "Before:",
+    len(titanic_with_duplicates),
+)
+
+print(
+    "After:",
+    len(titanic_without_duplicates),
+)
+```
+
+:::
+
+## 1.4 Outliers
+
+An outlier is an unusually small or large value.
+
+A common rule uses the interquartile range (IQR).
+
+$$
+IQR = Q_3 - Q_1
+$$
+
+Values outside the following range are considered potential outliers:
+
+$$
+[Q_1 - 1.5IQR,\; Q_3 + 1.5IQR]
+$$
+
+We use Titanic `fare` and first obtain the first and third quartiles.
+
+```{python}
+fare = (
+    titanic["fare"]
+    .dropna()
+)
+
+q1 = fare.quantile(0.25)
+q3 = fare.quantile(0.75)
+
+print(
+    "Q1:",
+    round(q1, 2),
+)
+
+print(
+    "Q3:",
+    round(q3, 2),
+)
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `iqr_outlier_bounds()` in `lab02_1.py`.
+It should return the lower and upper fences from `q1` and `q3`.
+
+**Hint:** Use `q3 - q1` for the IQR.
+
+```{python}
+#| eval: false
+
+lower, upper = iqr_outlier_bounds(
+    q1,
+    q3,
+)
+
+outlier_mask = (
+    (fare > upper)
+    | (fare < lower)
+)
+
+print(
+    "Lower threshold:",
+    round(lower, 2),
+)
+
+print(
+    "Upper threshold:",
+    round(upper, 2),
+)
+
+print(
+    "Potential outliers:",
+    int(outlier_mask.sum()),
+)
+```
+
+:::
+
+After implementing the function, run the following cell to visualize the
+potential outliers.
+
+```{python}
+#| eval: false
+#| fig-cap: "Potential fare outliers using the IQR rule"
+
+plot_fare_outliers(
+    fare,
+    lower,
+    upper,
+)
+```
+
+**Think:** Does a statistical outlier always mean that the recorded value is wrong?
+
+## 1.5 Aggregation
+
+Aggregation combines two or more objects into a single higher-level object.
+
+Objects with the same grouping value are combined into one summary record.
+
+For example, we can group passengers by `pclass` and summarize `survived`
+and `fare`.
+
+```{python}
+class_summary = (
+    titanic
+    .groupby("pclass")
+    .agg({
+        "survived": "mean",
+        "fare": "median",
+    })
+    .reset_index()
+)
+
+class_summary
+```
+
+Each row now represents one passenger class rather than one passenger.
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `summarize_by_class_and_sex()` in `lab02_1.py`.
+Group the passengers by `pclass` and `sex`. For each group, compute the mean
+of `survived` and the median of `fare`.
+
+**Hint:** Use `groupby(["pclass", "sex"])` followed by `agg({...})`.
+
+```{python}
+#| eval: false
+
+group_summary = summarize_by_class_and_sex(
+    titanic
+)
+
+group_summary
+```
+
+:::
+
+**Think:** What does one row represent before and after aggregation?
+
+## 1.6 Random and Stratified Sampling
+
+Simple random sampling gives each object an equal chance to be selected from
+the full dataset.
+
+For example, randomly select 10 passengers.
+
+```{python}
+random_sample = titanic.sample(
+    n=10,
+    random_state=42,
+)
+
+random_sample
+```
+
+Another sampling example selects every fifth row from the dataset.
+
+```{python}
+every_fifth = titanic.iloc[::5]
+
+every_fifth.head()
+```
+
+Stratified sampling first divides the data into groups and then selects
+objects from each group.
+
+Here, we use `pclass` as the grouping attribute.
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `stratified_sample_by_class()` in `lab02_1.py`.
+It should group passengers by `pclass` and select up to 5 passengers from
+each group.
+
+**Hint:** Loop over `df.groupby("pclass")` and `sample()` each group.
+
+```{python}
+#| eval: false
+
+stratified_sample = stratified_sample_by_class(
+    titanic,
+    n_per_group=5,
+    random_state=42,
+)
+
+stratified_sample
+```
+
+:::
+
+After implementing the function, run the following cell to check how many
+passengers were selected from each class.
+
+```{python}
+#| eval: false
+
+stratified_sample[
+    "pclass"
+].value_counts().sort_index()
+```
+
+**Think:** Why can stratified sampling be useful when some groups contain
+much fewer objects than others?

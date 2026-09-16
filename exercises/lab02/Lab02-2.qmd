@@ -1,0 +1,699 @@
+---
+title: "Lab 02-2. Data Transformation: Discretization, Binarization, and Scaling"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+Preprocessing can change how the same attribute is represented.
+
+In this lab, we use **Iris** and **Titanic** to examine discretization,
+binarization, functional transformation, and scaling.
+
+::: {.callout-important}
+## Implement in `lab02_2.py` first
+
+This notebook calls functions from `lab02_2.py`. Find each
+`# ========== TODO ==========` block, remove `raise NotImplementedError`,
+and write your implementation. Restart the kernel after editing the `.py`
+file, then run this notebook from the top.
+
+Check your functions with:
+
+```bash
+python -m doctest lab02_2.py -v
+```
+:::
+
+```{python}
+#| label: setup-transformation
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab02")
+if not (_lab / "lab02_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab02_setup
+
+import numpy as np
+import pandas as pd
+
+from sklearn.preprocessing import KBinsDiscretizer
+
+from data.loader import load_titanic
+
+from lab02_2 import (
+    binarize_categorical,
+    entropy,
+    equal_frequency_discretize,
+    load_iris_data,
+    minmax_scale,
+    plot_discretization,
+    plot_entropy_thresholds,
+    plot_log_transformation,
+    plot_scaling,
+    robust_scale,
+    weighted_split_entropy,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 2.1 Load the Data
+
+`load_titanic()` reads `data/record/titanic.csv`. If that file is missing, it
+downloads the seaborn Titanic table and saves it there.
+
+```{python}
+iris = load_iris_data()
+titanic = load_titanic()
+
+iris.head()
+```
+
+```{python}
+titanic.head()
+```
+
+## 2.2 Unsupervised Discretization
+
+Discretization transforms a **continuous attribute** into a
+**categorical attribute**.
+
+In unsupervised discretization, boundaries are selected without class labels.
+
+We use Iris `petal length (cm)`.
+
+```{python}
+petal_length = iris[[
+    "petal length (cm)"
+]]
+
+petal_length.describe()
+```
+
+`KBinsDiscretizer` divides a numerical attribute into bins according to the
+selected `strategy`.
+
+### Equal Width
+
+Equal-width discretization divides the value range into intervals with the
+same width.
+
+```{python}
+uniform = KBinsDiscretizer(
+    n_bins=3,
+    encode="ordinal",
+    strategy="uniform",
+    subsample=None,
+)
+
+uniform_bins = uniform.fit_transform(
+    petal_length
+)
+
+uniform.bin_edges_[0]
+```
+
+The transformed values are ordinal bin numbers. We map them to categorical
+labels to make the discretized representation easier to read.
+
+```{python}
+label_mapping = {
+    0: "low",
+    1: "medium",
+    2: "high",
+}
+
+uniform_result = pd.DataFrame({
+    "petal_length": (
+        petal_length[
+            "petal length (cm)"
+        ]
+    ),
+    "category": (
+        pd.Series(
+            uniform_bins.ravel()
+        )
+        .replace(label_mapping)
+    ),
+})
+
+uniform_result.head()
+```
+
+### Equal Frequency
+
+Equal-frequency discretization tries to place a similar number of objects in
+each interval.
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `equal_frequency_discretize()` in `lab02_2.py`.
+Create an equal-frequency discretizer with three bins and transform
+`petal_length`.
+
+**Hint:** Use `strategy="quantile"` and `fit_transform()`.
+
+```{python}
+#| eval: false
+
+quantile, quantile_bins = equal_frequency_discretize(
+    petal_length,
+    n_bins=3,
+)
+
+quantile.bin_edges_[0]
+```
+
+:::
+
+### Clustering-Based
+
+K-means discretization places boundaries according to one-dimensional
+clusters.
+
+```{python}
+kmeans = KBinsDiscretizer(
+    n_bins=3,
+    encode="ordinal",
+    strategy="kmeans",
+    subsample=None,
+)
+
+kmeans_bins = kmeans.fit_transform(
+    petal_length
+)
+
+kmeans.bin_edges_[0]
+```
+
+Equal width considers the value range, while equal frequency considers the
+number of objects in each interval. Neither method necessarily finds natural
+groups in the data. Clustering-based discretization uses the data distribution
+to place boundaries.
+
+```{python}
+#| eval: false
+#| fig-cap: "Discretization boundaries for the same Iris attribute"
+
+boundaries = {
+    "Equal width": uniform.bin_edges_[0],
+    "Equal frequency": quantile.bin_edges_[0],
+    "K-means": kmeans.bin_edges_[0],
+}
+
+plot_discretization(
+    petal_length,
+    boundaries,
+    title="Three Discretization Strategies",
+)
+```
+
+**Think:** Why can the same attribute have different boundaries under the
+three strategies?
+
+## 2.3 Supervised Discretization
+
+With class labels, we can evaluate whether a boundary creates intervals that
+mostly contain objects from the same class.
+
+A good interval has low class mixing. The entropy of interval $i$ is
+
+$$
+e_i
+=
+-\sum_{j=1}^{k}
+p_{ij}
+\log_2
+p_{ij},
+$$
+
+where $p_{ij}$ is the fraction of objects in interval $i$ that belong to
+class $j$.
+
+`entropy()` is provided in `lab02_2.py`. A pure interval has entropy 0, while
+an evenly mixed interval has higher entropy.
+
+```{python}
+pure = np.array([
+    "A", "A", "A", "A",
+])
+
+mixed = np.array([
+    "A", "A", "B", "B",
+])
+
+print(
+    "Pure entropy:",
+    entropy(pure),
+)
+
+print(
+    "Mixed entropy:",
+    entropy(mixed),
+)
+```
+
+To evaluate a candidate boundary, we first choose one threshold and split the
+attribute into two intervals.
+
+Here, `threshold = 2.45` is one candidate boundary for
+`petal length (cm)`.
+
+```{python}
+x = iris[
+    "petal length (cm)"
+].to_numpy()
+
+y = iris[
+    "species"
+].to_numpy()
+
+threshold = 2.45
+
+left_labels = y[
+    x <= threshold
+]
+
+right_labels = y[
+    x > threshold
+]
+
+left_entropy = entropy(
+    left_labels
+)
+
+right_entropy = entropy(
+    right_labels
+)
+
+print(
+    "Left entropy:",
+    round(left_entropy, 4),
+)
+
+print(
+    "Right entropy:",
+    round(right_entropy, 4),
+)
+```
+
+The total quality of the split is the weighted average of interval
+entropies:
+
+$$
+e
+=
+\sum_{i=1}^{n}
+w_i e_i,
+\qquad
+w_i
+=
+\frac{m_i}{m}.
+$$
+
+For two intervals, this becomes
+
+$$
+e
+=
+\frac{n_L}{n}e_L
++
+\frac{n_R}{n}e_R.
+$$
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `weighted_split_entropy()` in `lab02_2.py`.
+It should return the weighted entropy of the two intervals.
+
+**Hint:** Weight each interval entropy by the proportion of objects in that
+interval. Use `entropy()` from `lab02_2.py`.
+
+```{python}
+#| eval: false
+
+split_score = weighted_split_entropy(
+    left_labels,
+    right_labels,
+)
+
+print(
+    "Weighted entropy:",
+    round(split_score, 4),
+)
+```
+
+:::
+
+A good supervised boundary minimizes the weighted entropy.
+
+We can repeat the same calculation for all candidate thresholds.
+
+```{python}
+def split_entropy(
+    x,
+    y,
+    threshold,
+):
+    left = y[
+        x <= threshold
+    ]
+
+    right = y[
+        x > threshold
+    ]
+
+    if (
+        len(left) == 0
+        or len(right) == 0
+    ):
+        return np.inf
+
+    return (
+        len(left) / len(y)
+        * entropy(left)
+        +
+        len(right) / len(y)
+        * entropy(right)
+    )
+
+
+unique_values = np.sort(
+    np.unique(x)
+)
+
+candidate_thresholds = (
+    unique_values[:-1]
+    + unique_values[1:]
+) / 2
+
+scores = np.array([
+    split_entropy(
+        x,
+        y,
+        threshold,
+    )
+    for threshold
+    in candidate_thresholds
+])
+
+best_index = np.argmin(
+    scores
+)
+
+best_threshold = (
+    candidate_thresholds[
+        best_index
+    ]
+)
+
+print(
+    "Best threshold:",
+    best_threshold,
+)
+
+print(
+    "Minimum weighted entropy:",
+    round(
+        scores[best_index],
+        4,
+    ),
+)
+```
+
+```{python}
+#| fig-cap: "Weighted entropy for candidate thresholds"
+
+plot_entropy_thresholds(
+    candidate_thresholds,
+    scores,
+    best_threshold,
+)
+```
+
+**Think:** What information is used here that was not used in unsupervised
+discretization?
+
+## 2.4 Binarization
+
+Binarization transforms a categorical attribute into one or more
+**binary attributes**.
+
+For a categorical attribute with $m$ categories, there are two common
+representations:
+
+- **Compact encoding:** assign integers from $0$ to $m-1$ and represent them
+  using $\lceil \log_2 m \rceil$ binary variables.
+- **One-hot encoding:** create one binary variable for each category.
+
+For example, five categories require only three binary variables with compact
+encoding, but five variables with one-hot encoding.
+
+Compact encoding uses fewer variables, but its binary codes can create
+associations that are not present in the original categorical data.
+
+In this lab, we use **one-hot encoding** with `pd.get_dummies()`.
+
+```{python}
+embarked_binary = pd.get_dummies(
+    titanic["embarked"],
+    prefix="embarked",
+    dtype=int,
+)
+
+embarked_binary.head()
+```
+
+Each binary column represents one category. A value of `1` indicates that the
+passenger belongs to that category, and `0` indicates otherwise.
+
+```{python}
+num_categories = (
+    titanic["embarked"]
+    .nunique()
+)
+
+compact_variables = int(
+    np.ceil(
+        np.log2(
+            num_categories
+        )
+    )
+)
+
+print(
+    "Number of categories:",
+    num_categories,
+)
+
+print(
+    "Compact variables:",
+    compact_variables,
+)
+
+print(
+    "One-hot variables:",
+    embarked_binary.shape[1],
+)
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `binarize_categorical()` in `lab02_2.py`.
+Convert the categorical attribute `sex` into binary variables.
+
+**Hint:** Use `pd.get_dummies()` with `prefix="sex"` and `dtype=int`.
+
+```{python}
+#| eval: false
+
+sex_binary = binarize_categorical(
+    titanic["sex"],
+    prefix="sex",
+)
+
+sex_binary.head()
+```
+
+:::
+
+**Think:** If a categorical attribute has five categories, how many binary
+variables are required by compact encoding and one-hot encoding?
+
+**Think:** Why can compact encoding introduce relationships that were not
+present in the original categorical attribute?
+
+## 2.5 Functional Transformation
+
+A functional transformation applies a mathematical function to a numerical
+attribute.
+
+Titanic `fare` has a long right tail, so we apply a log transformation.
+
+```{python}
+fare = (
+    titanic["fare"]
+    .dropna()
+)
+
+fare_log = np.log1p(
+    fare
+)
+
+pd.DataFrame({
+    "fare": fare.head(),
+    "log_fare": fare_log.head(),
+})
+```
+
+```{python}
+#| fig-cap: "Fare before and after log transformation"
+
+plot_log_transformation(
+    fare,
+    fare_log,
+)
+```
+
+**Think:** What happened to the long right tail after the log transformation?
+
+## 2.6 Scaling
+
+Scaling places numerical attributes on comparable scales.
+
+We compare Titanic `age` and `fare`.
+
+```{python}
+X = titanic[[
+    "age",
+    "fare",
+]].copy()
+
+X["age"] = (
+    X["age"]
+    .fillna(
+        X["age"].median()
+    )
+)
+
+X["fare"] = (
+    X["fare"]
+    .fillna(
+        X["fare"].median()
+    )
+)
+
+X.describe()
+```
+
+For Z-score standardization,
+
+$$
+z
+=
+\frac{x-\mu}{\sigma}.
+$$
+
+```{python}
+zscore = (
+    X - X.mean()
+) / X.std(
+    ddof=0
+)
+
+zscore.describe().round(3)
+```
+
+Mean normalization uses
+
+$$
+x'
+=
+\frac{x-\mu}
+{x_{\max}-x_{\min}}.
+$$
+
+```{python}
+mean_normalized = (
+    X - X.mean()
+) / (
+    X.max()
+    - X.min()
+)
+
+mean_normalized.describe().round(3)
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `minmax_scale()` and `robust_scale()` in `lab02_2.py`.
+
+$$
+x_{\text{min-max}}
+=
+\frac{x-x_{\min}}
+{x_{\max}-x_{\min}}
+$$
+
+$$
+x_{\text{robust}}
+=
+\frac{x-\text{median}(x)}
+{IQR(x)}
+$$
+
+**Hint:** For the IQR, use
+`X.quantile(0.75) - X.quantile(0.25)`.
+
+```{python}
+#| eval: false
+
+minmax = minmax_scale(X)
+robust = robust_scale(X)
+
+print(
+    "Min-Max"
+)
+
+display(
+    minmax.describe().round(3)
+)
+
+print(
+    "Robust"
+)
+
+display(
+    robust.describe().round(3)
+)
+```
+
+:::
+
+```{python}
+#| eval: false
+#| fig-cap: "Comparison of numerical scaling methods"
+
+plot_scaling({
+    "Original": X,
+    "Min-Max": minmax,
+    "Mean normalization": mean_normalized,
+    "Z-score": zscore,
+    "Robust": robust,
+})
+```
+
+**Think:** Which scaling method uses the median and IQR instead of the mean
+and standard deviation?

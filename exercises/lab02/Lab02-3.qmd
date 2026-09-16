@@ -1,0 +1,569 @@
+---
+title: "Lab 02-3. Similarity Graph Construction"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+In this lab, we use **Iris** and **Moons** to construct similarity graphs from
+Euclidean distances.
+
+We build $\epsilon$-graphs and kNN graphs, then assign edge weights using the
+heat kernel.
+
+::: {.callout-important}
+## Implement in `lab02_3.py` first
+
+This notebook calls functions from `lab02_3.py`. Find each
+`# ========== TODO ==========` block, remove `raise NotImplementedError`,
+and write your implementation. Restart the kernel after editing the `.py`
+file, then run this notebook from the top.
+
+The same functions are reused on the Moons data in the last section, so
+implement them before that part.
+
+Check your functions with:
+
+```bash
+python -m doctest lab02_3.py -v
+```
+:::
+
+```{python}
+#| label: setup-similarity-graph
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab02")
+if not (_lab / "lab02_setup.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import lab02_setup
+
+import numpy as np
+import pandas as pd
+
+from sklearn.metrics import pairwise_distances
+
+from lab02_3 import (
+    apply_edge_weights,
+    epsilon_graph,
+    graph_summary,
+    knn_graph,
+    load_iris_graph_data,
+    load_moons_graph_data,
+    plot_distance_matrix,
+    plot_similarity_graph,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 3.1 Euclidean Distance
+
+We first use Iris `petal length` and `petal width`.
+
+```{python}
+X_iris, species, iris = (
+    load_iris_graph_data()
+)
+
+iris[[
+    "petal length (cm)",
+    "petal width (cm)",
+    "species",
+]].head()
+```
+
+For two objects,
+
+$$
+d(O_i,O_j)
+=
+\sqrt{
+\sum_{p=1}^{m}
+(x_{ip}-x_{jp})^2
+}.
+$$
+
+```{python}
+i = 0
+j = 1
+
+distance_01 = np.sqrt(
+    np.sum(
+        (X_iris[i] - X_iris[j]) ** 2
+    )
+)
+
+print(
+    "d(O_0, O_1):",
+    round(distance_01, 4),
+)
+```
+
+Now compute the Euclidean distance for every pair of Iris objects.
+
+```{python}
+D_iris = pairwise_distances(
+    X_iris,
+    metric="euclidean",
+)
+
+print(
+    "Distance matrix:",
+    D_iris.shape,
+)
+
+pd.DataFrame(
+    D_iris[:6, :6]
+).round(3)
+```
+
+Each entry `D_iris[i, j]` is $d(O_i,O_j)$.
+
+```{python}
+#| fig-cap: "Iris Euclidean distance matrix"
+
+plot_distance_matrix(
+    D_iris,
+    title="Iris Euclidean Distance Matrix",
+)
+```
+
+**Think:** What value should appear on the diagonal of a distance matrix?
+
+## 3.2 Constructing a Nearest Neighbor Graph
+
+The graph is constructed in three steps:
+
+1. create a node for each object,
+2. connect nearby objects,
+3. assign edge weights.
+
+### Step 1. Create Nodes
+
+Each Iris object becomes one node.
+
+```{python}
+print(
+    "Number of nodes:",
+    len(X_iris),
+)
+```
+
+### Step 2. Create Edges
+
+We first use a small distance matrix to see how each graph is constructed.
+
+```{python}
+D_small = np.array([
+    [0.0, 0.2, 0.8],
+    [0.2, 0.0, 0.5],
+    [0.8, 0.5, 0.0],
+])
+
+D_small
+```
+
+#### $\epsilon$-Graph
+
+Connect $O_i$ and $O_j$ when
+
+$$
+d(O_i,O_j)
+\le
+\epsilon.
+$$
+
+For example, with $\epsilon=0.4$:
+
+```{python}
+epsilon_small = 0.4
+
+A_small_epsilon = (
+    D_small
+    <= epsilon_small
+)
+
+np.fill_diagonal(
+    A_small_epsilon,
+    False,
+)
+
+A_small_epsilon
+```
+
+`True` indicates that the two objects are connected.
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `epsilon_graph()` in `lab02_3.py`.
+Use `epsilon = 0.25` and construct the Iris $\epsilon$-graph.
+
+**Hint:** Compare `D` with `epsilon`, then set the diagonal to `False`.
+
+```{python}
+#| eval: false
+
+epsilon = 0.25
+
+A_epsilon = epsilon_graph(
+    D_iris,
+    epsilon,
+)
+
+graph_summary(
+    A_epsilon
+)
+```
+
+:::
+
+```{python}
+#| eval: false
+#| fig-cap: "Iris epsilon graph"
+
+plot_similarity_graph(
+    X_iris,
+    A_epsilon,
+    labels=species,
+    title=f"Iris ε-Graph (ε = {epsilon})",
+)
+```
+
+**Think:** Why can different objects have different numbers of neighbors in an
+$\epsilon$-graph?
+
+#### kNN Graph
+
+If $O_j$ is among the $K$ nearest neighbors of $O_i$, add
+
+$$
+O_i
+\rightarrow
+O_j.
+$$
+
+For the same distance matrix, use $K=1$:
+
+```{python}
+K_small = 1
+n_small = D_small.shape[0]
+
+A_small_knn_directed = np.zeros(
+    (n_small, n_small),
+    dtype=bool,
+)
+
+for i in range(n_small):
+    distances = D_small[i].copy()
+    distances[i] = np.inf
+
+    neighbors = (
+        np.argsort(distances)[:K_small]
+    )
+
+    A_small_knn_directed[
+        i,
+        neighbors,
+    ] = True
+
+A_small_knn_directed
+```
+
+Each row shows the nearest-neighbor edge selected from one object.
+The direction is often ignored.
+
+```{python}
+A_small_knn = (
+    A_small_knn_directed
+    | A_small_knn_directed.T
+)
+
+A_small_knn
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `knn_graph()` in `lab02_3.py`.
+Apply the same kNN rule to every Iris object using `K = 4`, then ignore
+direction.
+
+**Hint:** For each row, set the self-distance to `inf`, sort the distances,
+and keep the first `K` indices. Symmetrize with a transpose.
+
+```{python}
+#| eval: false
+
+K = 4
+
+A_knn = knn_graph(
+    D_iris,
+    k=K,
+)
+
+graph_summary(
+    A_knn
+)
+```
+
+:::
+
+```{python}
+#| eval: false
+#| fig-cap: "Iris kNN graph"
+
+plot_similarity_graph(
+    X_iris,
+    A_knn,
+    labels=species,
+    title=f"Iris kNN Graph (K = {K})",
+)
+```
+
+**Think:** Why can a node have more than $K$ neighbors after direction is
+ignored?
+
+### Step 3. Heat-Kernel Weights
+
+For each pair,
+
+$$
+w_{ij}
+=
+\exp
+\left(
+-\frac{d(O_i,O_j)^2}
+{t^2}
+\right).
+$$
+
+Here, $t$ controls how quickly similarity decreases with distance.
+
+Because `D_iris` contains **Euclidean distances**, the heat-kernel similarity
+matrix is computed directly from `D_iris`.
+
+```{python}
+t = 1.0
+
+W = np.exp(
+    -(D_iris ** 2)
+    / (t ** 2)
+)
+
+pd.DataFrame(
+    W[:6, :6]
+).round(3)
+```
+
+::: {.callout-note title="Q. Practice"}
+
+Implement `apply_edge_weights()` in `lab02_3.py`.
+Keep heat-kernel weights only for the edges selected by the $\epsilon$-graph
+and kNN graph.
+
+**Hint:** Use `np.where()` with the adjacency matrix and `W`.
+
+```{python}
+#| eval: false
+
+W_epsilon = apply_edge_weights(
+    W,
+    A_epsilon,
+)
+
+W_knn = apply_edge_weights(
+    W,
+    A_knn,
+)
+
+pd.DataFrame(
+    W_epsilon[:6, :6]
+).round(3)
+```
+
+:::
+
+```{python}
+#| eval: false
+#| fig-cap: "Iris epsilon graph with heat-kernel weights"
+
+plot_similarity_graph(
+    X_iris,
+    A_epsilon,
+    weights=W_epsilon,
+    labels=species,
+    title="Iris Weighted ε-Graph",
+)
+```
+
+```{python}
+#| eval: false
+#| fig-cap: "Iris kNN graph with heat-kernel weights"
+
+plot_similarity_graph(
+    X_iris,
+    A_knn,
+    weights=W_knn,
+    labels=species,
+    title="Iris Weighted kNN Graph",
+)
+```
+
+**Think:** What happens to $w_{ij}$ as the Euclidean distance increases?
+
+## 3.3 Similarity Graphs on Moons
+
+We now apply the **same functions** to the Moons dataset. Do not reimplement
+the graph rules here. Reuse `epsilon_graph()`, `knn_graph()`, and
+`apply_edge_weights()` from `lab02_3.py`.
+
+```{python}
+X_moons, y_moons = (
+    load_moons_graph_data()
+)
+
+D_moons = pairwise_distances(
+    X_moons,
+    metric="euclidean",
+)
+
+pd.DataFrame(
+    D_moons[:6, :6]
+).round(3)
+```
+
+The labels `y_moons` are used only for visualization.
+
+### $\epsilon$-Graph
+
+```{python}
+#| eval: false
+
+epsilon_moons = 0.22
+
+A_moons_epsilon = epsilon_graph(
+    D_moons,
+    epsilon_moons,
+)
+
+graph_summary(
+    A_moons_epsilon
+)
+```
+
+```{python}
+#| eval: false
+#| fig-cap: "Moons epsilon graph"
+
+plot_similarity_graph(
+    X_moons,
+    A_moons_epsilon,
+    labels=y_moons,
+    title=f"Moons ε-Graph (ε = {epsilon_moons})",
+)
+```
+
+### kNN Graph
+
+```{python}
+#| eval: false
+
+K_moons = 4
+
+A_moons_knn = knn_graph(
+    D_moons,
+    k=K_moons,
+)
+
+graph_summary(
+    A_moons_knn
+)
+```
+
+```{python}
+#| eval: false
+#| fig-cap: "Moons kNN graph"
+
+plot_similarity_graph(
+    X_moons,
+    A_moons_knn,
+    labels=y_moons,
+    title=f"Moons kNN Graph (K = {K_moons})",
+)
+```
+
+### Heat-Kernel Weights
+
+Compute the heat-kernel similarity from the **Euclidean distance matrix**
+`D_moons`.
+
+$$
+w_{ij}
+=
+\exp
+\left(
+-\frac{d(O_i,O_j)^2}
+{t^2}
+\right).
+$$
+
+```{python}
+#| eval: false
+
+t_moons = epsilon_moons
+
+W_moons = np.exp(
+    -(D_moons ** 2)
+    / (t_moons ** 2)
+)
+
+W_moons_epsilon = apply_edge_weights(
+    W_moons,
+    A_moons_epsilon,
+)
+
+W_moons_knn = apply_edge_weights(
+    W_moons,
+    A_moons_knn,
+)
+```
+
+```{python}
+#| eval: false
+#| fig-cap: "Weighted Moons epsilon graph"
+
+plot_similarity_graph(
+    X_moons,
+    A_moons_epsilon,
+    weights=W_moons_epsilon,
+    labels=y_moons,
+    title="Moons Weighted ε-Graph",
+)
+```
+
+```{python}
+#| eval: false
+#| fig-cap: "Weighted Moons kNN graph"
+
+plot_similarity_graph(
+    X_moons,
+    A_moons_knn,
+    weights=W_moons_knn,
+    labels=y_moons,
+    title="Moons Weighted kNN Graph",
+)
+```
+
+**Think:** How do the $\epsilon$-graph and kNN graph differ in selecting
+neighbors?
