@@ -227,6 +227,35 @@ ul.task-list li input[type="checkbox"] {
 </li>
       </ul>
   </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab2. Data Preprocessing</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Discretization, Binarization, Scaling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Similarity Graph</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -245,6 +274,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#lab-0" id="toc-lab-0" class="nav-link" data-scroll-target="#lab-0">Lab 0</a></li>
   <li><a href="#lab-1-and-later" id="toc-lab-1-and-later" class="nav-link" data-scroll-target="#lab-1-and-later">Lab 1 and later</a></li>
+  <li><a href="#lab-2" id="toc-lab-2" class="nav-link" data-scroll-target="#lab-2">Lab 2</a></li>
   </ul></li>
   <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a>
   <ul class="collapse">
@@ -257,6 +287,7 @@ ul.task-list li input[type="checkbox"] {
   <ul class="collapse">
   <li><a href="#lab-0-1" id="toc-lab-0-1" class="nav-link" data-scroll-target="#lab-0-1">Lab 0</a></li>
   <li><a href="#lab-1" id="toc-lab-1" class="nav-link" data-scroll-target="#lab-1">Lab 1</a></li>
+  <li><a href="#lab-2-1" id="toc-lab-2-1" class="nav-link" data-scroll-target="#lab-2-1">Lab 2</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -341,6 +372,13 @@ ul.task-list li input[type="checkbox"] {
 <li><a href="lab01/lab01-4-interaction.html">Lab 1-4</a>: Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)</li>
 <li><a href="lab01/lab01-5-transaction.html">Lab 1-5</a>: Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)</li>
 </ul>
+<p><strong>Lab 2: Data Preprocessing</strong></p>
+<p>Three notebooks on this week’s preprocessing topics. Work through the notebooks in order, and implement the <code>TODO</code> functions in the matching <code>.py</code> file before running the practice cells.</p>
+<ul>
+<li><a href="lab02/Lab02-1.html">Lab 2-1</a>: Cleaning, aggregation, and sampling — Titanic</li>
+<li><a href="lab02/Lab02-2.html">Lab 2-2</a>: Discretization, binarization, and scaling — Iris and Titanic</li>
+<li><a href="lab02/Lab02-3.html">Lab 2-3</a>: Similarity graphs (ε-graph, kNN, heat kernel) — Iris and Moons</li>
+</ul>
 <p><strong>Later labs (TBD)</strong></p>
 <p>Additional labs will be posted as the corresponding lecture units are covered.</p>
 </section>
@@ -364,7 +402,7 @@ ul.task-list li input[type="checkbox"] {
 <tr class="odd">
 <td style="text-align: left;"><code>data/record/titanic.csv</code></td>
 <td style="text-align: left;">Titanic</td>
-<td style="text-align: left;">Lab 1-1 (<code>load_titanic()</code>; seaborn if missing)</td>
+<td style="text-align: left;">Lab 1-1, Lab 2-1, Lab 2-2 (<code>load_titanic()</code>; seaborn if missing)</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;"><code>data/text/20newsgroups/</code></td>
@@ -385,6 +423,16 @@ ul.task-list li input[type="checkbox"] {
 <td style="text-align: left;"><code>data/transaction/groceries_kaggle.csv</code></td>
 <td style="text-align: left;">Groceries baskets from Kaggle</td>
 <td style="text-align: left;">Lab 1-5 (<code>load_groceries()</code>; kagglehub if missing)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">scikit-learn <code>load_iris</code></td>
+<td style="text-align: left;">Iris</td>
+<td style="text-align: left;">Lab 2-2, Lab 2-3</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">scikit-learn <code>make_moons</code></td>
+<td style="text-align: left;">Moons</td>
+<td style="text-align: left;">Lab 2-3</td>
 </tr>
 </tbody>
 </table>
@@ -422,6 +470,16 @@ ul.task-list li input[type="checkbox"] {
 <li><code>data.loader</code>: Locates original files under the repository <code>data/</code> folder and downloads them if they are missing.</li>
 </ul>
 <p>For Lab 1 the helpers are <code>lab01_record.py</code>, <code>lab01_text.py</code>, <code>lab01_graph.py</code>, <code>lab01_interaction.py</code>, and <code>lab01_transaction.py</code>.</p>
+</section>
+<section id="lab-2" class="level3">
+<h3 class="anchored" data-anchor-id="lab-2">Lab 2</h3>
+<p>Lab 2 lives in <code>exercises/lab02/</code> and is split by preprocessing topic. Unlike Lab 1, you <strong>implement</strong> the <code>TODO</code> functions in the helper modules, then run the notebooks.</p>
+<ul>
+<li><code>Lab02-1.qmd</code>, <code>Lab02-2.qmd</code>, <code>Lab02-3.qmd</code>: The notebooks you read and run. Each loads data, shows a worked example, and calls the functions you write.</li>
+<li><code>lab02_1.py</code>, <code>lab02_2.py</code>, <code>lab02_3.py</code>: <strong>Submission files.</strong> Find each <code># ========== TODO ==========</code> block, remove <code>raise NotImplementedError</code>, and implement the function. Check with <code>python -m doctest lab02_1.py -v</code> (and the matching files for parts 2 and 3).</li>
+<li><code>lab02_setup.py</code>: Puts the repository root and this lab folder on <code>sys.path</code> so <code>from data.loader import ...</code> and <code>import lab02_1</code> both work.</li>
+<li><code>data.loader</code>: Loads Titanic from <code>data/record/titanic.csv</code>. Iris and Moons come from scikit-learn.</li>
+</ul>
 <p>Graded homework is posted separately on the <a href="../assignments/index.html">Assignments</a> page. Starter files will appear in <code>assignments/</code> as each unit is released.</p>
 </section>
 </section>
@@ -433,7 +491,7 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="step-2-open-the-lab-notebook" class="level3">
 <h3 class="anchored" data-anchor-id="step-2-open-the-lab-notebook">Step 2: Open the Lab Notebook</h3>
-<p>Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from <code>exercises/lab01/</code> so that helper modules import cleanly; <code>lab01_setup.py</code> also puts the repository root on <code>sys.path</code> so <code>from data.loader import ...</code> works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.</p>
+<p>Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from <code>exercises/lab01/</code> and Lab 2 notebooks from <code>exercises/lab02/</code> so that helper modules import cleanly. <code>lab01_setup.py</code> and <code>lab02_setup.py</code> also put the repository root on <code>sys.path</code> so <code>from data.loader import ...</code> works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -450,7 +508,8 @@ ul.task-list li input[type="checkbox"] {
 </section>
 <section id="step-3-run-and-observe" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-run-and-observe">Step 3: Run and Observe</h3>
-<p>Unlike the homework assignments, <strong>labs do not require you to write code from scratch or fill in <code>TODO</code> blocks.</strong> Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the <em>same</em> observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.</p>
+<p>Unlike the homework-style notebooks in Lab 2, <strong>Lab 0 and Lab 1 do not require you to write code from scratch or fill in <code>TODO</code> blocks.</strong> Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the <em>same</em> observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.</p>
+<p>Lab 2 is different: implement the <code>TODO</code> functions in <code>lab02_*.py</code> first, restart the kernel, then run the matching notebook from top to bottom.</p>
 </section>
 <section id="step-4-experiment-freely" class="level3">
 <h3 class="anchored" data-anchor-id="step-4-experiment-freely">Step 4: Experiment Freely</h3>
@@ -483,6 +542,16 @@ ul.task-list li input[type="checkbox"] {
 <li><strong>Think</strong> prompts at the end of a part ask you to say what was <em>stored</em> in the original data versus what was <em>derived</em> (for example, an item–item co-occurrence graph).</li>
 </ul>
 <p>When a lab imports <code>data.loader</code>, treat that as the place where original files are found and loaded. When it imports a <code>lab01_*.py</code> module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.</p>
+</section>
+<section id="lab-2-1" class="level3">
+<h3 class="anchored" data-anchor-id="lab-2-1">Lab 2</h3>
+<p>Lab 2 is organized by <strong>preprocessing topic</strong>, one notebook per topic:</p>
+<ul>
+<li><strong>Lab 2-1</strong> cleans Titanic records, then aggregates and samples them.</li>
+<li><strong>Lab 2-2</strong> changes how attributes are represented: discretization, binarization, a log transform, and scaling.</li>
+<li><strong>Lab 2-3</strong> builds ε-graphs and kNN graphs and weights edges with the heat kernel.</li>
+</ul>
+<p>When a notebook imports <code>lab02_*.py</code>, that is the file you edit. The notebook is where you inspect the result after the functions are implemented.</p>
 
 
 </section>
