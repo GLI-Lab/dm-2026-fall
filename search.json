@@ -300,387 +300,267 @@
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html",
-    "href": "exercises/lab01/lab01.html",
+    "objectID": "exercises/lab01/lab01-5-transaction.html",
+    "href": "exercises/lab01/lab01-5-transaction.html",
     "title": "Lab 01. Exploring Data Representations",
     "section": "",
     "text": "A dataset does not have only one useful representation.\nIn this lab, we examine how the same underlying data can be represented as records, sequences, matrices, vectors, and graphs.\n\nBefore choosing an algorithm, choose a representation.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#load-the-data",
-    "href": "exercises/lab01/lab01.html#load-the-data",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "1.1 Load the Data",
-    "text": "1.1 Load the Data\n\ntitanic = load_titanic()\n\ntype(titanic), titanic.shape\n\n(pandas.DataFrame, (891, 7))\n\n\n\ntitanic.head()\n\n\n\n\n\n\n\n\nsurvived\npclass\nsex\nage\nfare\nembarked\nalone\n\n\n\n\n0\n0\n3\nmale\n22.0\n7.2500\nS\nFalse\n\n\n1\n1\n1\nfemale\n38.0\n71.2833\nC\nFalse\n\n\n2\n1\n3\nfemale\n26.0\n7.9250\nS\nTrue\n\n\n3\n1\n1\nfemale\n35.0\n53.1000\nS\nFalse\n\n\n4\n0\n3\nmale\n35.0\n8.0500\nS\nTrue\n\n\n\n\n\n\n\n\ntitanic[\"survived\"].value_counts()\n\nsurvived\n0    549\n1    342\nName: count, dtype: int64",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-1-numerical-feature-matrix",
-    "href": "exercises/lab01/lab01.html#representation-1-numerical-feature-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "1.2 Representation 1: Numerical Feature Matrix",
-    "text": "1.2 Representation 1: Numerical Feature Matrix\nThe same passenger records can be represented as numerical vectors.\nCategorical values such as sex, pclass, and embarked are converted into 0/1 indicators, while numerical values such as age and fare remain as numbers.\nEach passenger is now represented by one row of numbers.\n\nX_numeric = build_numeric_matrix(\n    titanic\n)\n\ntype(X_numeric), X_numeric.shape\n\n(pandas.DataFrame, (891, 12))\n\n\n\nX_numeric.head()\n\n\n\n\n\n\n\n\nage\nfare\npclass_1\npclass_2\npclass_3\nsex_female\nsex_male\nembarked_C\nembarked_Q\nembarked_S\nalone_False\nalone_True\n\n\n\n\n0\n22.0\n7.2500\n0\n0\n1\n0\n1\n0\n0\n1\n1\n0\n\n\n1\n38.0\n71.2833\n1\n0\n0\n1\n0\n1\n0\n0\n1\n0\n\n\n2\n26.0\n7.9250\n0\n0\n1\n1\n0\n0\n0\n1\n0\n1\n\n\n3\n35.0\n53.1000\n1\n0\n0\n1\n0\n0\n0\n1\n1\n0\n\n\n4\n35.0\n8.0500\n0\n0\n1\n0\n1\n0\n0\n1\n0\n1\n\n\n\n\n\n\n\nThink: Is this a different dataset?\nNo. The passengers are the same. Only their representation has changed from mixed data types to numerical values.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-2-transaction-representation",
-    "href": "exercises/lab01/lab01.html#representation-2-transaction-representation",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "1.3 Representation 2: Transaction Representation",
-    "text": "1.3 Representation 2: Transaction Representation\nThe same passenger can also be represented as a set of attribute-value items.\nContinuous values such as age and fare are first discretized into categories.\n\ntransactions = build_transactions(\n    titanic\n)\n\ntype(transactions), type(transactions.iloc[0])\n\n(pandas.Series, list)\n\n\n\nfor i, items in transactions.head().items():\n    print(i, \":\", items)\n\n0 : ['pclass=3', 'sex=male', 'embarked=S', 'alone=False', 'age_group=young_adult', 'fare_group=low']\n1 : ['pclass=1', 'sex=female', 'embarked=C', 'alone=False', 'age_group=adult', 'fare_group=very_high']\n2 : ['pclass=3', 'sex=female', 'embarked=S', 'alone=True', 'age_group=young_adult', 'fare_group=medium']\n3 : ['pclass=1', 'sex=female', 'embarked=S', 'alone=False', 'age_group=young_adult', 'fare_group=very_high']\n4 : ['pclass=3', 'sex=male', 'embarked=S', 'alone=True', 'age_group=young_adult', 'fare_group=medium']\n\n\nThink: What changed in this representation?\nThe same passenger is now represented as a set of attribute-value items instead of one row containing mixed numerical and categorical values.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-3-binary-item-matrix",
-    "href": "exercises/lab01/lab01.html#representation-3-binary-item-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "1.4 Representation 3: Binary Item Matrix",
-    "text": "1.4 Representation 3: Binary Item Matrix\nThe transaction representation can be converted into a binary matrix.\nEach column corresponds to one possible item, and the value is 1 when the passenger has that item.\n\nitem_matrix = build_binary_item_matrix(\n    transactions\n)\n\ntype(item_matrix), item_matrix.shape\n\n(pandas.DataFrame, (891, 19))\n\n\n\nitem_matrix.head()\n\n\n\n\n\n\n\n\nage_group=adult\nage_group=child\nage_group=senior\nage_group=teen\nage_group=young_adult\nalone=False\nalone=True\nembarked=C\nembarked=Q\nembarked=S\nfare_group=high\nfare_group=low\nfare_group=medium\nfare_group=very_high\npclass=1\npclass=2\npclass=3\nsex=female\nsex=male\n\n\n\n\n0\n0\n0\n0\n0\n1\n1\n0\n0\n0\n1\n0\n1\n0\n0\n0\n0\n1\n0\n1\n\n\n1\n1\n0\n0\n0\n0\n1\n0\n1\n0\n0\n0\n0\n0\n1\n1\n0\n0\n1\n0\n\n\n2\n0\n0\n0\n0\n1\n0\n1\n0\n0\n1\n0\n0\n1\n0\n0\n0\n1\n1\n0\n\n\n3\n0\n0\n0\n0\n1\n1\n0\n0\n0\n1\n0\n0\n0\n1\n1\n0\n0\n1\n0\n\n\n4\n0\n0\n0\n0\n1\n0\n1\n0\n0\n1\n0\n0\n1\n0\n0\n0\n1\n0\n1\n\n\n\n\n\n\n\nThe matrix has the following meaning:\n\nRow = passenger\nColumn = attribute-value item\nValue = 1 if the passenger has that item\nZero = the passenger does not have that item\n\nThink: Is the information different from the transaction representation?\nNo. The item set and the binary matrix encode the same attribute-value information in two different forms.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-4-passenger-attribute-bipartite-graph",
-    "href": "exercises/lab01/lab01.html#representation-4-passenger-attribute-bipartite-graph",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "1.5 Representation 4: Passenger-Attribute Bipartite Graph",
-    "text": "1.5 Representation 4: Passenger-Attribute Bipartite Graph\nThe same transaction data can also be represented as a bipartite graph.\nWe create two kinds of nodes:\n\nPassenger nodes\nAttribute-value nodes\n\nAn edge connects a passenger to an attribute-value item that belongs to that passenger.\n\nG = build_bipartite_graph(\n    transactions,\n    n_show=6,\n)\n\ntype(G)\n\nnetworkx.classes.graph.Graph\n\n\n\nG.number_of_nodes(), G.number_of_edges()\n\n(20, 35)\n\n\n\nlist(G.edges())[:10]\n\n[('Passenger 0', 'pclass=3'),\n ('Passenger 0', 'sex=male'),\n ('Passenger 0', 'embarked=S'),\n ('Passenger 0', 'alone=False'),\n ('Passenger 0', 'age_group=young_adult'),\n ('Passenger 0', 'fare_group=low'),\n ('pclass=3', 'Passenger 2'),\n ('pclass=3', 'Passenger 4'),\n ('pclass=3', 'Passenger 5'),\n ('sex=male', 'Passenger 4')]\n\n\n\npassenger_nodes = [\n    node\n    for node, data in G.nodes(data=True)\n    if data[\"node_type\"] == \"passenger\"\n]\n\nattribute_nodes = [\n    node\n    for node, data in G.nodes(data=True)\n    if data[\"node_type\"] == \"attribute\"\n]\n\nattribute_order = [\n    \"pclass\",\n    \"sex\",\n    \"embarked\",\n    \"alone\",\n    \"age_group\",\n    \"fare_group\",\n]\n\n\ndef attribute_key(node):\n    prefix = node.split(\"=\")[0]\n\n    if prefix in attribute_order:\n        group = attribute_order.index(prefix)\n    else:\n        group = len(attribute_order)\n\n    return (group, node)\n\n\nattribute_nodes = sorted(\n    attribute_nodes,\n    key=attribute_key,\n)\n\npos = {}\n\npassenger_y = np.linspace(\n    0.9,\n    -0.9,\n    len(passenger_nodes),\n)\n\nfor y, node in zip(\n    passenger_y,\n    passenger_nodes,\n):\n    pos[node] = (-0.5, y)\n\nattribute_y = np.linspace(\n    0.95,\n    -0.95,\n    len(attribute_nodes),\n)\n\nfor y, node in zip(\n    attribute_y,\n    attribute_nodes,\n):\n    pos[node] = (0.5, y)\n\nfig, ax = plt.subplots(\n    figsize=(7, 5.5)\n)\n\nnx.draw_networkx_edges(\n    G,\n    pos,\n    edge_color=\"lightgray\",\n    alpha=0.6,\n    ax=ax,\n)\n\nnx.draw_networkx_nodes(\n    G,\n    pos,\n    nodelist=passenger_nodes,\n    node_size=340,\n    node_color=\"skyblue\",\n    ax=ax,\n)\n\nnx.draw_networkx_nodes(\n    G,\n    pos,\n    nodelist=attribute_nodes,\n    node_size=340,\n    node_color=\"salmon\",\n    node_shape=\"s\",\n    ax=ax,\n)\n\npassenger_label_pos = {\n    node: (-0.44, pos[node][1])\n    for node in passenger_nodes\n}\n\nattribute_label_pos = {\n    node: (0.44, pos[node][1])\n    for node in attribute_nodes\n}\n\nnx.draw_networkx_labels(\n    G,\n    passenger_label_pos,\n    labels={node: node for node in passenger_nodes},\n    font_size=7,\n    horizontalalignment=\"left\",\n    ax=ax,\n)\n\nnx.draw_networkx_labels(\n    G,\n    attribute_label_pos,\n    labels={node: node for node in attribute_nodes},\n    font_size=7,\n    horizontalalignment=\"right\",\n    ax=ax,\n)\n\nax.text(\n    -0.5,\n    1.05,\n    \"Passengers\",\n    ha=\"center\",\n    fontsize=9,\n)\n\nax.text(\n    0.5,\n    1.05,\n    \"Attribute-value items\",\n    ha=\"center\",\n    fontsize=9,\n)\n\nax.set_xlim(-0.78, 0.78)\nax.set_ylim(-1.05, 1.1)\nax.axis(\"off\")\n\nplt.tight_layout()\nplt.show()\n\n\n\n\nPassenger-attribute bipartite graph",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#load-the-data-1",
-    "href": "exercises/lab01/lab01.html#load-the-data-1",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.1 Load the Data",
-    "text": "2.1 Load the Data\n\nnews = load_20newsgroups(\n    n_per_class=100,\n    random_state=RANDOM_STATE,\n)\n\ntype(news), news.shape\n\n(pandas.DataFrame, (400, 3))\n\n\n\nnews.head()\n\n\n\n\n\n\n\n\ndoc_id\nlabel\ntext\n\n\n\n\n0\n20ng_0000\nrec.sport.baseball\n\\nwondering\\n                                                      -------------\\n\\nDo you mean ...\n\n\n1\n20ng_0001\nrec.sport.baseball\nActually, there can be any number of players on a side. You can\\nhave a 25-man roster, a 40-man ...\n\n\n2\n20ng_0002\ncomp.graphics\n\\n: 3DO is still a concept.\\n: The software is what sells and what will determine its\\n: success...\n\n\n3\n20ng_0003\nrec.sport.baseball\n\\n\\nI don't have a history handy, but I don't recall that the preponderance\\nof ROY's come from ...\n\n\n4\n20ng_0004\ncomp.graphics\n\\nHallo POV-Renderers !\\nI've got a BocaX3 Card. Now I try to get POV displaying True Colors\\nwh...\n\n\n\n\n\n\n\n\nnews[\"label\"].value_counts()\n\nlabel\nrec.sport.baseball    100\ncomp.graphics         100\nsci.space             100\nmisc.forsale          100\nName: count, dtype: int64",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#inspect-raw-text",
-    "href": "exercises/lab01/lab01.html#inspect-raw-text",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.2 Inspect Raw Text",
-    "text": "2.2 Inspect Raw Text\n\nprint(news.loc[0, \"text\"][:1200])\n\n\nwondering\n                                                      -------------\n\nDo you mean Juan Berenguer?  He was traded for Mark Davis in the middle\nof last season.  Exchanged one stiff for another, as Berenguer hadn't\ncome back from his injury in 91.  I think he's retired now.\n\nAnyhow, as middle relief, Marvin ain't that bad.  He at least can\npitch a couple of innings or do mop-up work.  I don't know much\nabout McMichael (was he the Mexican League guy?), but\neverybody else in the pen is a 1 inning man, except maybe\nMercker.\n\n\n-------------------------------------------------------\nEric Roush      fierkelab@  bchm.biochem.duke.edu\n\"I am a Marxist, of the Groucho sort\"\nGrafitti, Paris, 1968\n\nTANSTAAFL! (although the Internet comes close.)\n\n\nThink: What is one object in this dataset?\nEach row corresponds to one document. The same object can therefore be viewed as both a record and a document.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-1-token-sequence",
-    "href": "exercises/lab01/lab01.html#representation-1-token-sequence",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.3 Representation 1: Token Sequence",
-    "text": "2.3 Representation 1: Token Sequence\n\ntokens = tokenize_documents(news[\"text\"])\n\ntype(tokens), type(tokens[0])\n\n(list, list)\n\n\n\ntokens[0][:30]\n\n['wondering',\n 'do',\n 'you',\n 'mean',\n 'juan',\n 'berenguer',\n 'he',\n 'was',\n 'traded',\n 'for',\n 'mark',\n 'davis',\n 'in',\n 'the',\n 'middle',\n 'of',\n 'last',\n 'season',\n 'exchanged',\n 'one',\n 'stiff',\n 'for',\n 'another',\n 'as',\n 'berenguer',\n 'hadn',\n 'come',\n 'back',\n 'from',\n 'his']\n\n\nThink: What information is preserved in a token-sequence representation?\nThe order of tokens is preserved, so we can still distinguish which words appear before or after others.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-2-document-term-count-matrix",
-    "href": "exercises/lab01/lab01.html#representation-2-document-term-count-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.4 Representation 2: Document-Term Count Matrix",
-    "text": "2.4 Representation 2: Document-Term Count Matrix\n\nX_count, count_vectorizer = build_count_matrix(\n    news[\"text\"],\n    max_features=3000,\n)\n\ntype(X_count), X_count.shape\n\n(scipy.sparse._csr.csr_matrix, (400, 3000))\n\n\n\nX_count.nnz\n\n16025\n\n\nThe matrix has the following meaning:\n\nRow = document\nColumn = term\nValue = term count\nZero = the term does not occur in the document\n\n\nterms = count_vectorizer.get_feature_names_out()\n\nterm_counts = np.asarray(X_count.sum(axis=0)).ravel()\ntop_terms = term_counts.argsort()[-10:][::-1]\n\npd.DataFrame(\n    X_count[:6, top_terms].toarray(),\n    index=news.loc[:5, \"doc_id\"],\n    columns=terms[top_terms],\n)\n\n\n\n\n\n\n\n\nspace\nimage\nlike\ngood\njust\ndon\ntime\ndata\nnew\n00\n\n\ndoc_id\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n20ng_0000\n0\n0\n0\n0\n0\n1\n0\n0\n0\n0\n\n\n20ng_0001\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\n20ng_0002\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\n20ng_0003\n0\n0\n0\n0\n0\n2\n0\n0\n0\n0\n\n\n20ng_0004\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\n20ng_0005\n0\n0\n0\n0\n1\n0\n0\n0\n0\n0\n\n\n\n\n\n\n\n\nplt.figure(figsize=(8, 4))\nplt.spy(X_count[:100, :500], markersize=1)\nplt.xlabel(\"terms\")\nplt.ylabel(\"documents\")\nplt.show()\n\n\n\n\nSparse document-term count matrix\n\n\n\n\nThink: Why is this matrix sparse?\nEach document contains only a small subset of the entire vocabulary. Therefore, most document-term entries are zero.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-3-tf-idf-vector-space",
-    "href": "exercises/lab01/lab01.html#representation-3-tf-idf-vector-space",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.5 Representation 3: TF-IDF Vector Space",
-    "text": "2.5 Representation 3: TF-IDF Vector Space\n\nX_tfidf, tfidf_vectorizer = build_tfidf_matrix(\n    news[\"text\"],\n    max_features=3000,\n)\n\ntype(X_tfidf), X_tfidf.shape, X_tfidf.nnz\n\n(scipy.sparse._csr.csr_matrix, (400, 3000), 16025)\n\n\nThe shape is similar to the count matrix, but the values now have a different meaning: each row is a TF-IDF document vector.\nThink: Can the representation change even when the matrix shape stays the same?\nYes. The rows and columns can remain the same while the meaning of each value changes from a raw count to a TF-IDF weight.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#cosine-similarity",
-    "href": "exercises/lab01/lab01.html#cosine-similarity",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.6 Cosine Similarity",
-    "text": "2.6 Cosine Similarity\n\nscores = compute_cosine_similarity(\n    X_tfidf,\n    query_index=0,\n)\n\nscores.shape\n\n(400,)\n\n\n\nscores[0] = -1\ntop_idx = scores.argsort()[-5:][::-1]\n\nnews.loc[top_idx, [\"doc_id\", \"label\"]].assign(\n    cosine_similarity=scores[top_idx]\n)\n\n\n\n\n\n\n\n\ndoc_id\nlabel\ncosine_similarity\n\n\n\n\n271\n20ng_0271\nrec.sport.baseball\n0.096880\n\n\n79\n20ng_0079\nrec.sport.baseball\n0.093704\n\n\n289\n20ng_0289\nrec.sport.baseball\n0.091834\n\n\n138\n20ng_0138\nrec.sport.baseball\n0.090345\n\n\n323\n20ng_0323\nrec.sport.baseball\n0.083932\n\n\n\n\n\n\n\n\ni = top_idx[0]\n\nprint(\"similarity:\", round(float(scores[i]), 3))\nprint(\"label:\", news.loc[i, \"label\"])\nprint(news.loc[i, \"text\"][:600])\n\nsimilarity: 0.097\nlabel: rec.sport.baseball\n\n\nI'm not quite sure how these numbers are generated.  It appears that in\na neutral park Bo's HR and slugging tend to drop (he actually loses two\nhome runs).  Or do they?  What is \"equivalent average?\"\n\nOne thing, when looking at Bo's stats, is that you can see that KC took\naway some homers.  Normally, you expect some would-be homers to go for\ndoubles or triples in big parks, or to be caught, and for that matter you\nexpect lots of doubles and triples anyway.  But Bo, despite his speed, \nhit very few doubles and not that many triples.  So I would expect his\nvalue to have risen quite considerabl\n\n\nThink: Was this similarity stored in the original dataset?\nNo. It is a derived quantity created by representing documents with TF-IDF vectors and comparing them with cosine similarity.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-4-document-similarity-graph",
-    "href": "exercises/lab01/lab01.html#representation-4-document-similarity-graph",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "2.7 Representation 4: Document Similarity Graph",
-    "text": "2.7 Representation 4: Document Similarity Graph\nWe connect each document to its k most similar documents in the TF-IDF space.\n\nG = build_similarity_graph(\n    X_tfidf,\n    doc_ids=news[\"doc_id\"],\n    labels=news[\"label\"],\n    k=3,\n    max_docs=80,\n)\n\ntype(G)\n\nnetworkx.classes.graph.Graph\n\n\n\nG.number_of_nodes(), G.number_of_edges()\n\n(80, 174)\n\n\n\nlist(G.edges(data=True))[:10]\n\n[(0, 79, {'weight': 0.09370361115085846}),\n (0, 67, {'weight': 0.07719730486472909}),\n (0, 75, {'weight': 0.07141844974621436}),\n (0, 1, {'weight': 0.06130650588961917}),\n (0, 7, {'weight': 0.0}),\n (0, 18, {'weight': 0.0}),\n (1, 28, {'weight': 0.05882035919900275}),\n (1, 64, {'weight': 0.05119124894760718}),\n (1, 7, {'weight': 0.0}),\n (1, 18, {'weight': 0.0})]\n\n\n\npos = nx.spring_layout(\n    G,\n    seed=RANDOM_STATE,\n)\n\nlabels = [G.nodes[node][\"label\"] for node in G.nodes]\nnode_colors = pd.Categorical(labels).codes\n\nplt.figure(figsize=(8, 6))\nnx.draw_networkx_edges(G, pos, alpha=0.25)\nnx.draw_networkx_nodes(\n    G,\n    pos,\n    node_size=70,\n    node_color=node_colors,\n    cmap=\"tab10\",\n)\nplt.axis(\"off\")\nplt.show()\n\n\n\n\n\n\n\n\nThink: Were these edges present in the original 20 Newsgroups dataset?\nNo. They are derived edges. We created them by choosing a TF-IDF representation, cosine similarity, and a k-nearest-neighbor rule.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#load-the-data-2",
-    "href": "exercises/lab01/lab01.html#load-the-data-2",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.1 Load the Data",
-    "text": "3.1 Load the Data\n\nG = load_karate()\n\ntype(G), G.number_of_nodes(), G.number_of_edges()\n\n(networkx.classes.graph.Graph, 34, 78)\n\n\n\nlist(G.nodes(data=True))[:10]\n\n[(0, {'club': 'Mr. Hi'}),\n (1, {'club': 'Mr. Hi'}),\n (2, {'club': 'Mr. Hi'}),\n (3, {'club': 'Mr. Hi'}),\n (4, {'club': 'Mr. Hi'}),\n (5, {'club': 'Mr. Hi'}),\n (6, {'club': 'Mr. Hi'}),\n (7, {'club': 'Mr. Hi'}),\n (8, {'club': 'Mr. Hi'}),\n (9, {'club': 'Officer'})]\n\n\n\nlist(G.edges())[:10]\n\n[(0, 1),\n (0, 2),\n (0, 3),\n (0, 4),\n (0, 5),\n (0, 6),\n (0, 7),\n (0, 8),\n (0, 10),\n (0, 11)]",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#inspect-basic-graph-structure",
-    "href": "exercises/lab01/lab01.html#inspect-basic-graph-structure",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.2 Inspect Basic Graph Structure",
-    "text": "3.2 Inspect Basic Graph Structure\n\nprint(\"number of nodes:\", G.number_of_nodes())\nprint(\"number of edges:\", G.number_of_edges())\n\nnumber of nodes: 34\nnumber of edges: 78\n\n\n\nG.nodes[0]\n\n{'club': 'Mr. Hi'}\n\n\n\nlist(G.neighbors(0))\n\n[1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 17, 19, 21, 31]\n\n\nThink: How is a graph object described?\nA node can have its own attributes, but graph data also explicitly represents connections between nodes through edges.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-1-graph-visualization",
-    "href": "exercises/lab01/lab01.html#representation-1-graph-visualization",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.3 Representation 1: Graph Visualization",
-    "text": "3.3 Representation 1: Graph Visualization\nThe graph can be visualized using nodes and edges.\nEach node represents a club member, and each edge represents a relationship between two members.\n\ncolors = [\n    \"skyblue\" if G.nodes[n][\"club\"] == \"Mr. Hi\" else \"salmon\"\n    for n in G.nodes()\n]\n\npos = nx.spring_layout(\n    G,\n    seed=RANDOM_STATE,\n)\n\nplt.figure(figsize=(8, 6))\n\nnx.draw(\n    G,\n    pos,\n    node_color=colors,\n    with_labels=True,\n    node_size=500,\n    edge_color=\"gray\",\n)\n\nplt.show()\n\n\n\n\nKarate Club graph visualization\n\n\n\n\nThink: What information is easy to see in a graph visualization?\nWe can visually inspect neighborhoods, highly connected nodes, and groups of nodes that appear close together.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-2-edge-list",
-    "href": "exercises/lab01/lab01.html#representation-2-edge-list",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.4 Representation 2: Edge List",
-    "text": "3.4 Representation 2: Edge List\nThe same graph can be represented as a list of connected node pairs.\n\nedge_list = build_edge_list(G)\n\ntype(edge_list), edge_list.shape\n\n(pandas.DataFrame, (78, 2))\n\n\n\nedge_list.head(10)\n\n\n\n\n\n\n\n\nsource\ntarget\n\n\n\n\n0\n0\n1\n\n\n1\n0\n2\n\n\n2\n0\n3\n\n\n3\n0\n4\n\n\n4\n0\n5\n\n\n5\n0\n6\n\n\n6\n0\n7\n\n\n7\n0\n8\n\n\n8\n0\n10\n\n\n9\n0\n11\n\n\n\n\n\n\n\nThe table has the following meaning:\n\nRow = edge\nsource = one endpoint\ntarget = the other endpoint\n\n\nlist(G.edges(31))\n\n[(31, 0), (31, 24), (31, 25), (31, 28), (31, 32), (31, 33)]\n\n\nThink: Does the edge list contain different graph information from the graph visualization?\nNo. The same connections are represented differently: a line in the visualization becomes a (source, target) pair in the table.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-3-adjacency-list",
-    "href": "exercises/lab01/lab01.html#representation-3-adjacency-list",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.5 Representation 3: Adjacency List",
-    "text": "3.5 Representation 3: Adjacency List\nThe same graph can also be represented by listing the neighbors of each node.\n\nadjacency_list = build_adjacency_list(G)\n\ntype(adjacency_list), len(adjacency_list)\n\n(dict, 34)\n\n\n\nfor node in list(adjacency_list)[:10]:\n    print(node, \":\", adjacency_list[node])\n\n0 : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 17, 19, 21, 31]\n1 : [0, 2, 3, 7, 13, 17, 19, 21, 30]\n2 : [0, 1, 3, 7, 8, 9, 13, 27, 28, 32]\n3 : [0, 1, 2, 7, 12, 13]\n4 : [0, 6, 10]\n5 : [0, 6, 10, 16]\n6 : [0, 4, 5, 16]\n7 : [0, 1, 2, 3]\n8 : [0, 2, 30, 32, 33]\n9 : [2, 33]\n\n\nEach node is associated with the list of nodes directly connected to it.\nThink: How is the same connection represented here?\nIf node 1 appears in the neighbor list of node 0, then nodes 0 and 1 are connected by an edge.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-4-adjacency-matrix",
-    "href": "exercises/lab01/lab01.html#representation-4-adjacency-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "3.6 Representation 4: Adjacency Matrix",
-    "text": "3.6 Representation 4: Adjacency Matrix\nThe same graph can also be represented as a nodes × nodes matrix.\n\nA = adjacency(G)\n\nA_numeric = pd.DataFrame(\n    A,\n    index=[f\"N{i}\" for i in range(A.shape[0])],\n    columns=[f\"N{i}\" for i in range(A.shape[1])],\n)\n\ntype(A), A.shape\n\n(numpy.ndarray, (34, 34))\n\n\n\nA_numeric.iloc[:10, :10]\n\n\n\n\n\n\n\n\nN0\nN1\nN2\nN3\nN4\nN5\nN6\nN7\nN8\nN9\n\n\n\n\nN0\n0\n1\n1\n1\n1\n1\n1\n1\n1\n0\n\n\nN1\n1\n0\n1\n1\n0\n0\n0\n1\n0\n0\n\n\nN2\n1\n1\n0\n1\n0\n0\n0\n1\n1\n1\n\n\nN3\n1\n1\n1\n0\n0\n0\n0\n1\n0\n0\n\n\nN4\n1\n0\n0\n0\n0\n0\n1\n0\n0\n0\n\n\nN5\n1\n0\n0\n0\n0\n0\n1\n0\n0\n0\n\n\nN6\n1\n0\n0\n0\n1\n1\n0\n0\n0\n0\n\n\nN7\n1\n1\n1\n1\n0\n0\n0\n0\n0\n0\n\n\nN8\n1\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\nN9\n0\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\n\n\n\n\n\nA value of 1 indicates that two nodes are connected, while 0 indicates that there is no direct edge.\nThe same matrix can also be visualized using color.\n\nfrom matplotlib.colors import ListedColormap\n\nn = 12\nA_small = A[:n, :n]\n\ncmap = ListedColormap([\n    \"#F7F7F7\",\n    \"#87CEEB\",\n])\n\nfig, ax = plt.subplots(\n    figsize=(7, 7)\n)\n\nax.imshow(\n    A_small,\n    cmap=cmap,\n    vmin=0,\n    vmax=1,\n    interpolation=\"nearest\",\n)\n\nfor i in range(n):\n    for j in range(n):\n        ax.text(\n            j,\n            i,\n            str(A_small[i, j]),\n            ha=\"center\",\n            va=\"center\",\n            fontsize=8,\n        )\n\nax.set_xticks(range(n))\nax.set_yticks(range(n))\n\nax.set_xticklabels(\n    [f\"N{i}\" for i in range(n)]\n)\n\nax.set_yticklabels(\n    [f\"N{i}\" for i in range(n)]\n)\n\nax.set_xticks(\n    np.arange(-0.5, n, 1),\n    minor=True,\n)\n\nax.set_yticks(\n    np.arange(-0.5, n, 1),\n    minor=True,\n)\n\nax.grid(\n    which=\"minor\",\n    color=\"#D9D9D9\",\n    linewidth=0.6,\n)\n\nax.tick_params(\n    which=\"minor\",\n    bottom=False,\n    left=False,\n)\n\nax.set_xlabel(\"Node\")\nax.set_ylabel(\"Node\")\n\nplt.tight_layout()\nplt.show()\n\n\n\n\nKarate Club binary adjacency matrix\n\n\n\n\nThink: Is this different information from the graph visualization, edge list, or adjacency list?\nNo. The same connections are represented in matrix form.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#load-the-data-3",
-    "href": "exercises/lab01/lab01.html#load-the-data-3",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.1 Load the Data",
-    "text": "4.1 Load the Data\n\nratings = load_movielens_100k()\n\ntype(ratings), ratings.shape\n\n(pandas.DataFrame, (100000, 5))\n\n\n\nratings.head()\n\n\n\n\n\n\n\n\nuser_id\nitem_id\nrating\ntimestamp\ndatetime\n\n\n\n\n0\n196\n242\n3\n881250949\n1997-12-04 15:55:49\n\n\n1\n186\n302\n3\n891717742\n1998-04-04 19:22:22\n\n\n2\n22\n377\n1\n878887116\n1997-11-07 07:18:36\n\n\n3\n244\n51\n2\n880606923\n1997-11-27 05:02:03\n\n\n4\n166\n346\n1\n886397596\n1998-02-02 05:33:16\n\n\n\n\n\n\n\nEach row is one interaction: a (user, item) pair with a rating attached. This long format is often called a triple.\n\nmovies = load_movies()\ntitles = movies.set_index(\"item_id\")[\"title\"]\n\nmovies.head()\n\n\n\n\n\n\n\n\nitem_id\ntitle\nrelease_date\ngenres\n\n\n\n\n0\n1\nToy Story (1995)\n01-Jan-1995\n[Animation, Children's, Comedy]\n\n\n1\n2\nGoldenEye (1995)\n01-Jan-1995\n[Action, Adventure, Thriller]\n\n\n2\n3\nFour Rooms (1995)\n01-Jan-1995\n[Thriller]\n\n\n3\n4\nGet Shorty (1995)\n01-Jan-1995\n[Action, Comedy, Drama]\n\n\n4\n5\nCopycat (1995)\n01-Jan-1995\n[Crime, Drama, Thriller]\n\n\n\n\n\n\n\n\nusers = load_users()\n\nusers.head()\n\n\n\n\n\n\n\n\nuser_id\nage\ngender\noccupation\nzip_code\n\n\n\n\n0\n1\n24\nM\ntechnician\n85711\n\n\n1\n2\n53\nF\nother\n94043\n\n\n2\n3\n23\nM\nwriter\n32067\n\n\n3\n4\n24\nM\ntechnician\n43537\n\n\n4\n5\n33\nF\nother\n15213",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#inspect-the-raw-log",
-    "href": "exercises/lab01/lab01.html#inspect-the-raw-log",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.2 Inspect the Raw Log",
-    "text": "4.2 Inspect the Raw Log\n\npd.DataFrame(\n    {\n        \"n_interactions\": [len(ratings)],\n        \"n_users\": [ratings[\"user_id\"].nunique()],\n        \"n_items\": [ratings[\"item_id\"].nunique()],\n        \"rating_values\": [sorted(ratings[\"rating\"].unique())],\n    }\n)\n\n\n\n\n\n\n\n\nn_interactions\nn_users\nn_items\nrating_values\n\n\n\n\n0\n100000\n943\n1682\n[1, 2, 3, 4, 5]\n\n\n\n\n\n\n\n\nratings[\"rating\"].value_counts().sort_index()\n\nrating\n1     6110\n2    11370\n3    27145\n4    34174\n5    21201\nName: count, dtype: int64\n\n\nThink: What is one object in this dataset? Not a user, and not a movie. One row is one interaction — a pair of two different kinds of object. This is why interaction data does not fit the “one row = one object” assumption of record data.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-1-user-item-utility-matrix",
-    "href": "exercises/lab01/lab01.html#representation-1-user-item-utility-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.3 Representation 1: User-Item Utility Matrix",
-    "text": "4.3 Representation 1: User-Item Utility Matrix\nWe pivot the triples into a matrix whose rows are users and columns are items.\nLet us first take a small block that we can print in full.\n\nsmall = sample_interactions(\n    ratings,\n    n_items=12,\n    n_users=10,\n    random_state=RANDOM_STATE,\n)\n\nX_small, small_users, small_items = build_utility_matrix(small)\n\nX_small.shape\n\n(10, 12)\n\n\n\npd.DataFrame(\n    X_small.toarray(),\n    index=[f\"u{u}\" for u in small_users],\n    columns=[titles[i][:16] for i in small_items],\n).replace(0.0, np.nan)\n\n\n\n\n\n\n\n\nToy Story (1995)\nStar Wars (1977)\nFargo (1996)\nIndependence Day\nGodfather, The (\nRaiders of the L\nReturn of the Je\nContact (1997)\nEnglish Patient,\nScream (1996)\nLiar Liar (1997)\nAir Force One (1\n\n\n\n\nu33\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\nNaN\n4.0\n3.0\n4.0\n\n\nu396\n4.0\nNaN\n2.0\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n3.0\nNaN\n3.0\n\n\nu456\n2.0\n4.0\n3.0\n2.0\n5.0\n4.0\n3.0\n4.0\n3.0\nNaN\n1.0\nNaN\n\n\nu468\n5.0\n5.0\n5.0\n4.0\n4.0\n5.0\n3.0\n4.0\n4.0\nNaN\n3.0\nNaN\n\n\nu494\n3.0\n5.0\n5.0\n4.0\n5.0\n5.0\n4.0\nNaN\n4.0\nNaN\n4.0\n5.0\n\n\nu684\n4.0\n4.0\n4.0\n3.0\nNaN\nNaN\n4.0\nNaN\nNaN\nNaN\nNaN\nNaN\n\n\nu706\n4.0\n5.0\n1.0\nNaN\nNaN\nNaN\n4.0\n4.0\nNaN\n3.0\n4.0\nNaN\n\n\nu735\n4.0\n5.0\n2.0\nNaN\n4.0\nNaN\n4.0\n4.0\n5.0\n4.0\nNaN\n4.0\n\n\nu737\nNaN\nNaN\n5.0\nNaN\n5.0\n2.0\nNaN\n5.0\nNaN\nNaN\nNaN\nNaN\n\n\nu835\n3.0\n4.0\nNaN\nNaN\n4.0\n5.0\nNaN\nNaN\n3.0\n2.0\n3.0\nNaN\n\n\n\n\n\n\n\nEvery NaN is a pair we never observed. Now the full matrix:\n\nX, user_ids, item_ids = build_utility_matrix(ratings)\n\ntype(X), X.shape, X.nnz\n\n(scipy.sparse._csr.csr_matrix, (943, 1682), 100000)\n\n\n\nf\"density = {matrix_density(X):.4%}\"\n\n'density = 6.3047%'\n\n\nThe matrix has the following meaning:\n\nRow = user\nColumn = item\nValue = rating (1-5)\nMissing = the user has not rated the item\n\nThink: Why is this matrix sparse? Each user rates only a small subset of the 1,682 movies. Only 6.3% of the user-item pairs are observed, so more than 93% of the matrix is missing.\nThink: Did we lose anything by pivoting? Yes. The timestamp of each interaction is no longer visible in the matrix. The same triples could instead be represented as a sequence ordered by time.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-2-binary-interaction-matrix",
-    "href": "exercises/lab01/lab01.html#representation-2-binary-interaction-matrix",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.4 Representation 2: Binary Interaction Matrix",
-    "text": "4.4 Representation 2: Binary Interaction Matrix\nOften we only know that an interaction happened, not how much the user liked the item. We can convert the ratings into a binary “positive interaction” view.\n\nX_binary = binarize_utility_matrix(X, threshold=4.0)\n\nX_binary.shape, X_binary.nnz\n\n((943, 1682), 55375)\n\n\n\nf\"density = {matrix_density(X_binary):.4%}\"\n\n'density = 3.4912%'\n\n\n\npd.DataFrame(\n    {\n        \"representation\": [\"rating (1-5)\", \"binary (&gt;= 4)\"],\n        \"observed_entries\": [X.nnz, X_binary.nnz],\n        \"density\": [matrix_density(X), matrix_density(X_binary)],\n    }\n)\n\n\n\n\n\n\n\n\nrepresentation\nobserved_entries\ndensity\n\n\n\n\n0\nrating (1-5)\n100000\n0.063047\n\n\n1\nbinary (&gt;= 4)\n55375\n0.034912\n\n\n\n\n\n\n\nThink: In the binary matrix, is a 0 the same as a low rating? No. A 0 means “no positive interaction observed”, which mixes together disliked, not yet seen, and seen but not rated. A 1 is a statement by the user; a 0 is the absence of a statement.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-3-bipartite-graph",
-    "href": "exercises/lab01/lab01.html#representation-3-bipartite-graph",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.5 Representation 3: Bipartite Graph",
-    "text": "4.5 Representation 3: Bipartite Graph\nThe same interactions can be viewed as a graph with two kinds of node — users and items — where an edge exists whenever a user rated an item.\n\nG = build_bipartite_graph(\n    small,\n    titles=titles,\n    n_users=None,\n)\n\ntype(G), G.number_of_nodes(), G.number_of_edges()\n\n(networkx.classes.graph.Graph, 22, 71)\n\n\n\nnx.is_bipartite(G)\n\nTrue\n\n\n\nlist(G.edges(data=True))[:5]\n\n[('u33', 'i258', {'weight': 4.0}),\n ('u33', 'i288', {'weight': 4.0}),\n ('u33', 'i294', {'weight': 3.0}),\n ('u33', 'i300', {'weight': 4.0}),\n ('u396', 'i1', {'weight': 4.0})]\n\n\n\nuser_nodes = [n for n, d in G.nodes(data=True) if d[\"bipartite\"] == 0]\nitem_nodes = [n for n, d in G.nodes(data=True) if d[\"bipartite\"] == 1]\n\npos = nx.bipartite_layout(G, user_nodes)\n\nfig, ax = plt.subplots(figsize=(11, 8))\n\nnx.draw_networkx_edges(G, pos, alpha=0.25, edge_color=\"#AAAAAA\", width=1.0, ax=ax)\nnx.draw_networkx_nodes(G, pos, nodelist=user_nodes, node_color=\"tab:blue\",\n                       node_size=900, label=\"user\", ax=ax)\nnx.draw_networkx_nodes(G, pos, nodelist=item_nodes, node_color=\"tab:orange\",\n                       node_size=900, node_shape=\"s\", label=\"item\", ax=ax)\n\nnx.draw_networkx_labels(\n    G, pos,\n    labels={n: G.nodes[n][\"label\"] for n in user_nodes},\n    font_size=9, font_color=\"white\", font_weight=\"bold\", ax=ax,\n)\n\nfor node in item_nodes:\n    x, y = pos[node]\n    ax.text(x + 0.10, y, G.nodes[node][\"label\"][:24],\n            fontsize=10, va=\"center\", ha=\"left\")\n\nax.legend(scatterpoints=1, fontsize=11, frameon=False, ncol=2, markerscale=0.7,\n          loc=\"lower center\", bbox_to_anchor=(0.5, 1.01),\n          handletextpad=0.8, columnspacing=2.5)\nax.set_xlim(-1.25, 1.45)\nax.axis(\"off\")\nplt.show()\n\n\n\n\nBipartite user-item graph\n\n\n\n\nThe graph and the matrix are two views of the same object. The users x items block of the adjacency matrix is called the biadjacency matrix:\n\nB, row_nodes, col_nodes = biadjacency_matrix(G)\n\nB.shape, B.nnz\n\n((10, 12), 71)\n\n\n\nB.nnz == G.number_of_edges()\n\nTrue\n\n\n\npd.DataFrame(\n    B.toarray(),\n    index=row_nodes,\n    columns=[c[:10] for c in col_nodes],\n).replace(0.0, np.nan)\n\n\n\n\n\n\n\n\ni1\ni100\ni121\ni127\ni174\ni181\ni258\ni286\ni288\ni294\ni300\ni50\n\n\n\n\nu33\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\nNaN\n4.0\n3.0\n4.0\nNaN\n\n\nu396\n4.0\n2.0\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n3.0\nNaN\n3.0\nNaN\n\n\nu456\n2.0\n3.0\n2.0\n5.0\n4.0\n3.0\n4.0\n3.0\nNaN\n1.0\nNaN\n4.0\n\n\nu468\n5.0\n5.0\n4.0\n4.0\n5.0\n3.0\n4.0\n4.0\nNaN\n3.0\nNaN\n5.0\n\n\nu494\n3.0\n5.0\n4.0\n5.0\n5.0\n4.0\nNaN\n4.0\nNaN\n4.0\n5.0\n5.0\n\n\nu684\n4.0\n4.0\n3.0\nNaN\nNaN\n4.0\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\n\n\nu706\n4.0\n1.0\nNaN\nNaN\nNaN\n4.0\n4.0\nNaN\n3.0\n4.0\nNaN\n5.0\n\n\nu735\n4.0\n2.0\nNaN\n4.0\nNaN\n4.0\n4.0\n5.0\n4.0\nNaN\n4.0\n5.0\n\n\nu737\nNaN\n5.0\nNaN\n5.0\n2.0\nNaN\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n\n\nu835\n3.0\nNaN\nNaN\n4.0\n5.0\nNaN\nNaN\n3.0\n2.0\n3.0\nNaN\n4.0\n\n\n\n\n\n\n\nThink: Is the bipartite graph a different dataset from the utility matrix? No. The biadjacency matrix of the graph is the utility matrix, up to the ordering of rows and columns. Choosing “graph” or “matrix” changes which tools we can apply, not what the data contains.\nThink: What could a bipartite graph not store? An edge connects one user to one item. If each rating also carried a tag, we would need a three-column relation (user, item, tag), because an edge cannot by itself record which tag was used on which pair.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-4-user-user-projection",
-    "href": "exercises/lab01/lab01.html#representation-4-user-user-projection",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.6 Representation 4: User-User Projection",
-    "text": "4.6 Representation 4: User-User Projection\nWe can fold the bipartite graph onto one side: connect two users when they rated the same item, weighted by how many items they share. Here we keep only pairs that share at least four items, so that the strongest links stand out.\n\nP = project_onto_users(G, min_shared=4)\n\nP.number_of_nodes(), P.number_of_edges()\n\n(10, 24)\n\n\n\nsorted(\n    P.edges(data=True),\n    key=lambda e: e[2][\"weight\"],\n    reverse=True,\n)[:5]\n\n[('u456', 'u468', {'weight': 10}),\n ('u456', 'u494', {'weight': 9}),\n ('u468', 'u494', {'weight': 9}),\n ('u456', 'u735', {'weight': 7}),\n ('u468', 'u735', {'weight': 7})]\n\n\n\npos = nx.circular_layout(P)\n\nplt.figure(figsize=(10, 9))\nnx.draw_networkx_edges(P, pos, width=1.3, alpha=0.4, edge_color=\"#AAAAAA\")\nnx.draw_networkx_nodes(P, pos, node_color=\"tab:blue\", node_size=1700)\nnx.draw_networkx_labels(P, pos, font_size=11, font_color=\"white\",\n                        font_weight=\"bold\")\nnx.draw_networkx_edge_labels(\n    P, pos,\n    edge_labels={(u, v): d[\"weight\"] for u, v, d in P.edges(data=True)},\n    font_size=9, label_pos=0.28, rotate=False,\n)\nplt.margins(0.14)\nplt.axis(\"off\")\nplt.show()\n\n\n\n\nUser-user projection weighted by shared items\n\n\n\n\nThink: What was lost in the projection? The items. We can see that two users are similar, but the graph no longer tells us which movies they shared. Projection also destroys the bipartite structure: this graph has only one kind of node.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#representation-5-item-item-similarity-graph",
-    "href": "exercises/lab01/lab01.html#representation-5-item-item-similarity-graph",
-    "title": "Lab 01. Exploring Data Representations",
-    "section": "4.7 Representation 5: Item-Item Similarity Graph",
-    "text": "4.7 Representation 5: Item-Item Similarity Graph\nInstead of folding by counting shared users, we can compare item columns of the binary matrix with cosine similarity.\n\nquery_item = 50\nquery_index = int(np.where(item_ids == query_item)[0][0])\n\ntitles[query_item]\n\n'Star Wars (1977)'\n\n\n\nscores = compute_item_similarity(X_binary, query_index=query_index)\n\nscores.shape\n\n(1682,)\n\n\n\nscores[query_index] = -1\ntop_idx = scores.argsort()[-8:][::-1]\n\npd.DataFrame(\n    {\n        \"title\": [titles[item_ids[i]] for i in top_idx],\n        \"cosine_similarity\": scores[top_idx].round(3),\n    }\n)\n\n\n\n\n\n\n\n\ntitle\ncosine_similarity\n\n\n\n\n0\nReturn of the Jedi (1983)\n0.801\n\n\n1\nEmpire Strikes Back, The (1980)\n0.715\n\n\n2\nRaiders of the Lost Ark (1981)\n0.702\n\n\n3\nGodfather, The (1972)\n0.634\n\n\n4\nSilence of the Lambs, The (1991)\n0.617\n\n\n5\nToy Story (1995)\n0.616\n\n\n6\nIndiana Jones and the Last Crusade (1989)\n0.595\n\n\n7\nPrincess Bride, The (1987)\n0.593\n\n\n\n\n\n\n\nWe connect each item to its k most similar items, restricted to the 25 most-rated movies so that every column has enough observations to compare:\n\nG_items = build_item_knn_graph(\n    X_binary,\n    item_ids=item_ids,\n    titles=titles,\n    k=2,\n    max_items=25,\n)\n\nG_items.number_of_nodes(), G_items.number_of_edges()\n\n(25, 41)\n\n\n\ndef short_title(title):\n    title = title.split(\" (\")[0]\n    return title if len(title) &lt;= 17 else title[:16] + \".\"\n\npos = nx.kamada_kawai_layout(G_items)\n\nplt.figure(figsize=(10, 7))\nnx.draw_networkx_edges(G_items, pos, width=1.0, alpha=0.5, edge_color=\"#AAAAAA\")\nnx.draw_networkx_nodes(G_items, pos, node_size=700, node_color=\"tab:orange\")\n\nnx.draw_networkx_labels(\n    G_items, pos,\n    labels={n: short_title(G_items.nodes[n][\"title\"]) for n in G_items.nodes},\n    font_size=8,\n)\nnx.draw_networkx_edge_labels(\n    G_items, pos,\n    edge_labels={(u, v): f\"{d['weight']:.2f}\" for u, v, d in G_items.edges(data=True)},\n    font_size=6.5, label_pos=0.5, rotate=False,\n)\nplt.margins(0.14)\nplt.axis(\"off\")\nplt.show()\n\n\n\n\nk-nearest-neighbor item similarity graph\n\n\n\n\nThink: Were these edges present in the original MovieLens data? No. MovieLens contains only user-item ratings. The item-item edges are derived: we chose a binary representation, cosine similarity, and a k-nearest-neighbor rule. A different threshold or metric would produce a different graph.",
-    "crumbs": [
-      "Exercises",
-      "Lab1. Data Representations",
-      "Exploring Data Representations"
-    ]
-  },
-  {
-    "objectID": "exercises/lab01/lab01.html#load-the-data-4",
-    "href": "exercises/lab01/lab01.html#load-the-data-4",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#load-the-data",
+    "href": "exercises/lab01/lab01-5-transaction.html#load-the-data",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.1 Load the Data",
-    "text": "5.1 Load the Data\nPlace the downloaded Groceries CSV file at data/transaction/groceries.csv.\n\ngroceries = load_groceries(\"data/transaction/groceries.csv\")\n\ntype(groceries), groceries.shape\n\n(pandas.DataFrame, (9835, 2))\n\n\n\ngroceries.head()\n\n\n\n\n\n\n\n\ntransaction_id\nitems\n\n\n\n\n0\ntxn_00000\n[citrus fruit, semi-finished bread, margarine, ready soups]\n\n\n1\ntxn_00001\n[tropical fruit, yogurt, coffee]\n\n\n2\ntxn_00002\n[whole milk]\n\n\n3\ntxn_00003\n[pip fruit, yogurt, cream cheese, meat spreads]\n\n\n4\ntxn_00004\n[other vegetables, whole milk, condensed milk, long life bakery product]\n\n\n\n\n\n\n\nInspect one basket directly.\n\ngroceries.loc[0, \"items\"]\n\n['citrus fruit', 'semi-finished bread', 'margarine', 'ready soups']\n\n\nThink: What is one object in this dataset?\nOne object is a transaction (basket), represented as a collection of items purchased together.",
+    "text": "5.1 Load the Data\n\nfrom data.loader import load_groceries\n\ngroceries = load_groceries()\n\ntype(groceries), groceries.shape\n\n(pandas.DataFrame, (14963, 2))\n\n\n\ngroceries.head()\n\n\n\n\n\n\n\n\ntransaction_id\nitems\n\n\n\n\n0\ntxn_00000\n[tropical fruit, rolls/buns, candy]\n\n\n1\ntxn_00001\n[whole milk, tropical fruit, chocolate]\n\n\n2\ntxn_00002\n[pip fruit, other vegetables, flour]\n\n\n3\ntxn_00003\n[other vegetables, onions, shopping bags]\n\n\n4\ntxn_00004\n[whole milk, other vegetables, white bread]\n\n\n\n\n\n\n\nInspect one basket directly.\n\ngroceries.loc[0, \"items\"]\n\n['tropical fruit', 'rolls/buns', 'candy']\n\n\nThink: What is one object in this dataset?\nOne object is a transaction (basket), represented as a collection of items purchased together.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#representation-1-basket-item-set-view",
-    "href": "exercises/lab01/lab01.html#representation-1-basket-item-set-view",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#representation-1-basket-item-set-view",
+    "href": "exercises/lab01/lab01-5-transaction.html#representation-1-basket-item-set-view",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.2 Representation 1: Basket / Item-Set View",
-    "text": "5.2 Representation 1: Basket / Item-Set View\nEach transaction can be viewed directly as a variable-length collection of items.\n\nfor i in range(3):\n    print(\n        groceries.loc[i, \"transaction_id\"],\n        \"-&gt;\",\n        groceries.loc[i, \"items\"],\n    )\n\ntxn_00000 -&gt; ['citrus fruit', 'semi-finished bread', 'margarine', 'ready soups']\ntxn_00001 -&gt; ['tropical fruit', 'yogurt', 'coffee']\ntxn_00002 -&gt; ['whole milk']\n\n\nThink: How is this different from ordinary record data?\nDifferent transactions can contain different numbers of items, so there is no fixed set of attribute columns in the raw basket representation.",
+    "text": "5.2 Representation 1: Basket / Item-Set View\nUnlike record data, transactions do not have a fixed number of attributes. Each basket can contain a different number of items.\n\nfor i in range(3):\n    print(\n        groceries.loc[i, \"transaction_id\"],\n        \"-&gt;\",\n        groceries.loc[i, \"items\"],\n    )\n\ntxn_00000 -&gt; ['tropical fruit', 'rolls/buns', 'candy']\ntxn_00001 -&gt; ['whole milk', 'tropical fruit', 'chocolate']\ntxn_00002 -&gt; ['pip fruit', 'other vegetables', 'flour']\n\n\nThink: How is this different from ordinary record data?\nDifferent transactions can contain different numbers of items, so there is no fixed set of attribute columns in the raw basket representation.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#representation-2-long-table",
-    "href": "exercises/lab01/lab01.html#representation-2-long-table",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#representation-2-long-table",
+    "href": "exercises/lab01/lab01-5-transaction.html#representation-2-long-table",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.3 Representation 2: Long Table",
-    "text": "5.3 Representation 2: Long Table\nThe same baskets can be expanded into a table with one row for each transaction-item occurrence.\n\ngroceries_long = to_long_table(groceries)\n\ntype(groceries_long), groceries_long.shape\n\n(pandas.DataFrame, (43367, 2))\n\n\n\ngroceries_long.head(12)\n\n\n\n\n\n\n\n\ntransaction_id\nitem\n\n\n\n\n0\ntxn_00000\ncitrus fruit\n\n\n1\ntxn_00000\nsemi-finished bread\n\n\n2\ntxn_00000\nmargarine\n\n\n3\ntxn_00000\nready soups\n\n\n4\ntxn_00001\ntropical fruit\n\n\n5\ntxn_00001\nyogurt\n\n\n6\ntxn_00001\ncoffee\n\n\n7\ntxn_00002\nwhole milk\n\n\n8\ntxn_00003\npip fruit\n\n\n9\ntxn_00003\nyogurt\n\n\n10\ntxn_00003\ncream cheese\n\n\n11\ntxn_00003\nmeat spreads\n\n\n\n\n\n\n\nThe same transaction_id now appears repeatedly because one transaction can contain several items.\nThink: Did the underlying purchases change?\nNo. Only the representation changed from one row per basket to one row per transaction-item occurrence.",
+    "text": "5.3 Representation 2: Long Table\nThe same baskets can be expanded into a table with one row for each transaction-item occurrence.\n\ngroceries_long = to_long_table(groceries)\n\ntype(groceries_long), groceries_long.shape\n\n(pandas.DataFrame, (38006, 2))\n\n\n\ngroceries_long.head(12)\n\n\n\n\n\n\n\n\ntransaction_id\nitem\n\n\n\n\n0\ntxn_00000\ntropical fruit\n\n\n1\ntxn_00000\nrolls/buns\n\n\n2\ntxn_00000\ncandy\n\n\n3\ntxn_00001\nwhole milk\n\n\n4\ntxn_00001\ntropical fruit\n\n\n5\ntxn_00001\nchocolate\n\n\n6\ntxn_00002\npip fruit\n\n\n7\ntxn_00002\nother vegetables\n\n\n8\ntxn_00002\nflour\n\n\n9\ntxn_00003\nother vegetables\n\n\n10\ntxn_00003\nonions\n\n\n11\ntxn_00003\nshopping bags\n\n\n\n\n\n\n\nThe same transaction_id now appears repeatedly because one transaction can contain several items.\nThink: Did the underlying purchases change?\nNo. Only the representation changed from one row per basket to one row per transaction-item occurrence.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#representation-3-transaction-item-binary-matrix",
-    "href": "exercises/lab01/lab01.html#representation-3-transaction-item-binary-matrix",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#representation-3-transaction-item-binary-matrix",
+    "href": "exercises/lab01/lab01-5-transaction.html#representation-3-transaction-item-binary-matrix",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.4 Representation 3: Transaction-Item Binary Matrix",
-    "text": "5.4 Representation 3: Transaction-Item Binary Matrix\n\nX_transaction, item_names = build_transaction_item_matrix(groceries)\n\ntype(X_transaction), X_transaction.shape\n\n(scipy.sparse._csr.csr_matrix, (9835, 169))\n\n\n\nX_transaction.nnz\n\n43367\n\n\nThe matrix has the following meaning:\n\nRow = transaction\nColumn = item\nValue = 1 if the item is in the transaction\nZero = the item is not in the transaction\n\nView a small part of the matrix using the most frequent items.\n\nitem_counts = np.asarray(X_transaction.sum(axis=0)).ravel()\ntop_item_idx = item_counts.argsort()[-10:][::-1]\n\npd.DataFrame(\n    X_transaction[:8, top_item_idx].toarray(),\n    index=groceries.loc[:7, \"transaction_id\"],\n    columns=item_names[top_item_idx],\n)\n\n\n\n\n\n\n\n\nwhole milk\nother vegetables\nrolls/buns\nsoda\nyogurt\nbottled water\nroot vegetables\ntropical fruit\nshopping bags\nsausage\n\n\ntransaction_id\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntxn_00000\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00001\n0\n0\n0\n0\n1\n0\n0\n1\n0\n0\n\n\ntxn_00002\n1\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00003\n0\n0\n0\n0\n1\n0\n0\n0\n0\n0\n\n\ntxn_00004\n1\n1\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00005\n1\n0\n0\n0\n1\n0\n0\n0\n0\n0\n\n\ntxn_00006\n0\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00007\n0\n1\n1\n0\n0\n0\n0\n0\n0\n0\n\n\n\n\n\n\n\nNow inspect the sparse structure visually.\n\nplt.figure(figsize=(8, 4))\nplt.spy(X_transaction[:120, :120], markersize=1)\nplt.xlabel(\"items\")\nplt.ylabel(\"transactions\")\nplt.show()\n\n\n\n\nSparse transaction-item binary matrix\n\n\n\n\nThink: Why is this matrix sparse?\nEach basket contains only a small subset of all available items. Therefore, most transaction-item entries are zero.",
+    "text": "5.4 Representation 3: Transaction-Item Binary Matrix\n\nX_transaction, item_names = build_transaction_item_matrix(groceries)\n\ntype(X_transaction), X_transaction.shape\n\n(scipy.sparse._csr.csr_matrix, (14963, 167))\n\n\n\nX_transaction.nnz\n\n38006\n\n\nThe matrix has the following meaning:\n\nRow = transaction\nColumn = item\nValue = 1 if the item is in the transaction\nZero = the item is not in the transaction\n\nView a small part of the matrix using the most frequent items.\n\nitem_counts = np.asarray(X_transaction.sum(axis=0)).ravel()\ntop_item_idx = item_counts.argsort()[-10:][::-1]\n\npd.DataFrame(\n    X_transaction[:8, top_item_idx].toarray(),\n    index=groceries.loc[:7, \"transaction_id\"],\n    columns=item_names[top_item_idx],\n)\n\n\n\n\n\n\n\n\nwhole milk\nother vegetables\nrolls/buns\nsoda\nyogurt\nroot vegetables\ntropical fruit\nbottled water\nsausage\ncitrus fruit\n\n\ntransaction_id\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ntxn_00000\n0\n0\n1\n0\n0\n0\n1\n0\n0\n0\n\n\ntxn_00001\n1\n0\n0\n0\n0\n0\n1\n0\n0\n0\n\n\ntxn_00002\n0\n1\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00003\n0\n1\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00004\n1\n1\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ntxn_00005\n0\n0\n1\n0\n0\n0\n0\n0\n0\n1\n\n\ntxn_00006\n0\n1\n0\n0\n0\n0\n0\n1\n0\n0\n\n\ntxn_00007\n0\n0\n0\n0\n0\n0\n0\n0\n0\n1\n\n\n\n\n\n\n\nNow inspect the sparse structure visually.\n\nplt.figure(figsize=(8, 4))\nplt.spy(X_transaction[:120, :120], markersize=1)\nplt.xlabel(\"items\")\nplt.ylabel(\"transactions\")\nplt.show()\n\n\n\n\nSparse transaction-item binary matrix\n\n\n\n\nThink: Why is this matrix sparse?\nEach basket contains only a small subset of all available items. Therefore, most transaction-item entries are zero.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#item-support",
-    "href": "exercises/lab01/lab01.html#item-support",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#item-support",
+    "href": "exercises/lab01/lab01-5-transaction.html#item-support",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.5 Item Support",
-    "text": "5.5 Item Support\nOnce we have a binary transaction-item matrix, the support of an item becomes a simple summary of how frequently that item appears across transactions.\n\nitem_support = compute_item_support(\n    X_transaction,\n    item_names,\n)\n\nitem_support.head(10)\n\n\n\n\n\n\n\n\nitem\ncount\nsupport\n\n\n\n\n0\nwhole milk\n2513\n0.255516\n\n\n1\nother vegetables\n1903\n0.193493\n\n\n2\nrolls/buns\n1809\n0.183935\n\n\n3\nsoda\n1715\n0.174377\n\n\n4\nyogurt\n1372\n0.139502\n\n\n5\nbottled water\n1087\n0.110524\n\n\n6\nroot vegetables\n1072\n0.108998\n\n\n7\ntropical fruit\n1032\n0.104931\n\n\n8\nshopping bags\n969\n0.098526\n\n\n9\nsausage\n924\n0.093950\n\n\n\n\n\n\n\nThink: What does a support of 0.10 mean for an item?\nIt means that the item appears in 10% of all transactions.\nThis is the same basic notion of support used later in frequent itemset and association-rule mining. In this first lab, we stop at the representation and simple summary rather than running Apriori.",
+    "text": "5.5 Item Support\nOnce we have a binary transaction-item matrix, the support of an item becomes a simple summary of how frequently that item appears across transactions.\n\nitem_support = compute_item_support(\n    X_transaction,\n    item_names,\n)\n\nitem_support.head(10)\n\n\n\n\n\n\n\n\nitem\ncount\nsupport\n\n\n\n\n0\nwhole milk\n2363\n0.157923\n\n\n1\nother vegetables\n1827\n0.122101\n\n\n2\nrolls/buns\n1646\n0.110005\n\n\n3\nsoda\n1453\n0.097106\n\n\n4\nyogurt\n1285\n0.085879\n\n\n5\nroot vegetables\n1041\n0.069572\n\n\n6\ntropical fruit\n1014\n0.067767\n\n\n7\nbottled water\n908\n0.060683\n\n\n8\nsausage\n903\n0.060349\n\n\n9\ncitrus fruit\n795\n0.053131\n\n\n\n\n\n\n\nThink: What does a support of 0.10 mean for an item?\nIt means that the item appears in 10% of all transactions.\nThis is the same basic notion of support used later in frequent itemset and association-rule mining. In this first lab, we stop at the representation and simple summary rather than running Apriori.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
     ]
   },
   {
-    "objectID": "exercises/lab01/lab01.html#representation-4-item-co-occurrence-graph",
-    "href": "exercises/lab01/lab01.html#representation-4-item-co-occurrence-graph",
+    "objectID": "exercises/lab01/lab01-5-transaction.html#representation-4-item-co-occurrence-graph",
+    "href": "exercises/lab01/lab01-5-transaction.html#representation-4-item-co-occurrence-graph",
     "title": "Lab 01. Exploring Data Representations",
     "section": "5.6 Representation 4: Item Co-occurrence Graph",
-    "text": "5.6 Representation 4: Item Co-occurrence Graph\nWe can also represent items as a graph.\n\nNode = item\nEdge = strong co-occurrence relationship between two items\nEdge weight = Jaccard similarity (It measures how often two items occur together relative to how often either item occurs.)\n\nFor visualization, we use the most frequent items and connect each item to its strongest co-occurring neighbors.\n\nG_items = build_item_cooccurrence_graph(\n    X_transaction,\n    item_names,\n    top_n_items=15,\n    k=2,\n)\n\ntype(G_items)\n\nnetworkx.classes.graph.Graph\n\n\nInspect the graph before drawing it.\n\nG_items.number_of_nodes(), G_items.number_of_edges()\n\n(15, 26)\n\n\n\nlist(G_items.edges(data=True))[:10]\n\n[(0, 1, {'weight': 0.2}),\n (0, 4, {'weight': 0.16526694661067787}),\n (0, 2, {'weight': 0.14794156706507305}),\n (0, 5, {'weight': 0.10361741263028816}),\n (0, 6, {'weight': 0.15496134020618557}),\n (0, 10, {'weight': 0.10682783404116301}),\n (0, 13, {'weight': 0.08880818752063387}),\n (1, 6, {'weight': 0.18573136707851734}),\n (1, 2, {'weight': 0.1272395991497115}),\n (1, 4, {'weight': 0.14992977528089887})]\n\n\n\npos = nx.spring_layout(\n    G_items,\n    seed=RANDOM_STATE,\n    k=1.2,\n    iterations=200,\n    weight=None,\n)\n\nnode_labels = {\n    node: G_items.nodes[node][\"item\"]\n    for node in G_items.nodes\n}\n\nedge_labels = {\n    (u, v): f\"{data['weight']:.2f}\"\n    for u, v, data in G_items.edges(data=True)\n}\n\nplt.figure(figsize=(10, 7))\n\n# Draw edges\nnx.draw_networkx_edges(\n    G_items,\n    pos,\n    width=1.0,\n    alpha=0.35,\n)\n\n# Draw nodes\nnx.draw_networkx_nodes(\n    G_items,\n    pos,\n    node_size=1100,\n)\n\n# Draw node labels\nnx.draw_networkx_labels(\n    G_items,\n    pos,\n    labels=node_labels,\n    font_size=8,\n)\n\n# Draw Jaccard similarity on each edge\nnx.draw_networkx_edge_labels(\n    G_items,\n    pos,\n    edge_labels=edge_labels,\n    font_size=7,\n    rotate=False,\n)\n\nplt.axis(\"off\")\nplt.show()\n\n\n\n\n\n\n\n\nThink: Were these item-item edges explicitly stored in the original data?\nNo. The original data only records which items occurred in each transaction. The item-item graph is a derived representation created by aggregating co-occurrence across transactions.",
+    "text": "5.6 Representation 4: Item Co-occurrence Graph\nWe can also represent items as a graph.\n\nNode = item\nEdge = strong co-occurrence relationship between two items\nEdge weight = Jaccard similarity\n\nIt measures the similarity between two items based on how often they appear together relative to how often either item appears.\nA higher value indicates a stronger relationship between two items.\nFor visualization, we use the most frequent items and connect each item to its strongest co-occurring neighbors.\n\nG_items = build_item_cooccurrence_graph(\n    X_transaction,\n    item_names,\n    top_n_items=15,\n    k=2,\n)\n\ntype(G_items)\n\nnetworkx.classes.graph.Graph\n\n\nInspect the graph before drawing it.\n\nG_items.number_of_nodes(), G_items.number_of_edges()\n\n(15, 27)\n\n\n\nlist(G_items.edges(data=True))[:10]\n\n[(0, 1, {'weight': 0.05594758064516129}),\n (0, 2, {'weight': 0.055}),\n (0, 3, {'weight': 0.047775947281713346}),\n (0, 4, {'weight': 0.047974719908072394}),\n (0, 5, {'weight': 0.03433606806441811}),\n (0, 6, {'weight': 0.03779963122311002}),\n (0, 7, {'weight': 0.03381795195954488}),\n (0, 8, {'weight': 0.042784163473818644}),\n (0, 9, {'weight': 0.035070468698787285}),\n (0, 10, {'weight': 0.03190789473684211})]\n\n\n\npos = nx.spring_layout(\n    G_items,\n    seed=RANDOM_STATE,\n    k=1.2,\n    iterations=200,\n    weight=None,\n)\n\nnode_labels = {\n    node: G_items.nodes[node][\"item\"]\n    for node in G_items.nodes\n}\n\nedge_labels = {\n    (u, v): f\"{data['weight']:.2f}\"\n    for u, v, data in G_items.edges(data=True)\n}\n\nplt.figure(figsize=(10, 7))\n\n# Draw edges\nnx.draw_networkx_edges(\n    G_items,\n    pos,\n    width=1.0,\n    alpha=0.35,\n)\n\n# Draw nodes\nnx.draw_networkx_nodes(\n    G_items,\n    pos,\n    node_size=1100,\n)\n\n# Draw node labels\nnx.draw_networkx_labels(\n    G_items,\n    pos,\n    labels=node_labels,\n    font_size=8,\n)\n\n# Draw Jaccard similarity on each edge\nnx.draw_networkx_edge_labels(\n    G_items,\n    pos,\n    edge_labels=edge_labels,\n    font_size=7,\n    rotate=False,\n)\n\nplt.axis(\"off\")\nplt.show()\n\n\n\n\n\n\n\n\nThink: Were these item-item edges explicitly stored in the original data?\nNo. The original data only records which items occurred in each transaction. The item-item graph is a derived representation created by computing item similarity using co-occurrence information and Jaccard similarity.",
     "crumbs": [
       "Exercises",
       "Lab1. Data Representations",
-      "Exploring Data Representations"
+      "Transaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html",
+    "href": "exercises/lab01/lab01-3-graph.html",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "",
+    "text": "A dataset does not have only one useful representation.\nIn this lab, we examine how the same underlying data can be represented as records, sequences, matrices, vectors, and graphs.\n\nBefore choosing an algorithm, choose a representation.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#load-the-data",
+    "href": "exercises/lab01/lab01-3-graph.html#load-the-data",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.1 Load the Data",
+    "text": "3.1 Load the Data\nZachary’s Karate Club is a small social network.\n\nNode = club member\nEdge = relationship between two members\n\nload_karate() reads data/graph/karate/nodes.csv and edges.csv. If those files are missing, it writes them from NetworkX karate_club_graph().\n\nfrom data.loader import load_karate\n\nG = load_karate()\n\ntype(G), G.number_of_nodes(), G.number_of_edges()\n\n(networkx.classes.graph.Graph, 34, 78)",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#inspect-basic-graph-structure",
+    "href": "exercises/lab01/lab01-3-graph.html#inspect-basic-graph-structure",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.2 Inspect Basic Graph Structure",
+    "text": "3.2 Inspect Basic Graph Structure\nA graph contains nodes, edges, and their attributes. We can also inspect how each node is connected to other nodes.\n\nG.nodes[0]\n\n{'club': 'Mr. Hi'}\n\n\n\nG.edges[0, 1]\n\n{}\n\n\n\nG.degree[0]\n\n16\n\n\n\nlist(G.neighbors(0))\n\n[1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 17, 19, 21, 31]\n\n\n\nG.has_edge(0, 1)\n\nTrue\n\n\ndegree gives the number of edges connected to a node, while neighbors() returns the nodes directly connected to it.\nThink: What information does a graph store?\nA graph stores nodes, their attributes, and the connections between nodes.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#representation-1-graph-visualization",
+    "href": "exercises/lab01/lab01-3-graph.html#representation-1-graph-visualization",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.3 Representation 1: Graph Visualization",
+    "text": "3.3 Representation 1: Graph Visualization\nThe graph can be visualized using nodes and edges.\nEach node represents a club member, and each line represents a relationship between two members.\n\nplot_karate_graph(G)\n\n\n\n\nKarate Club graph visualization\n\n\n\n\nThink: What information is easy to see in a graph visualization?\nWe can visually inspect neighborhoods, highly connected nodes, and groups of nodes that appear close together.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#representation-2-edge-list",
+    "href": "exercises/lab01/lab01-3-graph.html#representation-2-edge-list",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.4 Representation 2: Edge List",
+    "text": "3.4 Representation 2: Edge List\nThe same graph can be represented as a list of connected node pairs.\nG.edges() returns the graph’s connections. We place these pairs into a table with one edge per row.\n\nedge_list = pd.DataFrame(\n    G.edges(),\n    columns=[\"source\", \"target\"],\n)\n\ntype(edge_list), edge_list.shape\n\n(pandas.DataFrame, (78, 2))\n\n\n\nedge_list.head(10)\n\n\n\n\n\n\n\n\nsource\ntarget\n\n\n\n\n0\n0\n1\n\n\n1\n0\n2\n\n\n2\n0\n3\n\n\n3\n0\n4\n\n\n4\n0\n5\n\n\n5\n0\n6\n\n\n6\n0\n7\n\n\n7\n0\n8\n\n\n8\n0\n10\n\n\n9\n0\n11\n\n\n\n\n\n\n\nThe table has the following meaning:\n\nRow = edge\nsource = one endpoint\ntarget = the other endpoint\n\nBecause this graph is undirected, source and target do not indicate direction.\nFor example, the following code shows all edges connected to node 31.\n\nlist(G.edges(31))\n\n[(31, 0), (31, 24), (31, 25), (31, 28), (31, 32), (31, 33)]\n\n\nThink: Does the edge list contain different graph information from the graph visualization?\nNo. A line in the visualization becomes a (source, target) pair in the table.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#representation-3-adjacency-list",
+    "href": "exercises/lab01/lab01-3-graph.html#representation-3-adjacency-list",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.5 Representation 3: Adjacency List",
+    "text": "3.5 Representation 3: Adjacency List\nThe same graph can also be represented by listing the neighbors of each node.\nFor each node, G.neighbors() gives the nodes directly connected to it.\n\nadjacency_list = {\n    node: list(G.neighbors(node))\n    for node in G.nodes()\n}\n\ntype(adjacency_list), len(adjacency_list)\n\n(dict, 34)\n\n\n\nfor node in list(adjacency_list)[:10]:\n    print(node, \":\", adjacency_list[node])\n\n0 : [1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 17, 19, 21, 31]\n1 : [0, 2, 3, 7, 13, 17, 19, 21, 30]\n2 : [0, 1, 3, 7, 8, 9, 13, 27, 28, 32]\n3 : [0, 1, 2, 7, 12, 13]\n4 : [0, 6, 10]\n5 : [0, 6, 10, 16]\n6 : [0, 4, 5, 16]\n7 : [0, 1, 2, 3]\n8 : [0, 2, 30, 32, 33]\n9 : [2, 33]\n\n\nEach key is a node, and its value is the list of neighboring nodes.\nThink: How is the same connection represented here?\nIf node 1 appears in the neighbor list of node 0, then nodes 0 and 1 are connected by an edge.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-3-graph.html#representation-4-adjacency-matrix",
+    "href": "exercises/lab01/lab01-3-graph.html#representation-4-adjacency-matrix",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "3.6 Representation 4: Adjacency Matrix",
+    "text": "3.6 Representation 4: Adjacency Matrix\nThe same graph can also be represented as a nodes × nodes matrix.\nnx.to_numpy_array() converts the graph into a matrix. Here, weight=None means that we only represent whether an edge exists, so the matrix contains binary values.\n\nA = nx.to_numpy_array(\n    G,\n    weight=None,\n    dtype=int,\n)\n\ntype(A), A.shape\n\n(numpy.ndarray, (34, 34))\n\n\nWe add node labels to the rows and columns so that the matrix is easier to inspect.\n\nA_numeric = pd.DataFrame(\n    A,\n    index=[f\"N{i}\" for i in range(A.shape[0])],\n    columns=[f\"N{i}\" for i in range(A.shape[1])],\n)\n\nA_numeric.iloc[:10, :10]\n\n\n\n\n\n\n\n\nN0\nN1\nN2\nN3\nN4\nN5\nN6\nN7\nN8\nN9\n\n\n\n\nN0\n0\n1\n1\n1\n1\n1\n1\n1\n1\n0\n\n\nN1\n1\n0\n1\n1\n0\n0\n0\n1\n0\n0\n\n\nN2\n1\n1\n0\n1\n0\n0\n0\n1\n1\n1\n\n\nN3\n1\n1\n1\n0\n0\n0\n0\n1\n0\n0\n\n\nN4\n1\n0\n0\n0\n0\n0\n1\n0\n0\n0\n\n\nN5\n1\n0\n0\n0\n0\n0\n1\n0\n0\n0\n\n\nN6\n1\n0\n0\n0\n1\n1\n0\n0\n0\n0\n\n\nN7\n1\n1\n1\n1\n0\n0\n0\n0\n0\n0\n\n\nN8\n1\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\nN9\n0\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\n\n\n\n\n\nA value of 1 means that two nodes are connected, while 0 means that there is no direct edge.\nThe same adjacency matrix can also be visualized using color.\n\nplot_adjacency_matrix(\n    A,\n    n=12,\n)\n\n\n\n\nKarate Club binary adjacency matrix\n\n\n\n\nThink: Is this different information from the graph visualization, edge list, or adjacency list?\nNo. The same connections are represented in matrix form.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Graph Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html",
+    "href": "exercises/lab01/lab01-2-text.html",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "",
+    "text": "A dataset does not have only one useful representation.\nIn this lab, we examine how the same underlying data can be represented as records, sequences, matrices, vectors, and graphs.\n\nBefore choosing an algorithm, choose a representation.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#load-the-data",
+    "href": "exercises/lab01/lab01-2-text.html#load-the-data",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.1 Load the Data",
+    "text": "2.1 Load the Data\nload_20newsgroups() caches the corpus under data/text/20newsgroups/. The sampling step is a practical choice for this lab. The original dataset is kept unchanged, while we use a smaller subset to make inspection and visualization easier.\n\nfrom data.loader import load_20newsgroups\n\ncategories = [\n    \"comp.graphics\",\n    \"misc.forsale\",\n    \"rec.sport.baseball\",\n    \"sci.space\",\n]\n\nnews = load_20newsgroups(\n    categories=categories,\n    random_state=RANDOM_STATE,\n)\n\nprint(\"Before sampling:\")\nprint(news.shape)\n\nnews = (\n    news\n    .groupby(\"label\")\n    .sample(\n        n=100,\n        random_state=RANDOM_STATE,\n    )\n    .reset_index(drop=True)\n)\n\nnews[\"doc_id\"] = [\n    f\"doc_{i:04d}\"\n    for i in range(len(news))\n]\n\nprint(\"After sampling:\")\nprint(news.shape)\n\nBefore sampling:\n(2300, 3)\nAfter sampling:\n(400, 3)\n\n\n\nnews.head()\n\n\n\n\n\n\n\n\ndoc_id\nlabel\ntext\n\n\n\n\n0\ndoc_0000\ncomp.graphics\nHi Steve,\\n\\nAs the author of Multiverse, I fe...\n\n\n1\ndoc_0001\ncomp.graphics\n\\n\\nI agree with you about the upgrade path; b...\n\n\n2\ndoc_0002\ncomp.graphics\n\\n\\n\\n\\n\\nDitto here too...\\n\\n\n\n\n3\ndoc_0003\ncomp.graphics\n\\nFor those of you who don't need 24 bit, I go...\n\n\n4\ndoc_0004\ncomp.graphics\n\\n\\nWhy not use the PD C library for reading/w...\n\n\n\n\n\n\n\n\nnews[\"label\"].value_counts()\n\nlabel\ncomp.graphics         100\nmisc.forsale          100\nrec.sport.baseball    100\nsci.space             100\nName: count, dtype: int64",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#inspect-raw-text",
+    "href": "exercises/lab01/lab01-2-text.html#inspect-raw-text",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.2 Inspect Raw Text",
+    "text": "2.2 Inspect Raw Text\n\nprint(news.loc[0, \"text\"][:1200])\n\nHi Steve,\n\nAs the author of Multiverse, I feel I had better respond to your\nmailnote questioning whether anyone had managed to compile this\nsoftware - the quick answer is yes! The long answer is yes - but a\nfew have had a few problems with their platforms - not all unix's are\nthe same, you know! As far as \"many bugs\" go, it would probably be more\nuseful to everyone (including you) if you were a bit more explicit! :-)\n\nPlatforms it has succesfully compiled and run on are: RS6000, Dec Ultrix\nSun Solaris so it is possible.\n\nThe main problem is that I don't have access to other platforms than the\nRS6000, so if there are portability problems then the only way I hear\nabout them is by people letting me know and giving me a clue as to\nhow to fix it.\n\nAs far as the software not doing anything, do you really think I would\nbother releasing it, if that was the case? Perhaps you didn't read the\nfew docs that ARE supplied. The dogfight world is made up of clients\nonly, so if you're in there on your own, then you're not going to see\nanything! The dactyl world has quite a lot of scenary - so if you don't\nsee anything there, then this is definitely a problem!\n\nOne final word - if you're not interes\n\n\nThink: What is one object in this dataset?\nEach row corresponds to one document. The same object can therefore be viewed as both a record and a document.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#representation-1-token-sequence",
+    "href": "exercises/lab01/lab01-2-text.html#representation-1-token-sequence",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.3 Representation 1: Token Sequence",
+    "text": "2.3 Representation 1: Token Sequence\n\ntokens = tokenize_documents(news[\"text\"])\n\ntype(tokens), type(tokens[0])\n\n(list, list)\n\n\n\ntokens[0][:30]\n\n['hi',\n 'steve',\n 'as',\n 'the',\n 'author',\n 'of',\n 'multiverse',\n 'feel',\n 'had',\n 'better',\n 'respond',\n 'to',\n 'your',\n 'mailnote',\n 'questioning',\n 'whether',\n 'anyone',\n 'had',\n 'managed',\n 'to',\n 'compile',\n 'this',\n 'software',\n 'the',\n 'quick',\n 'answer',\n 'is',\n 'yes',\n 'the',\n 'long']\n\n\nThink: What information is preserved in a token-sequence representation?\nThe order of tokens is preserved, so we can still distinguish which words appear before or after others.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#representation-2-document-term-count-matrix",
+    "href": "exercises/lab01/lab01-2-text.html#representation-2-document-term-count-matrix",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.4 Representation 2: Document-Term Count Matrix",
+    "text": "2.4 Representation 2: Document-Term Count Matrix\nA document-term matrix represents a collection of documents as a table. - Each row represents one document. - Each column represents one term (word). - Each value represents how many times the term appears in the document.\nFor example:\n\n\n\n\nspace\ncomputer\nbaseball\n\n\n\n\nDocument 1\n3\n1\n0\n\n\nDocument 2\n0\n2\n4\n\n\n\nThis representation converts unstructured text into a numerical matrix that can be used by machine learning and data mining algorithms.\nHere we limit the vocabulary size and remove very rare/common terms to obtain a more interpretable document-term matrix.\n\nX_count, count_vectorizer = build_count_matrix(\n    news[\"text\"],\n    max_features=3000,\n    min_df=2,\n    max_df=0.95,\n    stop_words=\"english\",\n)\n\ntype(X_count), X_count.shape\n\n(scipy.sparse._csr.csr_matrix, (400, 3000))\n\n\n\nX_count.nnz\n\n15683\n\n\n\nterms = count_vectorizer.get_feature_names_out()\n\nterm_counts = np.asarray(X_count.sum(axis=0)).ravel()\ntop_terms = term_counts.argsort()[-10:][::-1]\n\npd.DataFrame(\n    X_count[:6, top_terms].toarray(),\n    index=news.loc[:5, \"doc_id\"],\n    columns=terms[top_terms],\n)\n\n\n\n\n\n\n\n\nimage\nspace\ngood\ndata\n00\nnew\nlike\nedu\nnasa\ntime\n\n\ndoc_id\n\n\n\n\n\n\n\n\n\n\n\n\n\n\ndoc_0000\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ndoc_0001\n0\n0\n0\n0\n0\n1\n0\n0\n0\n0\n\n\ndoc_0002\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ndoc_0003\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\ndoc_0004\n0\n0\n1\n0\n0\n0\n0\n0\n0\n0\n\n\ndoc_0005\n0\n0\n0\n0\n0\n0\n0\n0\n0\n0\n\n\n\n\n\n\n\n\nplt.figure(figsize=(8, 4))\nplt.spy(X_count[:100, :500], markersize=1)\nplt.xlabel(\"terms\")\nplt.ylabel(\"documents\")\nplt.show()\n\n\n\n\nSparse document-term count matrix\n\n\n\n\nThink: Why is this matrix sparse?\nEach document contains only a small subset of the entire vocabulary. Therefore, most document-term entries are zero.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#representation-3-tf-idf-vector-space",
+    "href": "exercises/lab01/lab01-2-text.html#representation-3-tf-idf-vector-space",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.5 Representation 3: TF-IDF Vector Space",
+    "text": "2.5 Representation 3: TF-IDF Vector Space\nUnlike count representation, TF-IDF gives higher weights to terms that are important within a document but less frequent across the corpus.\n\nX_tfidf, tfidf_vectorizer = build_tfidf_matrix(\n    news[\"text\"],\n    max_features=3000,\n    min_df=2,\n    max_df=0.95,\n    stop_words=\"english\",\n)\n\ntype(X_tfidf), X_tfidf.shape, X_tfidf.nnz\n\n(scipy.sparse._csr.csr_matrix, (400, 3000), 15683)\n\n\nThe shape is similar to the count matrix, but the values now have a different meaning: each row is a TF-IDF document vector.\nThink: Can the representation change even when the matrix shape stays the same?\nYes. The rows and columns can remain the same while the meaning of each value changes from a raw count to a TF-IDF weight.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#cosine-similarity",
+    "href": "exercises/lab01/lab01-2-text.html#cosine-similarity",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.6 Cosine Similarity",
+    "text": "2.6 Cosine Similarity\nCosine similarity measures the similarity between two document vectors.\nAfter converting documents into TF-IDF vectors, each document can be viewed as a point in a high-dimensional vector space.\nCosine similarity compares the direction of two document vectors. If two documents have similar word usage patterns, their vectors point in a similar direction.\nThe value is between 0 and 1 for TF-IDF vectors:\n\nclose to 1 → the two documents have similar word usage patterns.\nclose to 0 → the two documents have different word usage patterns.\n\nUnlike comparing raw word counts, cosine similarity focuses on the direction of document vectors rather than their length, making it useful for comparing documents with different sizes.\n\nscores = compute_cosine_similarity(\n    X_tfidf,\n    query_index=0,\n)\n\nscores.shape\n\n(400,)\n\n\n\nscores[0] = -1\ntop_idx = scores.argsort()[-5:][::-1]\n\nnews.loc[top_idx, [\"doc_id\", \"label\"]].assign(\n    cosine_similarity=scores[top_idx]\n)\n\n\n\n\n\n\n\n\ndoc_id\nlabel\ncosine_similarity\n\n\n\n\n355\ndoc_0355\nsci.space\n0.158771\n\n\n9\ndoc_0009\ncomp.graphics\n0.144477\n\n\n213\ndoc_0213\nrec.sport.baseball\n0.133212\n\n\n399\ndoc_0399\nsci.space\n0.132038\n\n\n361\ndoc_0361\nsci.space\n0.128980\n\n\n\n\n\n\n\n\ni = top_idx[0]\n\nprint(\"similarity:\", round(float(scores[i]), 3))\nprint(\"label:\", news.loc[i, \"label\"])\nprint(news.loc[i, \"text\"][:600])\n\nsimilarity: 0.159\nlabel: sci.space\n\nWhen the Lunar Society's $500M estimate of the cost of a lunar colony was\nmentioned at Making Orbit, somebody asked Jerry Pournelle \"have you talked\nto Bill Gates?\".  The answer:  \"Yes.  He says that if he were going to\nsink that much money into it, he'd want to run it -- and he doesn't have\nthe time.\"\n\n(Somebody then asked him about Perot.  Answer:  \"Having Ross Perot on your\nboard may be a bigger problem than not having the money.\")\n\n\nThink: Was this similarity stored in the original dataset?\nNo. It is a derived quantity created by representing documents with TF-IDF vectors and comparing them with cosine similarity.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-2-text.html#representation-4-document-similarity-graph",
+    "href": "exercises/lab01/lab01-2-text.html#representation-4-document-similarity-graph",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "2.7 Representation 4: Document Similarity Graph",
+    "text": "2.7 Representation 4: Document Similarity Graph\nWe create a new graph where documents are connected based on their similarity in the TF-IDF vector space.\n\nG = build_similarity_graph(\n    X_tfidf,\n    doc_ids=news[\"doc_id\"],\n    labels=news[\"label\"],\n    k=3,\n    max_docs=80,\n)\n\ntype(G)\n\nnetworkx.classes.graph.Graph\n\n\n\nG.number_of_nodes(), G.number_of_edges()\n\n(80, 172)\n\n\n\nlist(G.edges(data=True))[:10]\n\n[(0, 9, {'weight': 0.1444769784565948}),\n (0, 73, {'weight': 0.1139841794025388}),\n (0, 45, {'weight': 0.10945299430144217}),\n (0, 1, {'weight': 0.08295382913753757}),\n (0, 16, {'weight': 0.0901827677685294}),\n (0, 31, {'weight': 0.08938748644002192}),\n (1, 16, {'weight': 0.2457242071635487}),\n (1, 45, {'weight': 0.05666573237002592}),\n (1, 2, {'weight': 0.0}),\n (2, 2, {'weight': 0.0})]\n\n\n\npos = nx.spring_layout(\n    G,\n    seed=RANDOM_STATE,\n)\n\nnode_colors = categorical_node_colors(\n    G,\n    attribute=\"label\",\n)\n\nplt.figure(figsize=(8, 6))\nnx.draw_networkx_edges(G, pos, alpha=0.25)\nnx.draw_networkx_nodes(\n    G,\n    pos,\n    node_size=70,\n    node_color=node_colors,\n    cmap=\"tab10\",\n)\nplt.axis(\"off\")\nplt.show()\n\n\n\n\n\n\n\n\nThink: Were these edges present in the original 20 Newsgroups dataset?\nNo. They are derived edges. We created them by choosing a TF-IDF representation, cosine similarity, and a k-nearest-neighbor rule.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Text Data"
     ]
   },
   {
@@ -688,7 +568,7 @@
     "href": "exercises/index.html",
     "title": "Exercises Guide",
     "section": "",
-    "text": "Labs are not graded. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.\n\n\n\n\n\n\nNoteBefore Choosing an Algorithm, Choose a Representation\n\n\n\nA dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: the representation you choose determines which algorithms you can apply.\n\n\n\n\n\n\n\n\nNoteLabs Marked TBD\n\n\n\nLabs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.\n\n\nLab 0: Python Prerequisites\nGet comfortable with the Python stack used throughout the course before working with real datasets.\n\nLab 0-1: Python Basics\nLab 0-2: NumPy Basics\nLab 0-3: Matplotlib Basics\nLab 0-4: Pandas Basics\n\nLab 1: Exploring Data Representations\nOne notebook, five data types. For each type you will construct several representations of the same underlying data and compare what each one reveals.\n\nLab 1: Exploring Data Representations\n\nPart 1. Record data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)\nPart 2. Text data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)\nPart 3. Graph data — Zachary’s Karate Club (visualization, edge list, adjacency list, adjacency matrix)\nPart 4. Interaction data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)\nPart 5. Transaction data — Groceries (baskets, long table, binary matrix, co-occurrence graph)\n\n\nLater labs (TBD)\nAdditional labs will be posted as the corresponding lecture units are covered.",
+    "text": "Labs are not graded. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.\n\n\n\n\n\n\nNoteBefore Choosing an Algorithm, Choose a Representation\n\n\n\nA dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: the representation you choose determines which algorithms you can apply.\n\n\n\n\n\n\n\n\nNoteLabs Marked TBD\n\n\n\nLabs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.\n\n\nLab 0: Python Prerequisites\nGet comfortable with the Python stack used throughout the course before working with real datasets.\n\nLab 0-1: Python Basics\nLab 0-2: NumPy Basics\nLab 0-3: Matplotlib Basics\nLab 0-4: Pandas Basics\n\nLab 1: Exploring Data Representations\nFive notebooks, five data types. For each type you will construct several representations of the same underlying data and compare what each one reveals. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).\n\nLab 1-1: Record Data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)\nLab 1-2: Text Data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)\nLab 1-3: Graph Data — Zachary’s Karate Club (visualization, edge list, adjacency list, adjacency matrix)\nLab 1-4: Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)\nLab 1-5: Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)\n\nLater labs (TBD)\nAdditional labs will be posted as the corresponding lecture units are covered.",
     "crumbs": [
       "Exercises"
     ]
@@ -698,7 +578,7 @@
     "href": "exercises/index.html#labs",
     "title": "Exercises Guide",
     "section": "",
-    "text": "Labs are not graded. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.\n\n\n\n\n\n\nNoteBefore Choosing an Algorithm, Choose a Representation\n\n\n\nA dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: the representation you choose determines which algorithms you can apply.\n\n\n\n\n\n\n\n\nNoteLabs Marked TBD\n\n\n\nLabs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.\n\n\nLab 0: Python Prerequisites\nGet comfortable with the Python stack used throughout the course before working with real datasets.\n\nLab 0-1: Python Basics\nLab 0-2: NumPy Basics\nLab 0-3: Matplotlib Basics\nLab 0-4: Pandas Basics\n\nLab 1: Exploring Data Representations\nOne notebook, five data types. For each type you will construct several representations of the same underlying data and compare what each one reveals.\n\nLab 1: Exploring Data Representations\n\nPart 1. Record data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)\nPart 2. Text data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)\nPart 3. Graph data — Zachary’s Karate Club (visualization, edge list, adjacency list, adjacency matrix)\nPart 4. Interaction data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)\nPart 5. Transaction data — Groceries (baskets, long table, binary matrix, co-occurrence graph)\n\n\nLater labs (TBD)\nAdditional labs will be posted as the corresponding lecture units are covered.",
+    "text": "Labs are not graded. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.\n\n\n\n\n\n\nNoteBefore Choosing an Algorithm, Choose a Representation\n\n\n\nA dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: the representation you choose determines which algorithms you can apply.\n\n\n\n\n\n\n\n\nNoteLabs Marked TBD\n\n\n\nLabs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.\n\n\nLab 0: Python Prerequisites\nGet comfortable with the Python stack used throughout the course before working with real datasets.\n\nLab 0-1: Python Basics\nLab 0-2: NumPy Basics\nLab 0-3: Matplotlib Basics\nLab 0-4: Pandas Basics\n\nLab 1: Exploring Data Representations\nFive notebooks, five data types. For each type you will construct several representations of the same underlying data and compare what each one reveals. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).\n\nLab 1-1: Record Data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)\nLab 1-2: Text Data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)\nLab 1-3: Graph Data — Zachary’s Karate Club (visualization, edge list, adjacency list, adjacency matrix)\nLab 1-4: Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)\nLab 1-5: Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)\n\nLater labs (TBD)\nAdditional labs will be posted as the corresponding lecture units are covered.",
     "crumbs": [
       "Exercises"
     ]
@@ -708,7 +588,7 @@
     "href": "exercises/index.html#datasets",
     "title": "Exercises Guide",
     "section": "Datasets",
-    "text": "Datasets\nLabs share a data/ folder at the top level of the course repository. Quarto is configured so that every notebook runs with the project root as its working directory, so paths such as data/transaction/groceries.csv work from any lab.\n\n\n\n\n\n\n\n\nFolder\nDataset\nUsed in\n\n\n\n\n(seaborn)\nTitanic\nLab 1, Part 1 (loaded in code; not stored under data/)\n\n\ndata/text/20newsgroups/\n20 Newsgroups\nLab 1, Part 2\n\n\n(NetworkX)\nZachary’s Karate Club\nLab 1, Part 3 (built-in graph)\n\n\ndata/interaction/Movielens/\nMovieLens 100K\nLab 1, Part 4\n\n\ndata/transaction/groceries.csv\nGroceries market baskets\nLab 1, Part 5\n\n\n\n\n\n\n\n\n\nImportantSome Datasets Must Be Downloaded Once\n\n\n\nMovieLens 100K is not shipped with the repository. Download it from GroupLens and place u.data, u.item, and u.user under data/interaction/Movielens/. Lab 1 Part 4 will not run until those files are present.\n20 Newsgroups and Groceries are already under data/. Titanic and Karate Club are loaded from libraries, so no extra files are required.",
+    "text": "Datasets\nOriginal files live in the repository data/ folder, not beside each notebook. Labs import data.loader, which finds those files and downloads anything that is missing. See data/README.md for paths and sources.\n\n\n\n\n\n\n\n\nPath\nDataset\nUsed in\n\n\n\n\ndata/record/titanic.csv\nTitanic\nLab 1-1 (load_titanic(); seaborn if missing)\n\n\ndata/text/20newsgroups/\n20 Newsgroups\nLab 1-2 (load_20newsgroups(); sklearn cache if missing)\n\n\ndata/graph/karate/\nZachary’s Karate Club\nLab 1-3 (load_karate(); NetworkX if missing)\n\n\ndata/interaction/Movielens/\nMovieLens 100K\nLab 1-4 (load_movielens_100k(); kagglehub if missing)\n\n\ndata/transaction/groceries_kaggle.csv\nGroceries baskets from Kaggle\nLab 1-5 (load_groceries(); kagglehub if missing)\n\n\n\n\n\n\n\n\n\nImportantDatasets Are Downloaded on First Run\n\n\n\nYou do not need to copy files into the lab folder. Run the load cell; if the file is already under data/, nothing is downloaded.\nMovieLens 100K is not shipped with the repository. If u.data, u.item, and u.user are missing, Lab 1-4 downloads them with kagglehub from Kaggle into data/interaction/Movielens/. MovieLens 100K may not be redistributed without separate permission from GroupLens.\n20 Newsgroups is cached under data/text/20newsgroups/ on first run. Groceries uses the Kaggle long-format file data/transaction/groceries_kaggle(raw).csv, grouped into baskets as data/transaction/groceries_kaggle.csv. If the processed file is missing, Lab 1-5 downloads heeraldedhia/groceries-dataset with kagglehub. Titanic and Karate Club are written under data/ the first time they are loaded.",
     "crumbs": [
       "Exercises"
     ]
@@ -718,7 +598,7 @@
     "href": "exercises/index.html#what-you-will-receive",
     "title": "Exercises Guide",
     "section": "What You Will Receive",
-    "text": "What You Will Receive\n\nLab 0\nEach prerequisite lab is a single guided notebook with explanations and complete, runnable code:\n\npython-basics.qmd, numpy-basics.qmd, matplotlib-basics.qmd, pandas-basics.qmd\n\n\n\nLab 1 and later\nStarting with Lab 1, each lab is split so that construction and interpretation stay separate:\n\nlabXX.qmd: The notebook you read and run. It inspects returned objects, visualizes them, and asks you to interpret the results.\nlabXX_*.py: Helper modules that load data and construct representations. You do not need to rewrite these to complete the lab; you import them and study what they return.\n\nFor Lab 1 the helpers are lab01_record.py, lab01_text.py, lab01_graph.py, lab01_interaction.py, and lab01_transaction.py.\nGraded homework is posted separately on the Assignments page. Starter files will appear in assignments/ as each unit is released.",
+    "text": "What You Will Receive\n\nLab 0\nEach prerequisite lab is a single guided notebook with explanations and complete, runnable code:\n\npython-basics.qmd, numpy-basics.qmd, matplotlib-basics.qmd, pandas-basics.qmd\n\n\n\nLab 1 and later\nStarting with Lab 1, each lab lives in its own folder (exercises/lab01/, …) and is split so that construction and interpretation stay separate:\n\nlab01-1-record.qmd, lab01-2-text.qmd, lab01-3-graph.qmd, lab01-4-interaction.qmd, lab01-5-transaction.qmd: The notebooks you read and run. Each loads data with data.loader, inspects returned objects, visualizes them, and asks you to interpret the results.\nlab01_*.py: Helper modules beside the notebooks that construct representations and draw figures. You do not need to rewrite these to complete the lab; you import them and study what they return.\ndata.loader: Locates original files under the repository data/ folder and downloads them if they are missing.\n\nFor Lab 1 the helpers are lab01_record.py, lab01_text.py, lab01_graph.py, lab01_interaction.py, and lab01_transaction.py.\nGraded homework is posted separately on the Assignments page. Starter files will appear in assignments/ as each unit is released.",
     "crumbs": [
       "Exercises"
     ]
@@ -728,7 +608,7 @@
     "href": "exercises/index.html#workflow",
     "title": "Exercises Guide",
     "section": "Workflow",
-    "text": "Workflow\n\nStep 1: Set Up the Environment\nFollow the Python Environment Setup guide before opening any lab. Activate the course pixi environment (or use Colab) so that NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.\n\n\nStep 2: Open the Lab Notebook\nLaunch the notebook using JupyterLab, VS Code, or Google Colab. Each lab opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.\n\n\n\n\n\n\nNoteRunning Cells in Order\n\n\n\nAlways run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports from earlier cells are missing.\n\n\n\n\nStep 3: Run and Observe\nUnlike the homework assignments, labs do not require you to write code from scratch or fill in TODO blocks. Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the same observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.\n\n\nStep 4: Experiment Freely\nLabs are exploratory playgrounds. Once you have run the provided code, change things:\n\nSubsample users, items, documents, or transactions and watch the representations change.\nSwap one representation for another (for example, a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).\nBreak things on purpose — a missing file path, a wrong key, a dense matrix that should have stayed sparse — and read the error.\n\nTinkering freely is one of the best ways to build intuition before tackling the homework.",
+    "text": "Workflow\n\nStep 1: Set Up the Environment\nFollow the Python Environment Setup guide before opening any lab. Activate the course pixi environment (or use Colab) so that NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.\n\n\nStep 2: Open the Lab Notebook\nLaunch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from exercises/lab01/ so that helper modules import cleanly; lab01_setup.py also puts the repository root on sys.path so from data.loader import ... works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.\n\n\n\n\n\n\nNoteRunning Cells in Order\n\n\n\nAlways run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports from earlier cells are missing.\n\n\n\n\nStep 3: Run and Observe\nUnlike the homework assignments, labs do not require you to write code from scratch or fill in TODO blocks. Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the same observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.\n\n\nStep 4: Experiment Freely\nLabs are exploratory playgrounds. Once you have run the provided code, change things:\n\nSubsample users, items, documents, or transactions and watch the representations change.\nSwap one representation for another (for example, a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).\nBreak things on purpose — a missing file path, a wrong key, a dense matrix that should have stayed sparse — and read the error.\n\nTinkering freely is one of the best ways to build intuition before tackling the homework.",
     "crumbs": [
       "Exercises"
     ]
@@ -738,7 +618,7 @@
     "href": "exercises/index.html#navigating-the-notebook-structure",
     "title": "Exercises Guide",
     "section": "Navigating the Notebook Structure",
-    "text": "Navigating the Notebook Structure\n\nLab 0\nEach prerequisite notebook follows a skill-oriented layout:\n\nObjectives lists the specific Python skills you will practice. Read this before you start.\nShort concept notes explain why that library shows up in data mining workflows.\nNumbered sections walk through examples you should run in order.\n\n\n\nLab 1\nLab 1 is organized by data type, not by algorithm:\n\nOverview states the theme of the lab: one dataset, many representations.\nParts 1–5 each load one dataset, build several representations, and visualize or inspect them. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).\nThink prompts at the end of a part ask you to say what was stored in the original data versus what was derived (for example, an item–item co-occurrence graph).\n\nWhen a lab imports a labXX_*.py module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.",
+    "text": "Navigating the Notebook Structure\n\nLab 0\nEach prerequisite notebook follows a skill-oriented layout:\n\nObjectives lists the specific Python skills you will practice. Read this before you start.\nShort concept notes explain why that library shows up in data mining workflows.\nNumbered sections walk through examples you should run in order.\n\n\n\nLab 1\nLab 1 is organized by data type, one notebook per type:\n\nOverview restates the theme of the lab: one dataset, many representations.\nLab 1-1 through Lab 1-5 each load one dataset, build several representations, and visualize or inspect them.\nThink prompts at the end of a part ask you to say what was stored in the original data versus what was derived (for example, an item–item co-occurrence graph).\n\nWhen a lab imports data.loader, treat that as the place where original files are found and loaded. When it imports a lab01_*.py module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.",
     "crumbs": [
       "Exercises"
     ]
@@ -815,14 +695,14 @@
     "href": "index.html#labs-and-homeworks",
     "title": "Data Mining",
     "section": "Labs and Homeworks",
-    "text": "Labs and Homeworks\nThis practicum is organized into two types of activities: Labs for exploration and Homeworks for evaluation.\n\nLabs (In-Class Exercises)\nLabs accompany each lecture unit. You receive a Jupyter notebook with complete, runnable code. Your job is to run it, read the explanations, and build intuition for the material covered in lecture.\nEvery lab notebook has the same structure:\n\nObjectives — the specific skills or concepts you will practice. Read this first.\nBackground — a concise theory refresher. Not a replacement for the lecture; just a quick reference.\nExperiments — executable cells to run, observe, and tinker with.\n\nWorkflow:\n\nRun and Observe. Execute cells top to bottom. Trace how each representation makes some patterns easy to see — and hides others.\nTinker Freely. Change a representation, a similarity measure, or a frequency threshold, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.\n\n\n\n\n\n\n\nWarningAlways Run Cells Top to Bottom\n\n\n\nSkipping cells or running them out of order causes later cells to fail due to missing variables or imports. If something breaks unexpectedly, restart the kernel and re-run from the top.\n\n\n\n\nHomeworks (Graded)\nThere are 8 homework assignments. All deadlines are at 11:59 PM KST.\n\nGrading: Evaluated by an autograder against your submitted .py files. Your score comes from both the provided doctests and additional hidden test cases. Passing all local doctests is a good sign, but it does not guarantee full credit.\nFormat: You receive a .py submission file and a .ipynb notebook for experimentation.\n\nWorkflow:\n\nExplore. Open hwXX.ipynb and experiment freely. The notebook imports your functions from the .py file, so changes are reflected after a kernel restart.\nImplement. Find the TODO blocks in the .py file, remove raise NotImplementedError, and write your solution. See the Assignments Guide for a full walkthrough.\nTest. Run python -m doctest hwXX.py -v in your terminal before submitting.\nSubmit. Upload only the .py files to eCampus. Do not rename them and do not submit the notebook.\n\n\n\n\n\n\n\nWarningTwo Things to Watch Out For\n\n\n\nRestart the kernel after editing .py files. Changes are not picked up until you restart and re-run all cells.\nRemove raise NotImplementedError before submitting. If this line remains in a function, it will always throw an error — even if your code above it is correct."
+    "text": "Labs and Homeworks\nThis practicum is organized into two types of activities: Labs for exploration and Homeworks for evaluation.\n\nLabs (In-Class Exercises)\nLabs accompany each lecture unit. You receive Jupyter notebooks with complete, runnable code. Your job is to run them, read the explanations, and build intuition for the material covered in lecture.\nLab 0 notebooks follow a skill-oriented layout:\n\nObjectives — the specific Python skills you will practice. Read this first.\nShort concept notes and numbered examples — executable cells to run, observe, and tinker with.\n\nStarting with Lab 1, each unit lives in its own folder (exercises/lab01/, …) and is split by data type — one notebook per type. data.loader locates and downloads the original files under the repository data/ folder; helper .py files beside the notebooks construct representations. Think prompts ask what was stored in the original data versus what was derived.\nWorkflow:\n\nRun and Observe. Execute cells top to bottom. Trace how each representation makes some patterns easy to see — and hides others.\nTinker Freely. Change a representation, a similarity measure, or a frequency threshold, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.\n\n\n\n\n\n\n\nWarningAlways Run Cells Top to Bottom\n\n\n\nSkipping cells or running them out of order causes later cells to fail due to missing variables or imports. If something breaks unexpectedly, restart the kernel and re-run from the top.\n\n\n\n\nHomeworks (Graded)\nThere are 8 homework assignments. All deadlines are at 11:59 PM KST.\n\nGrading: Evaluated by an autograder against your submitted .py files. Your score comes from both the provided doctests and additional hidden test cases. Passing all local doctests is a good sign, but it does not guarantee full credit.\nFormat: You receive a .py submission file and a .ipynb notebook for experimentation.\n\nWorkflow:\n\nExplore. Open hwXX.ipynb and experiment freely. The notebook imports your functions from the .py file, so changes are reflected after a kernel restart.\nImplement. Find the TODO blocks in the .py file, remove raise NotImplementedError, and write your solution. See the Assignments Guide for a full walkthrough.\nTest. Run python -m doctest hwXX.py -v in your terminal before submitting.\nSubmit. Upload only the .py files to eCampus. Do not rename them and do not submit the notebook.\n\n\n\n\n\n\n\nWarningTwo Things to Watch Out For\n\n\n\nRestart the kernel after editing .py files. Changes are not picked up until you restart and re-run all cells.\nRemove raise NotImplementedError before submitting. If this line remains in a function, it will always throw an error — even if your code above it is correct."
   },
   {
     "objectID": "index.html#schedule-materials",
     "href": "index.html#schedule-materials",
     "title": "Data Mining",
     "section": "Schedule & Materials",
-    "text": "Schedule & Materials\nThe timeline and specific contents below are subject to change as the course progresses. Labs marked as TBD have tentative topics that may be added, removed, or reordered.\n\n\n\nUnit\nTopic\nLabs (Ungraded)\nHW (Graded)\n\n\n\n\n0\nPython Prerequisites\nLab0\n-\n\n\n1\nData Representations\nLab1\nTBD"
+    "text": "Schedule & Materials\nThe timeline and specific contents below are subject to change as the course progresses. Labs marked as TBD have tentative topics that may be added, removed, or reordered.\n\n\n\nUnit\nTopic\nLabs (Ungraded)\nHW (Graded)\n\n\n\n\n0\nPython Prerequisites\nLab0-1 · Lab0-2 · Lab0-3 · Lab0-4\n-\n\n\n1\nData Representations\nLab1-1 · Lab1-2 · Lab1-3 · Lab1-4 · Lab1-5\nTBD"
   },
   {
     "objectID": "index.html#course-policies",
@@ -886,7 +766,7 @@
     "href": "exercises/environment-setup.html#option-a-local-pixi-vscode-or-jupyterlab",
     "title": "Python Environment Setup",
     "section": "Option A (Local): pixi + VSCode or JupyterLab",
-    "text": "Option A (Local): pixi + VSCode or JupyterLab\n\nWhy pixi?\nCompared to conda or mamba, pixi offers three main advantages for this course. It is significantly faster at solving and installing environments. It uses a lock file (pixi.lock) that pins every dependency to an exact version, so every student gets an identical environment. It also handles the common conflict between conda-managed and pip-managed packages in a single unified workflow.\n\n\nPrerequisites\nBefore starting, install the following tools on your machine.\n\n\n\n\n\n\nImportantWindows Users\n\n\n\nThis course environment supports Linux and macOS only. Windows users must use WSL2 (Windows Subsystem for Linux) to run in a Linux environment. Install WSL2 first, then follow the Linux instructions below inside your WSL2 terminal.\n\nOpen PowerShell as Administrator and run:\n\nwsl --install\n\nRestart your computer when prompted.\nOpen the Ubuntu app from the Start menu to finish setup (username and password).\nAll remaining steps in this guide should be run inside this Ubuntu terminal.\n\nFor the full WSL2 installation guide, see https://learn.microsoft.com/en-us/windows/wsl/install.\n\n\ngit — Required for cloning the course repository.\n\nLinux (WSL2 included): sudo apt update && sudo apt install git\nmacOS: Verify with git --version. If not installed, macOS will prompt you to install Xcode Command Line Tools automatically, or run xcode-select --install.\n\npixi — A fast, cross-platform package manager. sudo is not required — pixi installs to ~/.pixi/ under your own user account, and each project environment lives inside the project folder under .pixi/envs/. For the full installation guide, see https://pixi.prefix.dev/latest/installation.\n# Choose one depending on what is available on your system\ncurl -fsSL https://pixi.sh/install.sh | sh\n# or\nwget -qO- https://pixi.sh/install.sh | sh\n\n# Reload your shell to apply PATH changes\nsource ~/.bashrc     # use ~/.zshrc if you are on zsh\n\n# Verify installation\npixi --version\n# Expected: pixi 0.63.2  (or newer)\nVSCode — Download and install from https://code.visualstudio.com. After installation, open the Extensions panel (Ctrl+Shift+X / Cmd+Shift+X) and install the Python extension by Microsoft. This provides Jupyter notebook support and Python IntelliSense. Windows users should also install the WSL extension to open projects inside WSL2 directly from VSCode.\n\n\nStep 1: Clone the Course Repository\ngit clone -b students https://github.com/GLI-Lab/dm-2026-fall.git\ncd dm-2026-fall\nAfter cloning, the repository structure will look like this:\ndm-2026-fall/                  # course repository root\n├── pixi.toml                  # dependency declarations\n├── pixi.lock                  # exact pinned versions\n├── data/                      # shared datasets (paths are from the repo root)\n├── assignments/               # homework starter code\n└── exercises/                 # lab notebooks\nAlways start Jupyter from the repository root so that data/ paths resolve correctly.\n\n\nStep 2: Install All Required Packages\nNavigate into the repository folder and run:\npixi install\nThis reads pixi.lock and installs every package at its exact pinned version. The full dependency list is declared in pixi.toml:\n\n\npixi.toml\n\n[dependencies]\npython = \"3.12.*\"\nnumpy = \"*\"\nscipy = \"*\"\npandas = \"*\"\nscikit-learn = \"*\"\nmatplotlib = \"*\"\nseaborn = \"*\"\nnltk = \"*\"\nnetworkx = \"&gt;=3.1\"\nmlxtend = \"*\"\ngensim = \"&gt;=4.3.3\"\njupyterlab = \"*\"\n\n[tasks]\nlab = \"jupyter lab --ip=0.0.0.0 --port=8888 --no-browser\"\n\nYou do not need to install any of these separately — pixi install takes care of everything. This course does not require PyTorch or a GPU.\n\n\n\n\n\n\nNoteHow pixi install Behaves\n\n\n\nWhen pixi.lock exists (the normal case after cloning), pixi installs exact pinned versions with no solver step — this is fast.\nWhen no lock file exists, pixi reads constraints from pixi.toml, resolves versions, writes a new pixi.lock, then installs. This is slower due to the resolver, but only happens once.\nWhen pixi.toml is modified (e.g., after pixi add &lt;package&gt;), the lock file is updated automatically on the next pixi install or pixi run.\n\n\n\n\nStep 3: Open a Lab Notebook\nYou can open lab notebooks using either JupyterLab or VSCode. Both work with the pixi environment.\nJupyterLab — Launch from the repository root:\npixi run lab\nThis starts a JupyterLab server on port 8888. It does not open a browser automatically, so copy the URL printed in your terminal and paste it into your browser. The URL will look like this:\nhttp://127.0.0.1:8888/lab?token=your_token_here\nUse this command at the start of every lab session.\nVSCode — Open the repository folder in VSCode, then select the pixi kernel for your notebooks:\n\nOpen any .ipynb file in VSCode.\nClick Select Kernel in the top-right corner of the notebook editor.\nChoose Python Environments, then select the interpreter located at .pixi/envs/default/bin/python inside the repository folder.\n\n\n\n\n\n\n\nNoteEveryday Workflow\n\n\n\nFor all regular lab work, pixi run lab or opening notebooks in VSCode is all you need. If you prefer staying in an activated shell for an extended session, run pixi shell to activate the environment directly, then launch tools from there. Exit with exit when done.",
+    "text": "Option A (Local): pixi + VSCode or JupyterLab\n\nWhy pixi?\nCompared to conda or mamba, pixi offers three main advantages for this course. It is significantly faster at solving and installing environments. It uses a lock file (pixi.lock) that pins every dependency to an exact version, so every student gets an identical environment. It also handles the common conflict between conda-managed and pip-managed packages in a single unified workflow.\n\n\nPrerequisites\nBefore starting, install the following tools on your machine.\n\n\n\n\n\n\nImportantWindows Users\n\n\n\nThis course environment supports Linux and macOS only. Windows users must use WSL2 (Windows Subsystem for Linux) to run in a Linux environment. Install WSL2 first, then follow the Linux instructions below inside your WSL2 terminal.\n\nOpen PowerShell as Administrator and run:\n\nwsl --install\n\nRestart your computer when prompted.\nOpen the Ubuntu app from the Start menu to finish setup (username and password).\nAll remaining steps in this guide should be run inside this Ubuntu terminal.\n\nFor the full WSL2 installation guide, see https://learn.microsoft.com/en-us/windows/wsl/install.\n\n\ngit — Required for cloning the course repository.\n\nLinux (WSL2 included): sudo apt update && sudo apt install git\nmacOS: Verify with git --version. If not installed, macOS will prompt you to install Xcode Command Line Tools automatically, or run xcode-select --install.\n\npixi — A fast, cross-platform package manager. sudo is not required — pixi installs to ~/.pixi/ under your own user account, and each project environment lives inside the project folder under .pixi/envs/. For the full installation guide, see https://pixi.prefix.dev/latest/installation.\n# Choose one depending on what is available on your system\ncurl -fsSL https://pixi.sh/install.sh | sh\n# or\nwget -qO- https://pixi.sh/install.sh | sh\n\n# Reload your shell to apply PATH changes\nsource ~/.bashrc     # use ~/.zshrc if you are on zsh\n\n# Verify installation\npixi --version\n# Expected: pixi 0.63.2  (or newer)\nVSCode — Download and install from https://code.visualstudio.com. After installation, open the Extensions panel (Ctrl+Shift+X / Cmd+Shift+X) and install the Python extension by Microsoft. This provides Jupyter notebook support and Python IntelliSense. Windows users should also install the WSL extension to open projects inside WSL2 directly from VSCode.\n\n\nStep 1: Clone the Course Repository\ngit clone -b students https://github.com/GLI-Lab/dm-2026-fall.git\ncd dm-2026-fall\nAfter cloning, the repository structure will look like this:\ndm-2026-fall/                  # course repository root\n├── pixi.toml                  # dependency declarations\n├── pixi.lock                  # exact pinned versions\n├── data/                      # shared datasets (paths are from the repo root)\n├── assignments/               # homework starter code\n└── exercises/                 # lab notebooks\nShared datasets live in data/ at the repository root. Lab 1 notebooks import data.loader, which always looks there; lab01_setup.py puts the repo root on sys.path even when the working directory is exercises/lab01/.\n\n\nStep 2: Install All Required Packages\nNavigate into the repository folder and run:\npixi install\nThis reads pixi.lock and installs every package at its exact pinned version. The full dependency list is declared in pixi.toml:\n\n\npixi.toml\n\n[dependencies]\npython = \"3.12.*\"\nnumpy = \"*\"\nscipy = \"*\"\npandas = \"*\"\nscikit-learn = \"*\"\nmatplotlib = \"*\"\nseaborn = \"*\"\nnltk = \"*\"\nnetworkx = \"&gt;=3.1\"\nmlxtend = \"*\"\ngensim = \"&gt;=4.3.3\"\njupyterlab = \"*\"\n\n[tasks]\nlab = \"jupyter lab --ip=0.0.0.0 --port=8888 --no-browser\"\n\nYou do not need to install any of these separately — pixi install takes care of everything. This course does not require PyTorch or a GPU.\n\n\n\n\n\n\nNoteHow pixi install Behaves\n\n\n\nWhen pixi.lock exists (the normal case after cloning), pixi installs exact pinned versions with no solver step — this is fast.\nWhen no lock file exists, pixi reads constraints from pixi.toml, resolves versions, writes a new pixi.lock, then installs. This is slower due to the resolver, but only happens once.\nWhen pixi.toml is modified (e.g., after pixi add &lt;package&gt;), the lock file is updated automatically on the next pixi install or pixi run.\n\n\n\n\nStep 3: Open a Lab Notebook\nYou can open lab notebooks using either JupyterLab or VSCode. Both work with the pixi environment.\nJupyterLab — Launch from the repository root:\npixi run lab\nThis starts a JupyterLab server on port 8888. It does not open a browser automatically, so copy the URL printed in your terminal and paste it into your browser. The URL will look like this:\nhttp://127.0.0.1:8888/lab?token=your_token_here\nUse this command at the start of every lab session.\nVSCode — Open the repository folder in VSCode, then select the pixi kernel for your notebooks:\n\nOpen any .ipynb file in VSCode.\nClick Select Kernel in the top-right corner of the notebook editor.\nChoose Python Environments, then select the interpreter located at .pixi/envs/default/bin/python inside the repository folder.\n\n\n\n\n\n\n\nNoteEveryday Workflow\n\n\n\nFor all regular lab work, pixi run lab or opening notebooks in VSCode is all you need. If you prefer staying in an activated shell for an extended session, run pixi shell to activate the environment directly, then launch tools from there. Exit with exit when done.",
     "crumbs": [
       "Exercises",
       "Python Environment Setup"
@@ -901,6 +781,174 @@
     "crumbs": [
       "Exercises",
       "Python Environment Setup"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html",
+    "href": "exercises/lab01/lab01-1-record.html",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "",
+    "text": "A dataset does not have only one useful representation.\nIn this lab, we examine how the same underlying data can be represented as records, sequences, matrices, vectors, and graphs.\n\nBefore choosing an algorithm, choose a representation.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html#load-the-data",
+    "href": "exercises/lab01/lab01-1-record.html#load-the-data",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "1.1 Load the Data",
+    "text": "1.1 Load the Data\nload_titanic() reads data/record/titanic.csv. If that file is missing, it downloads the seaborn Titanic table and saves it there.\n\nfrom data.loader import load_titanic\n\ntitanic_raw = load_titanic()\n\ntype(titanic_raw), titanic_raw.shape\n\n(pandas.DataFrame, (891, 15))\n\n\n\ntitanic_raw.columns.tolist()\n\n['survived',\n 'pclass',\n 'sex',\n 'age',\n 'sibsp',\n 'parch',\n 'fare',\n 'embarked',\n 'class',\n 'who',\n 'adult_male',\n 'deck',\n 'embark_town',\n 'alive',\n 'alone']\n\n\n\nselected_columns = [\n    \"survived\",\n    \"pclass\",\n    \"sex\",\n    \"age\",\n    \"fare\",\n    \"embarked\",\n    \"alone\",\n]\n\ntitanic = titanic_raw[selected_columns].copy()\n\ntype(titanic), titanic.shape\n\n(pandas.DataFrame, (891, 7))\n\n\n\ntitanic.head()\n\n\n\n\n\n\n\n\nsurvived\npclass\nsex\nage\nfare\nembarked\nalone\n\n\n\n\n0\n0\n3\nmale\n22.0\n7.2500\nS\nFalse\n\n\n1\n1\n1\nfemale\n38.0\n71.2833\nC\nFalse\n\n\n2\n1\n3\nfemale\n26.0\n7.9250\nS\nTrue\n\n\n3\n1\n1\nfemale\n35.0\n53.1000\nS\nFalse\n\n\n4\n0\n3\nmale\n35.0\n8.0500\nS\nTrue\n\n\n\n\n\n\n\n\ntitanic[\"survived\"].value_counts()\n\nsurvived\n0    549\n1    342\nName: count, dtype: int64",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html#representation-1-numerical-feature-matrix",
+    "href": "exercises/lab01/lab01-1-record.html#representation-1-numerical-feature-matrix",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "1.2 Representation 1: Numerical Feature Matrix",
+    "text": "1.2 Representation 1: Numerical Feature Matrix\nThe same passenger records can be represented as numerical vectors.\nsurvived is excluded because it represents the outcome rather than an input feature.\n\nX_numeric = titanic.drop(\n    columns=[\"survived\"]\n).copy()\n\nMissing values in age and embarked are filled before conversion.\n\nX_numeric = fill_titanic_missing_values(\n    X_numeric\n)\n\npd.get_dummies() converts categorical values into binary (0/1) indicator columns.\n\nX_numeric = pd.get_dummies(\n    X_numeric,\n    columns=[\n        \"pclass\",\n        \"sex\",\n        \"embarked\",\n        \"alone\",\n    ],\n    dtype=int,\n)\n\ntype(X_numeric), X_numeric.shape\n\n(pandas.DataFrame, (891, 12))\n\n\n\nX_numeric.head()\n\n\n\n\n\n\n\n\nage\nfare\npclass_1\npclass_2\npclass_3\nsex_female\nsex_male\nembarked_C\nembarked_Q\nembarked_S\nalone_False\nalone_True\n\n\n\n\n0\n22.0\n7.2500\n0\n0\n1\n0\n1\n0\n0\n1\n1\n0\n\n\n1\n38.0\n71.2833\n1\n0\n0\n1\n0\n1\n0\n0\n1\n0\n\n\n2\n26.0\n7.9250\n0\n0\n1\n1\n0\n0\n0\n1\n0\n1\n\n\n3\n35.0\n53.1000\n1\n0\n0\n1\n0\n0\n0\n1\n1\n0\n\n\n4\n35.0\n8.0500\n0\n0\n1\n0\n1\n0\n0\n1\n0\n1\n\n\n\n\n\n\n\nThink: Is this a different dataset?\nNo. The passengers are the same. Only their representation has changed from mixed data types to numerical values.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html#representation-2-transaction-representation",
+    "href": "exercises/lab01/lab01-1-record.html#representation-2-transaction-representation",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "1.3 Representation 2: Transaction Representation",
+    "text": "1.3 Representation 2: Transaction Representation\nThe same passenger can also be represented as a set of attribute-value items.\npd.cut() and pd.qcut() discretize continuous values into categories.\n\ntitanic_tx = fill_titanic_missing_values(\n    titanic.copy()\n)\n\ntitanic_tx[\"age_group\"] = pd.cut(\n    titanic_tx[\"age\"],\n    bins=[0, 12, 18, 35, 60, np.inf],\n    labels=[\n        \"child\",\n        \"teen\",\n        \"young_adult\",\n        \"adult\",\n        \"senior\",\n    ],\n)\n\ntitanic_tx[\"fare_group\"] = pd.qcut(\n    titanic_tx[\"fare\"],\n    q=4,\n    labels=[\n        \"low\",\n        \"medium\",\n        \"high\",\n        \"very_high\",\n    ],\n)\n\nbuild_transactions() converts each passenger into a set of attribute-value items.\n\ntransactions = build_transactions(\n    titanic_tx\n)\n\ntype(transactions), type(transactions.iloc[0])\n\n(pandas.Series, list)\n\n\n\nfor i, items in transactions.head().items():\n    print(i, \":\", items)\n\n0 : ['pclass=3', 'sex=male', 'embarked=S', 'alone=False', 'age_group=young_adult', 'fare_group=low']\n1 : ['pclass=1', 'sex=female', 'embarked=C', 'alone=False', 'age_group=adult', 'fare_group=very_high']\n2 : ['pclass=3', 'sex=female', 'embarked=S', 'alone=True', 'age_group=young_adult', 'fare_group=medium']\n3 : ['pclass=1', 'sex=female', 'embarked=S', 'alone=False', 'age_group=young_adult', 'fare_group=very_high']\n4 : ['pclass=3', 'sex=male', 'embarked=S', 'alone=True', 'age_group=young_adult', 'fare_group=medium']\n\n\nThink: What changed from the original record representation?\nThe passenger is now represented as a set of attribute-value items.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html#representation-3-binary-item-matrix",
+    "href": "exercises/lab01/lab01-1-record.html#representation-3-binary-item-matrix",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "1.4 Representation 3: Binary Item Matrix",
+    "text": "1.4 Representation 3: Binary Item Matrix\nThe transaction representation can be converted into a binary matrix.\nMultiLabelBinarizer converts each passenger’s set of items into binary (0/1) columns, one for each possible item.\n\nmlb = MultiLabelBinarizer()\n\nX_items = mlb.fit_transform(\n    transactions\n)\n\nitem_matrix = pd.DataFrame(\n    X_items,\n    index=transactions.index,\n    columns=mlb.classes_,\n)\n\ntype(item_matrix), item_matrix.shape\n\n(pandas.DataFrame, (891, 19))\n\n\n\nitem_matrix.head()\n\n\n\n\n\n\n\n\nage_group=adult\nage_group=child\nage_group=senior\nage_group=teen\nage_group=young_adult\nalone=False\nalone=True\nembarked=C\nembarked=Q\nembarked=S\nfare_group=high\nfare_group=low\nfare_group=medium\nfare_group=very_high\npclass=1\npclass=2\npclass=3\nsex=female\nsex=male\n\n\n\n\n0\n0\n0\n0\n0\n1\n1\n0\n0\n0\n1\n0\n1\n0\n0\n0\n0\n1\n0\n1\n\n\n1\n1\n0\n0\n0\n0\n1\n0\n1\n0\n0\n0\n0\n0\n1\n1\n0\n0\n1\n0\n\n\n2\n0\n0\n0\n0\n1\n0\n1\n0\n0\n1\n0\n0\n1\n0\n0\n0\n1\n1\n0\n\n\n3\n0\n0\n0\n0\n1\n1\n0\n0\n0\n1\n0\n0\n0\n1\n1\n0\n0\n1\n0\n\n\n4\n0\n0\n0\n0\n1\n0\n1\n0\n0\n1\n0\n0\n1\n0\n0\n0\n1\n0\n1\n\n\n\n\n\n\n\nThe matrix has the following meaning:\n\nRow = passenger\nColumn = attribute-value item\nValue = 1 if the passenger has that item\nValue = 0 if the passenger does not have that item\n\nThink: Does the binary matrix contain new information?\nNo. It represents the same transaction information in matrix form.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-1-record.html#representation-4-passenger-attribute-bipartite-graph",
+    "href": "exercises/lab01/lab01-1-record.html#representation-4-passenger-attribute-bipartite-graph",
+    "title": "Lab 01. Exploring Data Representations",
+    "section": "1.5 Representation 4: Passenger-Attribute Bipartite Graph",
+    "text": "1.5 Representation 4: Passenger-Attribute Bipartite Graph\nThe same transaction data can also be represented as a bipartite graph.\nWe create two kinds of nodes:\n\nPassenger nodes\nAttribute-value nodes\n\nAn edge connects a passenger to an attribute-value item that belongs to that passenger.\n\nG = build_bipartite_graph(\n    transactions,\n    n_show=6,\n)\n\ntype(G)\n\nnetworkx.classes.graph.Graph\n\n\n\nG.number_of_nodes(), G.number_of_edges()\n\n(20, 36)\n\n\n\nlist(G.edges())[:10]\n\n[('Passenger 0', 'pclass=3'),\n ('Passenger 0', 'sex=male'),\n ('Passenger 0', 'embarked=S'),\n ('Passenger 0', 'alone=False'),\n ('Passenger 0', 'age_group=young_adult'),\n ('Passenger 0', 'fare_group=low'),\n ('pclass=3', 'Passenger 2'),\n ('pclass=3', 'Passenger 4'),\n ('pclass=3', 'Passenger 5'),\n ('sex=male', 'Passenger 4')]\n\n\n\nplot_bipartite_graph(G)\n\n\n\n\nPassenger-attribute bipartite graph",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Record Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html",
+    "href": "exercises/lab01/lab01-4-interaction.html",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "",
+    "text": "A dataset does not have only one useful representation.\nIn this lab, we examine how the same underlying data can be represented as records, sequences, matrices, vectors, and graphs.\n\nBefore choosing an algorithm, choose a representation.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#load-the-data",
+    "href": "exercises/lab01/lab01-4-interaction.html#load-the-data",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.1 Load the Data",
+    "text": "4.1 Load the Data\n\nfrom data.loader import load_movielens_100k, load_movies, load_users\n\nratings = load_movielens_100k()\n\ntype(ratings), ratings.shape\n\n(pandas.DataFrame, (100000, 5))\n\n\n\nratings.head()\n\n\n\n\n\n\n\n\nuser_id\nitem_id\nrating\ntimestamp\ndatetime\n\n\n\n\n0\n196\n242\n3\n881250949\n1997-12-04 15:55:49\n\n\n1\n186\n302\n3\n891717742\n1998-04-04 19:22:22\n\n\n2\n22\n377\n1\n878887116\n1997-11-07 07:18:36\n\n\n3\n244\n51\n2\n880606923\n1997-11-27 05:02:03\n\n\n4\n166\n346\n1\n886397596\n1998-02-02 05:33:16\n\n\n\n\n\n\n\nEach row is one interaction: a (user, item) pair with a rating attached. The (user_id, item_id, rating) fields form a triple; this log also records a timestamp, and the loader adds its readable datetime version.\n\nmovies = load_movies()\ntitles = movies.set_index(\"item_id\")[\"title\"]\n\nmovies.head()\n\n\n\n\n\n\n\n\nitem_id\ntitle\nrelease_date\ngenres\n\n\n\n\n0\n1\nToy Story (1995)\n01-Jan-1995\n[Animation, Children's, Comedy]\n\n\n1\n2\nGoldenEye (1995)\n01-Jan-1995\n[Action, Adventure, Thriller]\n\n\n2\n3\nFour Rooms (1995)\n01-Jan-1995\n[Thriller]\n\n\n3\n4\nGet Shorty (1995)\n01-Jan-1995\n[Action, Comedy, Drama]\n\n\n4\n5\nCopycat (1995)\n01-Jan-1995\n[Crime, Drama, Thriller]\n\n\n\n\n\n\n\n\nusers = load_users()\n\nusers.head()\n\n\n\n\n\n\n\n\nuser_id\nage\ngender\noccupation\nzip_code\n\n\n\n\n0\n1\n24\nM\ntechnician\n85711\n\n\n1\n2\n53\nF\nother\n94043\n\n\n2\n3\n23\nM\nwriter\n32067\n\n\n3\n4\n24\nM\ntechnician\n43537\n\n\n4\n5\n33\nF\nother\n15213",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#inspect-the-raw-log",
+    "href": "exercises/lab01/lab01-4-interaction.html#inspect-the-raw-log",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.2 Inspect the Raw Log",
+    "text": "4.2 Inspect the Raw Log\n\npd.DataFrame(\n    {\n        \"n_interactions\": [len(ratings)],\n        \"n_users\": [ratings[\"user_id\"].nunique()],\n        \"n_items\": [ratings[\"item_id\"].nunique()],\n        \"rating_values\": [sorted(ratings[\"rating\"].unique())],\n    }\n)\n\n\n\n\n\n\n\n\nn_interactions\nn_users\nn_items\nrating_values\n\n\n\n\n0\n100000\n943\n1682\n[1, 2, 3, 4, 5]\n\n\n\n\n\n\n\n\nratings[\"rating\"].value_counts().sort_index()\n\nrating\n1     6110\n2    11370\n3    27145\n4    34174\n5    21201\nName: count, dtype: int64\n\n\nThink: What is one object in this dataset? Not a user, and not a movie. One row is one interaction — a pair of two different kinds of object. This is why interaction data does not fit the “one row = one object” assumption of record data.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#representation-1-user-item-utility-matrix",
+    "href": "exercises/lab01/lab01-4-interaction.html#representation-1-user-item-utility-matrix",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.3 Representation 1: User-Item Utility Matrix",
+    "text": "4.3 Representation 1: User-Item Utility Matrix\nWe pivot the triples into a numeric matrix whose rows are users and columns are items. Each cell contains the rating for that pair. User and item IDs label the axes; their numerical sizes are not features or measures of similarity.\nMethod: long table → numeric matrix.\n\nChoose user_id as the row index and item_id as the column index.\nPut rating into the matching cell.\nLeave unobserved pairs missing. In MovieLens, a missing rating is not a rating of zero: observed ratings range from 1 to 5.\n\nbuild_utility_table() uses DataFrame.pivot() to reshape the log without aggregating rows. It requires one value per user-item pair. First check that the full log satisfies that requirement:\n\nratings.duplicated(subset=[\"user_id\", \"item_id\"]).sum()\n\nnp.int64(0)\n\n\nIf repeated ratings existed, we would first need to choose how to handle them, for example keeping the latest rating. This lab uses the original unique pairs.\nLet us first take a small block that we can print in full. The helper selects 12 popular movies and up to 10 users who rated at least 3, but fewer than all 12, of those movies. RANDOM_STATE = 42 keeps the sample reproducible; this block is for display, while the full matrix uses every rating.\n\nsmall = sample_interactions(\n    ratings,\n    n_items=12,\n    n_users=10,\n    random_state=RANDOM_STATE,\n)\n\nutility_table = build_utility_table(small)\n\nutility_table\n\n\n\n\n\n\n\nitem_id\n1\n50\n100\n121\n127\n174\n181\n258\n286\n288\n294\n300\n\n\nuser_id\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n33\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\nNaN\n4.0\n3.0\n4.0\n\n\n396\n4.0\nNaN\n2.0\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n3.0\nNaN\n3.0\n\n\n456\n2.0\n4.0\n3.0\n2.0\n5.0\n4.0\n3.0\n4.0\n3.0\nNaN\n1.0\nNaN\n\n\n468\n5.0\n5.0\n5.0\n4.0\n4.0\n5.0\n3.0\n4.0\n4.0\nNaN\n3.0\nNaN\n\n\n494\n3.0\n5.0\n5.0\n4.0\n5.0\n5.0\n4.0\nNaN\n4.0\nNaN\n4.0\n5.0\n\n\n684\n4.0\n4.0\n4.0\n3.0\nNaN\nNaN\n4.0\nNaN\nNaN\nNaN\nNaN\nNaN\n\n\n706\n4.0\n5.0\n1.0\nNaN\nNaN\nNaN\n4.0\n4.0\nNaN\n3.0\n4.0\nNaN\n\n\n735\n4.0\n5.0\n2.0\nNaN\n4.0\nNaN\n4.0\n4.0\n5.0\n4.0\nNaN\n4.0\n\n\n737\nNaN\nNaN\n5.0\nNaN\n5.0\n2.0\nNaN\n5.0\nNaN\nNaN\nNaN\nNaN\n\n\n835\n3.0\n4.0\nNaN\nNaN\n4.0\n5.0\nNaN\nNaN\n3.0\n2.0\n3.0\nNaN\n\n\n\n\n\n\n\nEvery NaN is a user-item pair without an observed rating in the log. For the full data, use a CSR sparse matrix (Compressed Sparse Row), which stores values and their positions instead of a dense array of all pairs. Unstored entries read as zero, so we reserve zero for missing ratings here.\nEssential function: build_utility_matrix(). The sorted ID arrays define the row and column order. pd.Series maps each original ID to a zero-based position; .loc looks up those positions for every interaction. .to_numpy() extracts the numeric arrays. sparse.csr_matrix((values, (rows, cols)), shape=...) then places each rating at its mapped coordinates. Keep user_ids and item_ids with the matrix so that positions can be mapped back to people and movies.\nFor the small sample, check that the pivot and sparse construction agree:\n\nX_small, small_users, small_items = build_utility_matrix(small)\n\nnp.array_equal(\n    utility_table.reindex(index=small_users, columns=small_items)\n    .fillna(0).to_numpy(),\n    X_small.toarray(),\n)\n\nTrue\n\n\n.fillna(0) is used only to compare the two storage conventions; it does not turn an unknown rating into a real rating of zero. .toarray() makes a dense array, so we use it only for the small display block.\n\npd.DataFrame(\n    X_small.toarray(),\n    index=[f\"u{u}\" for u in small_users],\n    columns=[titles[i][:16] for i in small_items],\n).replace(0.0, np.nan)\n\n\n\n\n\n\n\n\nToy Story (1995)\nStar Wars (1977)\nFargo (1996)\nIndependence Day\nGodfather, The (\nRaiders of the L\nReturn of the Je\nContact (1997)\nEnglish Patient,\nScream (1996)\nLiar Liar (1997)\nAir Force One (1\n\n\n\n\nu33\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\nNaN\n4.0\n3.0\n4.0\n\n\nu396\n4.0\nNaN\n2.0\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n3.0\nNaN\n3.0\n\n\nu456\n2.0\n4.0\n3.0\n2.0\n5.0\n4.0\n3.0\n4.0\n3.0\nNaN\n1.0\nNaN\n\n\nu468\n5.0\n5.0\n5.0\n4.0\n4.0\n5.0\n3.0\n4.0\n4.0\nNaN\n3.0\nNaN\n\n\nu494\n3.0\n5.0\n5.0\n4.0\n5.0\n5.0\n4.0\nNaN\n4.0\nNaN\n4.0\n5.0\n\n\nu684\n4.0\n4.0\n4.0\n3.0\nNaN\nNaN\n4.0\nNaN\nNaN\nNaN\nNaN\nNaN\n\n\nu706\n4.0\n5.0\n1.0\nNaN\nNaN\nNaN\n4.0\n4.0\nNaN\n3.0\n4.0\nNaN\n\n\nu735\n4.0\n5.0\n2.0\nNaN\n4.0\nNaN\n4.0\n4.0\n5.0\n4.0\nNaN\n4.0\n\n\nu737\nNaN\nNaN\n5.0\nNaN\n5.0\n2.0\nNaN\n5.0\nNaN\nNaN\nNaN\nNaN\n\n\nu835\n3.0\n4.0\nNaN\nNaN\n4.0\n5.0\nNaN\nNaN\n3.0\n2.0\n3.0\nNaN\n\n\n\n\n\n\n\nNow build the full matrix:\n\nX, user_ids, item_ids = build_utility_matrix(ratings)\n\ntype(X), X.shape, X.nnz\n\n(scipy.sparse._csr.csr_matrix, (943, 1682), 100000)\n\n\nX.shape gives the number of rows and columns. X.nnz counts stored entries; since all observed ratings are positive, it equals the number of observed pairs. Density is the fraction of matrix cells containing stored nonzero values:\n\nf\"density = {matrix_density(X):.4%}\"\n\n'density = 6.3047%'\n\n\nThe matrix has the following meaning:\n\nRow = user\nColumn = item\nValue = rating (1-5)\nMissing = the user has not rated the item\n\nThink: Why is this matrix sparse? Each user rates only a small subset of the 1,682 movies. Only 6.3% of the user-item pairs are observed, so more than 93% of the matrix is missing.\nThink: Did we lose anything by pivoting? Yes. The timestamp of each interaction is no longer visible in the matrix. The same triples could instead be represented as a sequence ordered by time.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#representation-2-binary-interaction-matrix",
+    "href": "exercises/lab01/lab01-4-interaction.html#representation-2-binary-interaction-matrix",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.4 Representation 2: Binary Interaction Matrix",
+    "text": "4.4 Representation 2: Binary Interaction Matrix\nOften we only know that an interaction happened, not how much the user liked the item. Here we start with explicit ratings and derive a binary positive interaction view using a threshold of 4:\n\n1: the observed rating is 4 or 5.\n0: the rating is below 4, or no rating was observed.\n\nEssential function: binarize_utility_matrix(). .data contains the stored ratings, so the comparison is applied only to observed entries. .astype(float) converts the comparison results into numeric 0/1 values. .eliminate_zeros() removes stored zeros to keep the result sparse. copy=True preserves X.\nThis is not an “any rating occurred” matrix: ratings 1–3 also become zero. The rating scale and the distinction between a low rating and a missing rating are lost.\n\nX_binary = binarize_utility_matrix(X, threshold=4.0)\n\nX_binary.shape, X_binary.nnz\n\n((943, 1682), 55375)\n\n\n\nf\"density = {matrix_density(X_binary):.4%}\"\n\n'density = 3.4912%'\n\n\n\npd.DataFrame(\n    {\n        \"representation\": [\"rating (1-5)\", \"binary (&gt;= 4)\"],\n        \"stored_nonzero_entries\": [X.nnz, X_binary.nnz],\n        \"density\": [matrix_density(X), matrix_density(X_binary)],\n    }\n)\n\n\n\n\n\n\n\n\nrepresentation\nstored_nonzero_entries\ndensity\n\n\n\n\n0\nrating (1-5)\n100000\n0.063047\n\n\n1\nbinary (&gt;= 4)\n55375\n0.034912\n\n\n\n\n\n\n\nThink: In the binary matrix, is a 0 the same as a low rating? No. A 0 means “no positive interaction under our threshold”: it combines observed ratings below 4 with unobserved pairs. We cannot infer from a missing rating whether the movie was unseen, disliked, or seen but not rated. A 1 means that an observed rating met our chosen threshold.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#representation-3-bipartite-graph",
+    "href": "exercises/lab01/lab01-4-interaction.html#representation-3-bipartite-graph",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.5 Representation 3: Bipartite Graph",
+    "text": "4.5 Representation 3: Bipartite Graph\nThe same interactions can be viewed as a graph with two kinds of node — users and items — where an edge exists whenever a user rated an item. Here we use small, including ratings below 4; the graph corresponds to X_small, rather than to the thresholded positive-interaction matrix.\nEssential function: build_bipartite_graph(). nx.Graph() creates an undirected graph. add_node() records the two node types with bipartite=0/1; add_edge(..., weight=rating) stores the rating on each user-item edge. Prefixes such as u50 and i50 distinguish users from movies even when their numeric IDs match. The bipartite property comes from connecting only opposite node types, not from the attributes alone.\n\nG = build_bipartite_graph(\n    small,\n    titles=titles,\n)\n\ntype(G), G.number_of_nodes(), G.number_of_edges()\n\n(networkx.classes.graph.Graph, 22, 71)\n\n\n\nnx.is_bipartite(G)\n\nTrue\n\n\n\nlist(G.edges(data=True))[:5]\n\n[('u33', 'i258', {'weight': 4.0}),\n ('u33', 'i288', {'weight': 4.0}),\n ('u33', 'i294', {'weight': 3.0}),\n ('u33', 'i300', {'weight': 4.0}),\n ('u396', 'i1', {'weight': 4.0})]\n\n\n\nplot_bipartite_graph(G)\nplt.show()\n\n\n\n\nBipartite user-item graph\n\n\n\n\nThe graph and the matrix are two views of the same object. The users x items block of the adjacency matrix is called the biadjacency matrix. The full adjacency matrix would include all user and item nodes on both axes; this block has only users on rows and items on columns.\nEssential function: build_biadjacency_matrix(). The helper uses nx.bipartite.biadjacency_matrix() with weight=\"weight\" to recover ratings. Passing small_users and small_items matches both axis orders to X_small. With weight=None, the NetworkX method would return edge-presence values instead.\n\nB, row_nodes, col_nodes = build_biadjacency_matrix(\n    G, small_users, small_items,\n)\n\nB.shape, B.nnz\n\n((10, 12), 71)\n\n\n\nB.nnz == G.number_of_edges(), (B != X_small).nnz == 0\n\n(True, True)\n\n\n\npd.DataFrame(\n    B.toarray(),\n    index=row_nodes,\n    columns=[c[:10] for c in col_nodes],\n).replace(0.0, np.nan)\n\n\n\n\n\n\n\n\ni1\ni50\ni100\ni121\ni127\ni174\ni181\ni258\ni286\ni288\ni294\ni300\n\n\n\n\nu33\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\nNaN\n4.0\nNaN\n4.0\n3.0\n4.0\n\n\nu396\n4.0\nNaN\n2.0\n5.0\nNaN\nNaN\nNaN\nNaN\nNaN\n3.0\nNaN\n3.0\n\n\nu456\n2.0\n4.0\n3.0\n2.0\n5.0\n4.0\n3.0\n4.0\n3.0\nNaN\n1.0\nNaN\n\n\nu468\n5.0\n5.0\n5.0\n4.0\n4.0\n5.0\n3.0\n4.0\n4.0\nNaN\n3.0\nNaN\n\n\nu494\n3.0\n5.0\n5.0\n4.0\n5.0\n5.0\n4.0\nNaN\n4.0\nNaN\n4.0\n5.0\n\n\nu684\n4.0\n4.0\n4.0\n3.0\nNaN\nNaN\n4.0\nNaN\nNaN\nNaN\nNaN\nNaN\n\n\nu706\n4.0\n5.0\n1.0\nNaN\nNaN\nNaN\n4.0\n4.0\nNaN\n3.0\n4.0\nNaN\n\n\nu735\n4.0\n5.0\n2.0\nNaN\n4.0\nNaN\n4.0\n4.0\n5.0\n4.0\nNaN\n4.0\n\n\nu737\nNaN\nNaN\n5.0\nNaN\n5.0\n2.0\nNaN\n5.0\nNaN\nNaN\nNaN\nNaN\n\n\nu835\n3.0\n4.0\nNaN\nNaN\n4.0\n5.0\nNaN\nNaN\n3.0\n2.0\n3.0\nNaN\n\n\n\n\n\n\n\nThink: Is the bipartite graph a different dataset from the utility matrix? No. The biadjacency matrix of the graph is the utility matrix, up to the ordering of rows and columns. Choosing “graph” or “matrix” changes which tools we can apply, not what the data contains.\nThink: What information does this particular graph leave out? Our construction stores the rating and omits the timestamp. A graph could store timestamps or tags as edge attributes, but a simple nx.Graph keeps only one edge per user-item pair. Repeated events would need an explicit representation, such as an event log or a multigraph. A separate tag node type is useful if tags also need to participate in graph relationships.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#representation-4-user-user-projection",
+    "href": "exercises/lab01/lab01-4-interaction.html#representation-4-user-user-projection",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.6 Representation 4: User-User Projection",
+    "text": "4.6 Representation 4: User-User Projection\nWe can fold the bipartite graph onto one side: connect two users when they rated the same item, weighted by how many items they share. Here we keep only pairs that share at least four items, so that the strongest links stand out.\nEssential function: project_onto_users(). nx.bipartite.weighted_projected_graph() counts common item neighbors for each user pair. It does not compare or multiply the original rating weights: two users can rate the same movie differently and still contribute one shared item. We then remove edges whose counts are below min_shared=4; users with no remaining edges are retained as isolated nodes.\n\nP = project_onto_users(G, min_shared=4)\n\nP.number_of_nodes(), P.number_of_edges()\n\n(10, 24)\n\n\n\nsorted(\n    P.edges(data=True),\n    key=lambda e: e[2][\"weight\"],\n    reverse=True,\n)[:5]\n\n[('u456', 'u468', {'weight': 10}),\n ('u456', 'u494', {'weight': 9}),\n ('u468', 'u494', {'weight': 9}),\n ('u456', 'u735', {'weight': 7}),\n ('u468', 'u735', {'weight': 7})]\n\n\n\nplot_user_projection(P)\nplt.show()\n\n\n\n\nUser-user projection weighted by shared items\n\n\n\n\nThink: What was lost in the projection? The item identities and rating values. We can see how many movies two users both rated, but the graph no longer tells us which movies they shared or whether their preferences agreed. Projection also destroys the bipartite structure: this graph has only one kind of node.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
+    ]
+  },
+  {
+    "objectID": "exercises/lab01/lab01-4-interaction.html#representation-5-item-item-similarity-graph",
+    "href": "exercises/lab01/lab01-4-interaction.html#representation-5-item-item-similarity-graph",
+    "title": "Lab 1-4. Interaction Data",
+    "section": "4.7 Representation 5: Item-Item Similarity Graph",
+    "text": "4.7 Representation 5: Item-Item Similarity Graph\nInstead of folding by counting shared users, we can compare item columns of the binary matrix with cosine similarity.\nMethod: compare item vectors. Each column of X_binary records which users rated that item at least 4. Transposing with .T makes each item a row because cosine_similarity() compares row vectors. For two nonzero item vectors \\(x_i\\) and \\(x_j\\),\n\\[\n\\operatorname{cosine}(i,j)\n= \\frac{x_i^\\top x_j}{\\lVert x_i\\rVert_2\\lVert x_j\\rVert_2}.\n\\]\nFor binary vectors, the numerator counts users who rated both movies at least 4; the denominator is the square root of the product of their positive-rating counts. This differs from the raw shared-item count in the user projection. scikit-learn returns zero similarity for a zero vector, which carries no positive-rating evidence.\nEssential function: compute_item_similarity(). .tocsr() prepares the transposed matrix for row selection. Selecting one query row avoids constructing the full item-by-item similarity matrix; .ravel() returns a one-dimensional score array in the same order as item_ids.\n\nquery_item = 50\nquery_index = int(np.where(item_ids == query_item)[0][0])\n\ntitles[query_item]\n\n'Star Wars (1977)'\n\n\n\nscores = compute_item_similarity(X_binary, query_index=query_index)\n\nscores.shape\n\n(1682,)\n\n\n\nscores[query_index] = -1\ntop_idx = scores.argsort()[-8:][::-1]\n\npd.DataFrame(\n    {\n        \"title\": [titles[item_ids[i]] for i in top_idx],\n        \"cosine_similarity\": scores[top_idx].round(3),\n    }\n)\n\n\n\n\n\n\n\n\ntitle\ncosine_similarity\n\n\n\n\n0\nReturn of the Jedi (1983)\n0.801\n\n\n1\nEmpire Strikes Back, The (1980)\n0.715\n\n\n2\nRaiders of the Lost Ark (1981)\n0.702\n\n\n3\nGodfather, The (1972)\n0.634\n\n\n4\nSilence of the Lambs, The (1991)\n0.617\n\n\n5\nToy Story (1995)\n0.616\n\n\n6\nIndiana Jones and the Last Crusade (1989)\n0.595\n\n\n7\nPrincess Bride, The (1987)\n0.593\n\n\n\n\n\n\n\nWe connect each item to its k most similar items, restricted to the 25 movies with the most positive ratings in X_binary. Popularity is measured after binarization.\nEssential function: build_item_knn_graph(). NearestNeighbors(metric=\"cosine\") finds nearby item vectors; similarity is 1 - distance. Requesting k + 1 candidates allows us to remove the item itself explicitly, then keep up to k other items. The search below is within the selected 25 movies and uses all users’ positive ratings as features.\nThis is an undirected graph: an edge is included when either endpoint selects the other. A node can therefore have more than k neighbors. We use k=2 and max_items=25:\n\nG_items = build_item_knn_graph(\n    X_binary,\n    item_ids=item_ids,\n    titles=titles,\n    k=2,\n    max_items=25,\n)\n\nG_items.number_of_nodes(), G_items.number_of_edges()\n\n(25, 41)\n\n\n\nplot_item_similarity_graph(G_items)\nplt.show()\n\n\n\n\nk-nearest-neighbor item similarity graph\n\n\n\n\nThink: Were these edges present in the original MovieLens data? No. MovieLens contains only user-item ratings. The item-item edges are derived: we chose a binary representation, cosine similarity, and a k-nearest-neighbor rule. A different threshold or metric would produce a different graph.",
+    "crumbs": [
+      "Exercises",
+      "Lab1. Data Representations",
+      "Interaction Data"
     ]
   },
   {

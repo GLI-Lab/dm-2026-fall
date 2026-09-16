@@ -232,8 +232,32 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/lab01/lab01.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Exploring Data Representations</span></a>
+  <a href="../exercises/lab01/lab01-1-record.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Record Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab01/lab01-2-text.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Text Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab01/lab01-3-graph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Graph Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab01/lab01-4-interaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Interaction Data</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/lab01/lab01-5-transaction.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transaction Data</span></a>
   </div>
 </li>
       </ul>
@@ -380,7 +404,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> data/                      <span class="co"># shared datasets (paths are from the repo root)</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> assignments/               <span class="co"># homework starter code</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> exercises/                 <span class="co"># lab notebooks</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Always start Jupyter <strong>from the repository root</strong> so that <code>data/</code> paths resolve correctly.</p>
+<p>Shared datasets live in <code>data/</code> at the repository root. Lab 1 notebooks import <code>data.loader</code>, which always looks there; <code>lab01_setup.py</code> puts the repo root on <code>sys.path</code> even when the working directory is <code>exercises/lab01/</code>.</p>
 </section>
 <section id="step-2-install-all-required-packages" class="level3">
 <h3 class="anchored" data-anchor-id="step-2-install-all-required-packages">Step 2: Install All Required Packages</h3>
