@@ -37,6 +37,14 @@ Five notebooks, five data types. For each type you will construct several repres
 - [Lab 1-4](lab01/lab01-4-interaction.html): Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
 - [Lab 1-5](lab01/lab01-5-transaction.html): Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)
 
+**Lab 2: Data Preprocessing**
+
+Three notebooks on this week's preprocessing topics. Work through the notebooks in order, and implement the `TODO` functions in the matching `.py` file before running the practice cells.
+
+- [Lab 2-1](lab02/Lab02-1.html): Cleaning, aggregation, and sampling — Titanic
+- [Lab 2-2](lab02/Lab02-2.html): Discretization, binarization, and scaling — Iris and Titanic
+- [Lab 2-3](lab02/Lab02-3.html): Similarity graphs (ε-graph, kNN, heat kernel) — Iris and Moons
+
 **Later labs (TBD)**
 
 Additional labs will be posted as the corresponding lecture units are covered.
@@ -47,11 +55,13 @@ Original files live in the repository `data/` folder, not beside each notebook. 
 
 | Path | Dataset | Used in |
 |:---|:---|:---|
-| `data/record/titanic.csv` | Titanic | Lab 1-1 (`load_titanic()`; seaborn if missing) |
+| `data/record/titanic.csv` | Titanic | Lab 1-1, Lab 2-1, Lab 2-2 (`load_titanic()`; seaborn if missing) |
 | `data/text/20newsgroups/` | 20 Newsgroups | Lab 1-2 (`load_20newsgroups()`; sklearn cache if missing) |
 | `data/graph/karate/` | Zachary's Karate Club | Lab 1-3 (`load_karate()`; NetworkX if missing) |
 | `data/interaction/Movielens/` | MovieLens 100K | Lab 1-4 (`load_movielens_100k()`; kagglehub if missing) |
 | `data/transaction/groceries_kaggle.csv` | Groceries baskets from Kaggle | Lab 1-5 (`load_groceries()`; kagglehub if missing) |
+| scikit-learn `load_iris` | Iris | Lab 2-2, Lab 2-3 |
+| scikit-learn `make_moons` | Moons | Lab 2-3 |
 
 ::: {.callout-important}
 ## Datasets Are Downloaded on First Run
@@ -81,6 +91,15 @@ Starting with Lab 1, each lab lives in its own folder (`exercises/lab01/`, …) 
 
 For Lab 1 the helpers are `lab01_record.py`, `lab01_text.py`, `lab01_graph.py`, `lab01_interaction.py`, and `lab01_transaction.py`.
 
+### Lab 2
+
+Lab 2 lives in `exercises/lab02/` and is split by preprocessing topic. Unlike Lab 1, you **implement** the `TODO` functions in the helper modules, then run the notebooks.
+
+- `Lab02-1.qmd`, `Lab02-2.qmd`, `Lab02-3.qmd`: The notebooks you read and run. Each loads data, shows a worked example, and calls the functions you write.
+- `lab02_1.py`, `lab02_2.py`, `lab02_3.py`: **Submission files.** Find each `# ========== TODO ==========` block, remove `raise NotImplementedError`, and implement the function. Check with `python -m doctest lab02_1.py -v` (and the matching files for parts 2 and 3).
+- `lab02_setup.py`: Puts the repository root and this lab folder on `sys.path` so `from data.loader import ...` and `import lab02_1` both work.
+- `data.loader`: Loads Titanic from `data/record/titanic.csv`. Iris and Moons come from scikit-learn.
+
 Graded homework is posted separately on the [Assignments](/assignments/index.html) page. Starter files will appear in `assignments/` as each unit is released.
 
 ## Workflow
@@ -91,7 +110,7 @@ Follow the [Python Environment Setup](environment-setup.html) guide before openi
 
 ### Step 2: Open the Lab Notebook
 
-Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from `exercises/lab01/` so that helper modules import cleanly; `lab01_setup.py` also puts the repository root on `sys.path` so `from data.loader import ...` works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
+Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from `exercises/lab01/` and Lab 2 notebooks from `exercises/lab02/` so that helper modules import cleanly. `lab01_setup.py` and `lab02_setup.py` also put the repository root on `sys.path` so `from data.loader import ...` works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
 
 ::: {.callout-note}
 ## Running Cells in Order
@@ -101,7 +120,9 @@ Always run notebook cells from top to bottom. If you skip a cell or run them out
 
 ### Step 3: Run and Observe
 
-Unlike the homework assignments, **labs do not require you to write code from scratch or fill in `TODO` blocks.** Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the *same* observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.
+Unlike the homework-style notebooks in Lab 2, **Lab 0 and Lab 1 do not require you to write code from scratch or fill in `TODO` blocks.** Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the *same* observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.
+
+Lab 2 is different: implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook from top to bottom.
 
 ### Step 4: Experiment Freely
 
@@ -132,3 +153,13 @@ Lab 1 is organized by **data type**, one notebook per type:
 - **Think** prompts at the end of a part ask you to say what was *stored* in the original data versus what was *derived* (for example, an item–item co-occurrence graph).
 
 When a lab imports `data.loader`, treat that as the place where original files are found and loaded. When it imports a `lab01_*.py` module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.
+
+### Lab 2
+
+Lab 2 is organized by **preprocessing topic**, one notebook per topic:
+
+- **Lab 2-1** cleans Titanic records, then aggregates and samples them.
+- **Lab 2-2** changes how attributes are represented: discretization, binarization, a log transform, and scaling.
+- **Lab 2-3** builds ε-graphs and kNN graphs and weights edges with the heat kernel.
+
+When a notebook imports `lab02_*.py`, that is the file you edit. The notebook is where you inspect the result after the functions are implemented.

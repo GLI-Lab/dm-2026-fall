@@ -33,6 +33,8 @@ Lab 0 notebooks follow a skill-oriented layout:
 
 Starting with Lab 1, each unit lives in its own folder (`exercises/lab01/`, …) and is split by **data type** — one notebook per type. `data.loader` locates and downloads the original files under the repository `data/` folder; helper `.py` files beside the notebooks construct representations. **Think** prompts ask what was stored in the original data versus what was derived.
 
+Lab 2 is split by **preprocessing topic**. The notebooks show worked examples; you implement the `TODO` functions in `lab02_1.py`, `lab02_2.py`, and `lab02_3.py`, then run the matching notebook.
+
 **Workflow:**
 
 1. **Run and Observe.** Execute cells top to bottom. Trace how each representation makes some patterns easy to see — and hides others.
@@ -74,6 +76,7 @@ The timeline and specific contents below are subject to change as the course pro
 |:---|:---|:---|:---|
 | **0** | Python Prerequisites | [Lab0-1](/exercises/lab00/python-basics.html) · [Lab0-2](/exercises/lab00/numpy-basics.html) · [Lab0-3](/exercises/lab00/matplotlib-basics.html) · [Lab0-4](/exercises/lab00/pandas-basics.html) | - |
 | **1** | Data Representations | [Lab1-1](/exercises/lab01/lab01-1-record.html) · [Lab1-2](/exercises/lab01/lab01-2-text.html) · [Lab1-3](/exercises/lab01/lab01-3-graph.html) · [Lab1-4](/exercises/lab01/lab01-4-interaction.html) · [Lab1-5](/exercises/lab01/lab01-5-transaction.html) | TBD |
+| **2** | Data Preprocessing | [Lab2-1](/exercises/lab02/Lab02-1.html) · [Lab2-2](/exercises/lab02/Lab02-2.html) · [Lab2-3](/exercises/lab02/Lab02-3.html) | `lab02_1.py` · `lab02_2.py` · `lab02_3.py` |
 
 
 ## Course Policies
