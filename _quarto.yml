@@ -1,6 +1,6 @@
 project:
   type: website
-  execute-dir: file  # lab01_setup.py / lab02_setup.py 가 이 폴더와 저장소 루트를 sys.path에 넣음
+  execute-dir: file  # cwd는 .qmd가 있는 폴더. helper.py / lab01_setup.py가 저장소 루트를 sys.path에 넣음
   output-dir: _site
   render:
     - "**/*.qmd"

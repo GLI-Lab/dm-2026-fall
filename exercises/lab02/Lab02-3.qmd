@@ -43,26 +43,28 @@ from pathlib import Path
 import sys
 
 _lab = Path("exercises/lab02")
-if not (_lab / "lab02_setup.py").exists():
+if not (_lab / "helper.py").exists():
     _lab = Path(".")
 sys.path.insert(0, str(_lab.resolve()))
 
-import lab02_setup
+import helper
 
 import numpy as np
 import pandas as pd
 
 from sklearn.metrics import pairwise_distances
 
-from lab02_3 import (
-    apply_edge_weights,
-    epsilon_graph,
+from helper import (
     graph_summary,
-    knn_graph,
     load_iris_graph_data,
     load_moons_graph_data,
     plot_distance_matrix,
     plot_similarity_graph,
+)
+from lab02_3 import (
+    apply_edge_weights,
+    epsilon_graph,
+    knn_graph,
 )
 
 pd.set_option("display.max_colwidth", 100)

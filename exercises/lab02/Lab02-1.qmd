@@ -40,23 +40,25 @@ from pathlib import Path
 import sys
 
 _lab = Path("exercises/lab02")
-if not (_lab / "lab02_setup.py").exists():
+if not (_lab / "helper.py").exists():
     _lab = Path(".")
 sys.path.insert(0, str(_lab.resolve()))
 
-import lab02_setup
+import helper
 
 import numpy as np
 import pandas as pd
 
 from data.loader import load_titanic
 
+from helper import (
+    plot_fare_outliers,
+    plot_missing_counts,
+)
 from lab02_1 import (
     drop_duplicate_rows,
     fill_missing_with_mode,
     iqr_outlier_bounds,
-    plot_fare_outliers,
-    plot_missing_counts,
     stratified_sample_by_class,
     summarize_by_class_and_sex,
 )

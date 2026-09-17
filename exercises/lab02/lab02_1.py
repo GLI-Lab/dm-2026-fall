@@ -1,13 +1,10 @@
-"""Helper functions for Lab 02-1 — Data Preprocessing.
+"""Lab 02-1 — functions you implement.
 
-Original Titanic rows are loaded by data.loader.
-This module constructs figures and holds the functions you implement.
+Titanic is loaded by data.loader. Figures live in helper.py.
 """
 
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 
 
@@ -113,93 +110,3 @@ def stratified_sample_by_class(
     # concatenate the groups. Pass random_state so the sample is reproducible.
     raise NotImplementedError("Remove this line and implement above")
     # ==========================
-
-
-def plot_missing_counts(
-    df,
-    columns=("age", "embarked", "deck"),
-):
-    counts = (
-        df[list(columns)]
-        .isna()
-        .sum()
-    )
-
-    fig, ax = plt.subplots(
-        figsize=(7, 4)
-    )
-
-    ax.bar(
-        counts.index,
-        counts.values,
-    )
-
-    ax.set(
-        xlabel="Attribute",
-        ylabel="Missing count",
-        title="Missing Values in Titanic",
-    )
-
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_fare_outliers(
-    fare,
-    lower,
-    upper,
-):
-    values = (
-        fare
-        .dropna()
-        .to_numpy(dtype=float)
-    )
-
-    mask = (
-        (values < lower)
-        | (values > upper)
-    )
-
-    fig, ax = plt.subplots(
-        figsize=(7, 4)
-    )
-
-    ax.scatter(
-        np.arange(len(values)),
-        values,
-        s=14,
-        alpha=0.6,
-        label="Fare",
-    )
-
-    ax.scatter(
-        np.flatnonzero(mask),
-        values[mask],
-        s=28,
-        marker="x",
-        label="IQR outlier",
-    )
-
-    ax.axhline(
-        lower,
-        linestyle="--",
-        linewidth=1,
-        label="IQR bounds",
-    )
-
-    ax.axhline(
-        upper,
-        linestyle="--",
-        linewidth=1,
-    )
-
-    ax.set(
-        xlabel="Passenger",
-        ylabel="Fare",
-        title="Potential Fare Outliers",
-    )
-
-    ax.legend()
-
-    plt.tight_layout()
-    plt.show()

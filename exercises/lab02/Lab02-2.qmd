@@ -39,11 +39,11 @@ from pathlib import Path
 import sys
 
 _lab = Path("exercises/lab02")
-if not (_lab / "lab02_setup.py").exists():
+if not (_lab / "helper.py").exists():
     _lab = Path(".")
 sys.path.insert(0, str(_lab.resolve()))
 
-import lab02_setup
+import helper
 
 import numpy as np
 import pandas as pd
@@ -52,16 +52,18 @@ from sklearn.preprocessing import KBinsDiscretizer
 
 from data.loader import load_titanic
 
-from lab02_2 import (
-    binarize_categorical,
+from helper import (
     entropy,
-    equal_frequency_discretize,
     load_iris_data,
-    minmax_scale,
     plot_discretization,
     plot_entropy_thresholds,
     plot_log_transformation,
     plot_scaling,
+)
+from lab02_2 import (
+    binarize_categorical,
+    equal_frequency_discretize,
+    minmax_scale,
     robust_scale,
     weighted_split_entropy,
 )
@@ -242,7 +244,7 @@ $$
 where $p_{ij}$ is the fraction of objects in interval $i$ that belong to
 class $j$.
 
-`entropy()` is provided in `lab02_2.py`. A pure interval has entropy 0, while
+`entropy()` is provided in `helper.py`. A pure interval has entropy 0, while
 an evenly mixed interval has higher entropy.
 
 ```{python}
@@ -339,7 +341,7 @@ Implement `weighted_split_entropy()` in `lab02_2.py`.
 It should return the weighted entropy of the two intervals.
 
 **Hint:** Weight each interval entropy by the proportion of objects in that
-interval. Use `entropy()` from `lab02_2.py`.
+interval. Use `entropy()` from `helper.py`.
 
 ```{python}
 #| eval: false
