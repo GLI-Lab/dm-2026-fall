@@ -1,63 +1,14 @@
-"""Helper functions for Lab 02-2 — Data Transformation.
+"""Lab 02-2 — functions you implement.
 
-Iris is loaded from scikit-learn. Titanic is loaded by data.loader.
-This module constructs figures and holds the functions you implement.
+Iris and figures live in helper.py. Titanic is loaded by data.loader.
 """
 
 from __future__ import annotations
 
-import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
-
-from sklearn.datasets import load_iris
 from sklearn.preprocessing import KBinsDiscretizer
 
-
-def load_iris_data() -> pd.DataFrame:
-    iris = load_iris(
-        as_frame=True
-    )
-
-    data = iris.frame.copy()
-
-    data["species"] = (
-        data["target"]
-        .map(
-            dict(
-                enumerate(
-                    iris.target_names
-                )
-            )
-        )
-    )
-
-    return data.drop(
-        columns=["target"]
-    )
-
-
-def entropy(labels) -> float:
-    """Shannon entropy of a label vector, using log base 2."""
-    labels = np.asarray(
-        labels
-    )
-
-    _, counts = np.unique(
-        labels,
-        return_counts=True,
-    )
-
-    p = (
-        counts
-        / counts.sum()
-    )
-
-    return float(
-        -np.sum(
-            p * np.log2(p)
-        )
-    )
+from helper import entropy
 
 
 def equal_frequency_discretize(
@@ -94,7 +45,7 @@ def weighted_split_entropy(
     """
     # ========== TODO ==========
     # Weight each interval's entropy by the proportion of objects in that
-    # interval. Use entropy() from this module.
+    # interval. Use entropy() from helper.py.
     raise NotImplementedError("Remove this line and implement above")
     # ==========================
 
@@ -145,178 +96,3 @@ def robust_scale(
     # (X - X.median()) / (X.quantile(0.75) - X.quantile(0.25))
     raise NotImplementedError("Remove this line and implement above")
     # ==========================
-
-
-def plot_discretization(
-    values,
-    boundaries,
-    title,
-):
-    x = np.asarray(
-        values,
-        dtype=float,
-    ).ravel()
-
-    fig, ax = plt.subplots(
-        figsize=(7.5, 4.5)
-    )
-
-    ax.hist(
-        x,
-        bins=24,
-        alpha=0.65,
-        edgecolor="black",
-    )
-
-    line_styles = [
-        "-",
-        "--",
-        ":",
-    ]
-
-    for (name, edges), style in zip(
-        boundaries.items(),
-        line_styles,
-    ):
-        for i, boundary in enumerate(
-            np.asarray(edges)[1:-1]
-        ):
-            ax.axvline(
-                boundary,
-                linestyle=style,
-                linewidth=1.7,
-                label=name if i == 0 else None,
-            )
-
-    ax.set(
-        xlabel="Petal length (cm)",
-        ylabel="Count",
-        title=title,
-    )
-
-    ax.legend()
-
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_entropy_thresholds(
-    thresholds,
-    scores,
-    best_threshold,
-):
-    fig, ax = plt.subplots(
-        figsize=(7.5, 4)
-    )
-
-    ax.plot(
-        thresholds,
-        scores,
-        marker=".",
-        linewidth=1,
-    )
-
-    ax.axvline(
-        best_threshold,
-        linestyle="--",
-        linewidth=1.5,
-        label="Best threshold",
-    )
-
-    ax.set(
-        xlabel="Threshold",
-        ylabel="Weighted entropy",
-        title="Weighted Entropy by Threshold",
-    )
-
-    ax.legend()
-
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_log_transformation(
-    original,
-    transformed,
-):
-    original = pd.Series(
-        original
-    ).dropna()
-
-    transformed = pd.Series(
-        transformed
-    ).dropna()
-
-    fig, axes = plt.subplots(
-        1,
-        2,
-        figsize=(7, 3),
-    )
-
-    axes[0].hist(
-        original,
-        bins=30,
-        edgecolor="black",
-        alpha=0.7,
-    )
-    axes[0].set(
-        xlabel="Fare",
-        ylabel="Count",
-        title="Original",
-    )
-
-    axes[1].hist(
-        transformed,
-        bins=30,
-        edgecolor="black",
-        alpha=0.7,
-    )
-    axes[1].set(
-        xlabel="Transformed fare",
-        ylabel="Count",
-        title="Log Transformed",
-    )
-
-    plt.tight_layout()
-    plt.show()
-
-
-def plot_scaling(
-    data_dict,
-):
-    names = list(
-        data_dict.keys()
-    )
-
-    fig, axes = plt.subplots(
-        len(names),
-        1,
-        figsize=(7.5, 2.3 * len(names)),
-    )
-
-    if len(names) == 1:
-        axes = [axes]
-
-    for ax, name in zip(
-        axes,
-        names,
-    ):
-        frame = data_dict[name]
-
-        ax.boxplot(
-            [
-                frame[column]
-                .dropna()
-                .to_numpy()
-                for column in frame.columns
-            ],
-            tick_labels=list(frame.columns),
-            vert=False,
-        )
-
-        ax.set_title(
-            name
-        )
-
-    plt.tight_layout()
-    plt.show()
