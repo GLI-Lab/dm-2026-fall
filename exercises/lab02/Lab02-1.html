@@ -370,7 +370,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.16</p>
+      <p class="date-modified">2026.09.17</p>
     </div>
   </div>
     
@@ -403,7 +403,7 @@ window.Quarto = {
 <section id="load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-the-data">1.1 Load the Data</h2>
 <p><code>load_titanic()</code> reads <code>data/record/titanic.csv</code>. If that file is missing, it downloads the seaborn Titanic table and saves it there.</p>
-<div id="5b1590b8" class="cell" data-execution_count="2">
+<div id="3202f885" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>titanic <span class="op">=</span> load_titanic()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(titanic), titanic.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -411,7 +411,7 @@ window.Quarto = {
 <pre><code>(pandas.DataFrame, (891, 15))</code></pre>
 </div>
 </div>
-<div id="f6c7c187" class="cell" data-execution_count="3">
+<div id="ed3d6a56" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>titanic.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
@@ -540,7 +540,7 @@ window.Quarto = {
 <section id="missing-values" class="level2">
 <h2 class="anchored" data-anchor-id="missing-values">1.2 Missing Values</h2>
 <p>Missing values occur when some attribute values are not recorded.</p>
-<div id="5245c190" class="cell" data-execution_count="4">
+<div id="1b6dbae8" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>titanic[[</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"embarked"</span>,</span>
@@ -553,7 +553,7 @@ deck        688
 dtype: int64</code></pre>
 </div>
 </div>
-<div id="ac34cc49" class="cell" data-execution_count="5">
+<div id="7215b614" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plot_missing_counts(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    titanic</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -567,7 +567,7 @@ dtype: int64</code></pre>
 </div>
 </div>
 <p>For a numerical attribute, one simple approach is to replace missing values with the median.</p>
-<div id="2107e1e8" class="cell" data-execution_count="6">
+<div id="c45060ef" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>titanic_clean <span class="op">=</span> titanic.copy()</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>age_median <span class="op">=</span> titanic_clean[<span class="st">"age"</span>].median()</span>
@@ -597,7 +597,7 @@ dtype: int64</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>fill_missing_with_mode()</code> in <code>lab02_1.py</code>. It should replace missing values in <code>embarked</code> with the most frequent category.</p>
 <p><strong>Hint:</strong> <code>Series.mode()</code> returns the most frequent value, and <code>Series.fillna()</code> replaces missing values.</p>
-<div id="83b03844" class="cell" data-execution_count="7">
+<div id="7268332b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>titanic_clean, embarked_mode <span class="op">=</span> fill_missing_with_mode(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    titanic_clean,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    column<span class="op">=</span><span class="st">"embarked"</span>,</span>
@@ -621,7 +621,7 @@ dtype: int64</code></pre>
 <h2 class="anchored" data-anchor-id="duplicate-records">1.3 Duplicate Records</h2>
 <p>Duplicate records can make the same observation count more than once.</p>
 <p>The Titanic dataset does not include a passenger ID that can be used here to verify true duplicate passengers. To demonstrate duplicate detection, we intentionally copy three rows and append them to a small subset of the data.</p>
-<div id="b393832d" class="cell" data-execution_count="8">
+<div id="0d161daf" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>titanic_with_duplicates <span class="op">=</span> pd.concat(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    [</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        titanic.iloc[:<span class="dv">8</span>],</span>
@@ -863,7 +863,7 @@ dtype: int64</code></pre>
 </div>
 <p>Rows 8, 9, and 10 are copies of rows 1, 3, and 5.</p>
 <p>By default, <code>duplicated()</code> compares all columns except the index. The first occurrence is marked as <code>False</code>, and later identical rows are marked as <code>True</code>.</p>
-<div id="51fa3db5" class="cell" data-execution_count="9">
+<div id="68187840" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>duplicate_mask <span class="op">=</span> (</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    titanic_with_duplicates</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    .duplicated()</span>
@@ -886,7 +886,7 @@ dtype: bool</code></pre>
 </div>
 </div>
 <p>The <code>True</code> values indicate rows that have already appeared earlier.</p>
-<div id="82fb50be" class="cell" data-execution_count="10">
+<div id="d01dfd8f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>titanic_with_duplicates[</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    duplicate_mask</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -988,7 +988,7 @@ dtype: bool</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>drop_duplicate_rows()</code> in <code>lab02_1.py</code>. It should count duplicate rows and return a DataFrame with them removed.</p>
 <p><strong>Hint:</strong> Use <code>duplicated().sum()</code> and <code>drop_duplicates()</code>.</p>
-<div id="46e5fcf4" class="cell" data-execution_count="11">
+<div id="dd04b916" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>titanic_without_duplicates, duplicate_count <span class="op">=</span> drop_duplicate_rows(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    titanic_with_duplicates</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1023,7 +1023,7 @@ IQR = Q_3 - Q_1
 [Q_1 - 1.5IQR,\; Q_3 + 1.5IQR]
 \]</span></p>
 <p>We use Titanic <code>fare</code> and first obtain the first and third quartiles.</p>
-<div id="29479374" class="cell" data-execution_count="12">
+<div id="e9d1d80f" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>fare <span class="op">=</span> (</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    titanic[<span class="st">"fare"</span>]</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    .dropna()</span>
@@ -1058,7 +1058,7 @@ Q3: 31.0</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>iqr_outlier_bounds()</code> in <code>lab02_1.py</code>. It should return the lower and upper fences from <code>q1</code> and <code>q3</code>.</p>
 <p><strong>Hint:</strong> Use <code>q3 - q1</code> for the IQR.</p>
-<div id="48a74702" class="cell" data-execution_count="13">
+<div id="bd4e2eb9" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>lower, upper <span class="op">=</span> iqr_outlier_bounds(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    q1,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    q3,</span>
@@ -1087,7 +1087,7 @@ Q3: 31.0</code></pre>
 </div>
 </div>
 <p>After implementing the function, run the following cell to visualize the potential outliers.</p>
-<div id="647facc3" class="cell" data-execution_count="14">
+<div id="01fac838" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>plot_fare_outliers(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    fare,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    lower,</span>
@@ -1101,7 +1101,7 @@ Q3: 31.0</code></pre>
 <p>Aggregation combines two or more objects into a single higher-level object.</p>
 <p>Objects with the same grouping value are combined into one summary record.</p>
 <p>For example, we can group passengers by <code>pclass</code> and summarize <code>survived</code> and <code>fare</code>.</p>
-<div id="84dd48a8" class="cell" data-execution_count="15">
+<div id="36a3e9b9" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>class_summary <span class="op">=</span> (</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    titanic</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    .groupby(<span class="st">"pclass"</span>)</span>
@@ -1164,7 +1164,7 @@ Q3: 31.0</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>summarize_by_class_and_sex()</code> in <code>lab02_1.py</code>. Group the passengers by <code>pclass</code> and <code>sex</code>. For each group, compute the mean of <code>survived</code> and the median of <code>fare</code>.</p>
 <p><strong>Hint:</strong> Use <code>groupby(["pclass", "sex"])</code> followed by <code>agg({...})</code>.</p>
-<div id="a25be0a5" class="cell" data-execution_count="16">
+<div id="6c8ace03" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>group_summary <span class="op">=</span> summarize_by_class_and_sex(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    titanic</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1179,7 +1179,7 @@ Q3: 31.0</code></pre>
 <h2 class="anchored" data-anchor-id="random-and-stratified-sampling">1.6 Random and Stratified Sampling</h2>
 <p>Simple random sampling gives each object an equal chance to be selected from the full dataset.</p>
 <p>For example, randomly select 10 passengers.</p>
-<div id="43c5d034" class="cell" data-execution_count="17">
+<div id="bd0a8239" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>random_sample <span class="op">=</span> titanic.sample(</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    n<span class="op">=</span><span class="dv">10</span>,</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    random_state<span class="op">=</span><span class="dv">42</span>,</span>
@@ -1399,7 +1399,7 @@ Q3: 31.0</code></pre>
 </div>
 </div>
 <p>Another sampling example selects every fifth row from the dataset.</p>
-<div id="6fb625fa" class="cell" data-execution_count="18">
+<div id="0854f1cc" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>every_fifth <span class="op">=</span> titanic.iloc[::<span class="dv">5</span>]</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>every_fifth.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1539,7 +1539,7 @@ Q3: 31.0</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>stratified_sample_by_class()</code> in <code>lab02_1.py</code>. It should group passengers by <code>pclass</code> and select up to 5 passengers from each group.</p>
 <p><strong>Hint:</strong> Loop over <code>df.groupby("pclass")</code> and <code>sample()</code> each group.</p>
-<div id="2b2fa0a5" class="cell" data-execution_count="19">
+<div id="20dcd90c" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>stratified_sample <span class="op">=</span> stratified_sample_by_class(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    titanic,</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    n_per_group<span class="op">=</span><span class="dv">5</span>,</span>
@@ -1551,7 +1551,7 @@ Q3: 31.0</code></pre>
 </div>
 </div>
 <p>After implementing the function, run the following cell to check how many passengers were selected from each class.</p>
-<div id="994c0cbf" class="cell" data-execution_count="20">
+<div id="99fb262b" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>stratified_sample[</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pclass"</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>].value_counts().sort_index()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
