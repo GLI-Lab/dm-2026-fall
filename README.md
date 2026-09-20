@@ -79,8 +79,8 @@ pixi run quarto preview
 >
 > `preview` = `_site`를 서빙하기 위한 로컬 서버를 생성함. `--render` 기본값은 `none`
 >
-> - `quarto preview`: 시작 때 전체를 다시 실행하지 않음. 이미 있는 `_freeze`로 HTML을 맞춘 뒤 서빙
-> - `quarto preview --render all`: 시작할 때 프로젝트 전체 `render`를 한 번 한 뒤 preview
+> - `quarto preview`: 시작 때 전체를 다시 실행하지 않음. 이미 있는 `_freeze`로 HTML을 맞춘 뒤 서빙. qmd 옆에 `*_files/`를 만들지 않음
+> - `quarto preview --render all`: 시작할 때 프로젝트 전체 `render`를 한 번 한 뒤 preview. 그때 `*_files/`가 qmd 옆에 생겼다가 `_site`로 복사됨. 이때 `*_files/`를 지우지 않음
 > - `quarto preview --render all -M freeze:false`: 시작할 때 freeze를 무시하고 전부 다시 실행한 뒤 preview (CSV 등 외부 파일만 바뀐 경우)
 
 ## 5. 서버에 상시 프리뷰 띄우기 (PM2)
