@@ -16,7 +16,7 @@ Public site: <https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall>
 | `students` | 학생용 `.ipynb` + `pixi.toml` + `data/` (`README-students.md` → `README.md`) |
 | `data` | `data/` 미러 (`data/**` 변경 시에만 갱신) |
 
-`main`에 push하면 `gh-pages`와 `students`가 자동 갱신됩니다.
+`main`에 push하면 `gh-pages`와 `students`가 자동 갱신됨. `data`는 `data/**`가 바뀔 때만 갱신됨.
 
 ---
 
@@ -65,29 +65,36 @@ quarto --version
 ## 4. 로컬에서 작업하기
 
 ```bash
-pixi install                 # 최초 1회
-
-# 1. _freeze / _site 갱신. freeze: auto라 바뀐 qmd만 다시 실행 (마크다운만 바꿔도 해당 파일은 다시 그림)
+pixi install  # 최초 1회
 pixi run quarto render
-#    qmd는 그대로인데 CSV 등 외부 데이터만 바뀐 경우
-pixi run quarto render -M freeze:false
-
-# 2. 브라우저로 확인. 저장하면 그 .qmd만 다시 그림 (마크다운 포함)
 pixi run quarto preview
 ```
 
+> `render` = `_site` 생성 후 바로 종료함
+>
+> - `quarto render`: 프로젝트 전체에 대해서 `_site` HTML 생성 (`freeze: auto`)
+>   - qmd가 바뀐 파일: 셀을 다시 실행 → 갱신한 `_freeze`로 `_site` HTML 생성
+>   - qmd가 안 바뀐 파일: 셀은 다시 실행하지 않음 → 기존 `_freeze`로 `_site` HTML만 생성
+> - `quarto render -M freeze:false`: 프로젝트 전체에 대해서 freeze를 무시하고 전부 다시 실행하여 `_site` HTML 생성함 (CSV 등 외부 파일만 바뀐 경우)
+>
+> `preview` = `_site`를 서빙하기 위한 로컬 서버를 생성함. `--render` 기본값은 `none`
+>
+> - `quarto preview`: 시작 때 전체를 다시 실행하지 않음. 이미 있는 `_freeze`로 HTML을 맞춘 뒤 서빙
+> - `quarto preview --render all`: 시작할 때 프로젝트 전체 `render`를 한 번 한 뒤 preview
+> - `quarto preview --render all -M freeze:false`: 시작할 때 freeze를 무시하고 전부 다시 실행한 뒤 preview (CSV 등 외부 파일만 바뀐 경우)
+
 ## 5. 서버에 상시 프리뷰 띄우기 (PM2)
 
-터미널을 종료해도 렌더링 결과를 계속 확인할 때
+터미널 종료 후에도 렌더링 결과를 계속 확인하고 싶을 때
 
 ```bash
-# 기존 _site를 띄움. 저장하면 그 .qmd만 다시 그림 (마크다운 포함). 시작 시 전체 재실행은 하지 않음
+# quarto preview
 pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0
 
-# (추천) 시작할 때 사이트 전체를 한 번 render한 뒤 띄움 (freeze: auto라 안 바뀐 qmd는 _freeze 재사용). 이후 저장 시 해당 파일만 다시 그림
+# --render all (추천)
 pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0 --render all
 
-# qmd는 그대로인데 CSV 등 외부 데이터만 바뀐 경우: 시작 시 freeze를 끄고 전부 다시 실행
+# --render all -M freeze:false
 pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0 --render all -M freeze:false
 
 # 기존 _site만 서빙. 변경 감지 없음 (저장해도 다시 그리지 않음)
@@ -121,7 +128,18 @@ pm2 startup
 
 ## Workflow
 
-이 저장소는 `*.qmd` 원본과 `_freeze/` 아래의 렌더 결과를 함께 관리합니다. 따라서 문서를 수정한 뒤 `git push` 하기 전에는 보통 아래 순서로 작업하는 것이 안전합니다.
+> `qmd` → (실행) → `_freeze` (셀 출력/그림 캐시) → `_site` (완성 HTML).
+>
+> | | `_freeze/` | `_site/` |
+> |---|---|---|
+> | 역할 | 코드 셀 실행 캐시 | 브라우저가 보는 사이트 |
+> | `main`에 커밋 | 함. qmd와 짝이 맞아야 CI가 Python 없이 빌드함 | 안 함 (`.gitignore`). `gh-pages`에만 올라감 |
+>
+> **커밋:** `.qmd`, `_freeze/`, 워크플로, `data/` (일부), TODO `.py`
+>
+> **커밋 안 함:** `_site/`, `*-solution.py`, `*-solution.qmd`, `solution/`, `.pixi/`, `*.ipynb`
+
+이 저장소는 `*.qmd` 원본과 `_freeze/` 아래의 렌더 결과를 함께 관리함. 따라서 문서를 수정한 뒤 `git push` 하기 전에는 보통 아래 순서로 작업하는 것이 안전함
 
 ```bash
 pixi run quarto render
@@ -131,4 +149,36 @@ git commit -m "..."
 git push
 ```
 
-즉, `qmd`만 수정하고 렌더 결과를 갱신하지 않으면 원본과 산출물이 서로 어긋날 수 있습니다. CSV만 바뀐 경우에는 4절의 `quarto render -M freeze:false`를 쓰면 됩니다.
+## Practice 결과를 사이트에 넣을 때
+
+1. TODO `.py`와 `.qmd`를 먼저 커밋해 학생 과제를 만든 뒤
+2. 마지막에 `_freeze`를 커밋하여 Practice 결과(셀 출력·그림)를 넣음
+
+> `pixi run freeze-solutions`가 하는 일:
+>
+> 1. `#| eval: false`를 `.qmd`에서 제거함
+> 2. gitignored `labXX_X-solution.py`를 `labXX_X.py` **위에 복사**함. 파일은 안 지워짐. 작업 트리의 `labXX_X.py` 내용만 풀이로 바뀜. `*-solution.py`는 그대로 남음. git에 커밋된 TODO `.py`도 그대로 있음
+> 3. `quarto render -M freeze:false`로 그 `.qmd`를 실행해 `_freeze`를 갱신함
+> 4. `git checkout -- labXX_X.py`로 TODO `.py`를 복구함. `_freeze`는 그대로 둠
+> 5. 스크립트는 커밋하지 않음. 확인 후 **이번 커밋**에는 `.qmd`와 `_freeze`만 넣음. TODO `.py`는 이미 `main`에 있음. 여기서 다시 add하지 않음 (복구가 안 되면 풀이가 들어감). `*-solution.py`는 gitignore
+
+```bash
+pixi run freeze-solutions --dry-run          # 잡히는 파일 확인
+pixi run freeze-solutions                    # 전체
+pixi run freeze-solutions exercises/labXX    # 한 랩만
+```
+
+```bash
+git add exercises/labXX/*.qmd _freeze/exercises/labXX
+git status   # TODO .py 가 modified면 복구 실패. *-solution.py 가 잡히면 안 됨
+git commit -m "..."
+git push
+```
+
+## README·qmd 작성 가이드
+
+- Think·Practice는 `::: {.callout-important}` 로 두며, 시험에는 코드 구현이 아닌 Think·Practice와 관련있음
+  - Think: `title="Think"`. 질문 다음에 답을 바로 적음
+  - Practice: `title="Q. Practice"`. 구현은 `labXX_*.py`. qmd 셀은 `#| eval: false`. 필요하면 Hint
+- 데이터 원본은 `data/`에 두고 찾기·다운로드·가공은 `data.loader`에 둠. 각 lab helper.py에 넣지 않음
+- 모든 README와 qmd 파일에서 한글은 **개조식**으로 씀 (`~함`, `~둠`, `~않음`). 긴 서술체(`~합니다`)는 쓰지 않음
