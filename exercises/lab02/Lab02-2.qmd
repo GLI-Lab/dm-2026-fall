@@ -16,7 +16,7 @@ Preprocessing can change how the same attribute is represented.
 In this lab, we use **Iris** and **Titanic** to examine discretization,
 binarization, functional transformation, and scaling.
 
-::: {.callout-important}
+::: {.callout-note}
 ## Implement in `lab02_2.py` first
 
 This notebook calls functions from `lab02_2.py`. Find each
@@ -50,11 +50,10 @@ import pandas as pd
 
 from sklearn.preprocessing import KBinsDiscretizer
 
-from data.loader import load_titanic
+from data.loader import load_iris, load_titanic
 
 from helper import (
     entropy,
-    load_iris_data,
     plot_discretization,
     plot_entropy_thresholds,
     plot_log_transformation,
@@ -73,11 +72,14 @@ pd.set_option("display.max_colwidth", 100)
 
 ## 2.1 Load the Data
 
+`load_iris()` reads `data/record/iris.csv`. If that file is missing, it
+writes the scikit-learn Iris table there.
+
 `load_titanic()` reads `data/record/titanic.csv`. If that file is missing, it
 downloads the seaborn Titanic table and saves it there.
 
 ```{python}
-iris = load_iris_data()
+iris = load_iris()
 titanic = load_titanic()
 
 iris.head()
@@ -159,7 +161,7 @@ uniform_result.head()
 Equal-frequency discretization tries to place a similar number of objects in
 each interval.
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `equal_frequency_discretize()` in `lab02_2.py`.
 Create an equal-frequency discretizer with three bins and transform
@@ -222,8 +224,12 @@ plot_discretization(
 )
 ```
 
-**Think:** Why can the same attribute have different boundaries under the
-three strategies?
+::: {.callout-tip title="Think"}
+Why can the same attribute have different boundaries under the
+three strategies?  
+Equal width splits the value range, equal frequency splits by count, and
+k-means follows clusters. Each method optimizes a different criterion.
+:::
 
 ## 2.3 Supervised Discretization
 
@@ -335,7 +341,7 @@ e
 \frac{n_R}{n}e_R.
 $$
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `weighted_split_entropy()` in `lab02_2.py`.
 It should return the weighted entropy of the two intervals.
@@ -445,8 +451,11 @@ plot_entropy_thresholds(
 )
 ```
 
-**Think:** What information is used here that was not used in unsupervised
-discretization?
+::: {.callout-tip title="Think"}
+What information is used here that was not used in unsupervised
+discretization?  
+Class labels. Unsupervised methods look only at the attribute values.
+:::
 
 ## 2.4 Binarization
 
@@ -511,7 +520,7 @@ print(
 )
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `binarize_categorical()` in `lab02_2.py`.
 Convert the categorical attribute `sex` into binary variables.
@@ -531,11 +540,19 @@ sex_binary.head()
 
 :::
 
-**Think:** If a categorical attribute has five categories, how many binary
-variables are required by compact encoding and one-hot encoding?
+::: {.callout-tip title="Think"}
+If a categorical attribute has five categories, how many binary
+variables are required by compact encoding and one-hot encoding?  
+Compact encoding needs $\lceil \log_2 5 \rceil = 3$ binary variables.
+One-hot encoding needs 5.
+:::
 
-**Think:** Why can compact encoding introduce relationships that were not
-present in the original categorical attribute?
+::: {.callout-tip title="Think"}
+Why can compact encoding introduce relationships that were not
+present in the original categorical attribute?  
+The bit patterns impose closeness that the original categories do not have.
+Two categories can look similar only because they share bits.
+:::
 
 ## 2.5 Functional Transformation
 
@@ -569,7 +586,11 @@ plot_log_transformation(
 )
 ```
 
-**Think:** What happened to the long right tail after the log transformation?
+::: {.callout-tip title="Think"}
+What happened to the long right tail after the log transformation?  
+The tail is compressed. Large fares move closer to the rest of the
+distribution.
+:::
 
 ## 2.6 Scaling
 
@@ -638,7 +659,7 @@ mean_normalized = (
 mean_normalized.describe().round(3)
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `minmax_scale()` and `robust_scale()` in `lab02_2.py`.
 
@@ -697,5 +718,8 @@ plot_scaling({
 })
 ```
 
-**Think:** Which scaling method uses the median and IQR instead of the mean
-and standard deviation?
+::: {.callout-tip title="Think"}
+Which scaling method uses the median and IQR instead of the mean
+and standard deviation?  
+Robust scaling.
+:::

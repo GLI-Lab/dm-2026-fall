@@ -132,10 +132,12 @@ pd.DataFrame(
 ratings["rating"].value_counts().sort_index()
 ```
 
-**Think:** What is one object in this dataset?
+::: {.callout-tip title="Think"}
+What is one object in this dataset?
 Not a user, and not a movie. One row is one *interaction* — a pair of two
 different kinds of object. This is why interaction data does not fit the
 "one row = one object" assumption of record data.
+:::
 
 ## 4.3 Representation 1: User-Item Utility Matrix
 
@@ -241,13 +243,17 @@ The matrix has the following meaning:
 - Value = rating (1-5)
 - Missing = the user has not rated the item
 
-**Think:** Why is this matrix sparse?
+::: {.callout-tip title="Think"}
+Why is this matrix sparse?
 Each user rates only a small subset of the 1,682 movies. Only 6.3% of the
 user-item pairs are observed, so more than 93% of the matrix is missing.
+:::
 
-**Think:** Did we lose anything by pivoting?
+::: {.callout-tip title="Think"}
+Did we lose anything by pivoting?
 Yes. The timestamp of each interaction is no longer visible in the matrix. The
 same triples could instead be represented as a sequence ordered by time.
+:::
 
 ## 4.4 Representation 2: Binary Interaction Matrix
 
@@ -287,11 +293,13 @@ pd.DataFrame(
 )
 ```
 
-**Think:** In the binary matrix, is a 0 the same as a low rating?
+::: {.callout-tip title="Think"}
+In the binary matrix, is a 0 the same as a low rating?
 No. A 0 means "no positive interaction under our threshold": it combines
 observed ratings below 4 with unobserved pairs. We cannot infer from a missing
 rating whether the movie was unseen, disliked, or seen but not rated. A 1 means
 that an observed rating met our chosen threshold.
+:::
 
 ## 4.5 Representation 3: Bipartite Graph
 
@@ -361,17 +369,21 @@ pd.DataFrame(
 ).replace(0.0, np.nan)
 ```
 
-**Think:** Is the bipartite graph a different dataset from the utility matrix?
+::: {.callout-tip title="Think"}
+Is the bipartite graph a different dataset from the utility matrix?
 No. The biadjacency matrix of the graph is the utility matrix, up to the
 ordering of rows and columns. Choosing "graph" or "matrix" changes which tools
 we can apply, not what the data contains.
+:::
 
-**Think:** What information does this particular graph leave out?
+::: {.callout-tip title="Think"}
+What information does this particular graph leave out?
 Our construction stores the rating and omits the timestamp. A graph could store
 timestamps or tags as edge attributes, but a simple `nx.Graph` keeps only one
 edge per user-item pair. Repeated events would need an explicit representation,
 such as an event log or a multigraph. A separate tag node type is useful if tags
 also need to participate in graph relationships.
+:::
 
 ## 4.6 Representation 4: User-User Projection
 
@@ -407,11 +419,13 @@ plot_user_projection(P)
 plt.show()
 ```
 
-**Think:** What was lost in the projection?
+::: {.callout-tip title="Think"}
+What was lost in the projection?
 The item identities and rating values. We can see how many movies two users
 both rated, but the graph no longer tells us *which* movies they shared or
 whether their preferences agreed. Projection also destroys the bipartite structure:
 this graph has only one kind of node.
+:::
 
 ## 4.7 Representation 5: Item-Item Similarity Graph
 
@@ -497,7 +511,9 @@ plot_item_similarity_graph(G_items)
 plt.show()
 ```
 
-**Think:** Were these edges present in the original MovieLens data?
+::: {.callout-tip title="Think"}
+Were these edges present in the original MovieLens data?
 No. MovieLens contains only user-item ratings. The item-item edges are derived:
 we chose a binary representation, cosine similarity, and a k-nearest-neighbor
 rule. A different threshold or metric would produce a different graph.
+:::

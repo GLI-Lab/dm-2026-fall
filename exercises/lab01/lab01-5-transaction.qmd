@@ -18,7 +18,6 @@ records, sequences, matrices, vectors, and graphs.
 
 > **Before choosing an algorithm, choose a representation.**
 
-
 # Part 5. Transaction Data
 
 We use the **Groceries transaction dataset** to examine how one collection
@@ -86,9 +85,11 @@ Inspect one basket directly.
 groceries.loc[0, "items"]
 ```
 
-**Think:** What is one object in this dataset?  
+::: {.callout-tip title="Think"}
+What is one object in this dataset?  
 One object is a transaction (basket), represented as a collection of items
 purchased together.
+:::
 
 ## 5.2 Representation 1: Basket / Item-Set View
 
@@ -104,9 +105,11 @@ for i in range(3):
     )
 ```
 
-**Think:** How is this different from ordinary record data?  
+::: {.callout-tip title="Think"}
+How is this different from ordinary record data?  
 Different transactions can contain different numbers of items, so there is no
 fixed set of attribute columns in the raw basket representation.
+:::
 
 ## 5.3 Representation 2: Long Table
 
@@ -126,9 +129,11 @@ groceries_long.head(12)
 The same `transaction_id` now appears repeatedly because one transaction can
 contain several items.
 
-**Think:** Did the underlying purchases change?  
+::: {.callout-tip title="Think"}
+Did the underlying purchases change?  
 No. Only the representation changed from one row per basket to one row per
 transaction-item occurrence.
+:::
 
 ## 5.4 Representation 3: Transaction-Item Binary Matrix
 
@@ -174,9 +179,11 @@ plt.ylabel("transactions")
 plt.show()
 ```
 
-**Think:** Why is this matrix sparse?  
+::: {.callout-tip title="Think"}
+Why is this matrix sparse?  
 Each basket contains only a small subset of all available items. Therefore,
 most transaction-item entries are zero.
+:::
 
 ## 5.5 Item Support
 
@@ -192,8 +199,10 @@ item_support = compute_item_support(
 item_support.head(10)
 ```
 
-**Think:** What does a support of `0.10` mean for an item?  
+::: {.callout-tip title="Think"}
+What does a support of `0.10` mean for an item?  
 It means that the item appears in 10% of all transactions.
+:::
 
 This is the same basic notion of support used later in frequent itemset and
 association-rule mining. In this first lab, we stop at the representation and
@@ -293,7 +302,9 @@ plt.axis("off")
 plt.show()
 ```
 
-**Think:** Were these item-item edges explicitly stored in the original data?  
+::: {.callout-tip title="Think"}
+Were these item-item edges explicitly stored in the original data?  
 No. The original data only records which items occurred in each transaction.
 The item-item graph is a derived representation created by computing item
 similarity using co-occurrence information and Jaccard similarity.
+:::

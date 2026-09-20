@@ -18,7 +18,6 @@ records, sequences, matrices, vectors, and graphs.
 
 > **Before choosing an algorithm, choose a representation.**
 
-
 # Part 2. Text Data
 
 We use **20 Newsgroups** to examine how the same text collection changes
@@ -115,9 +114,11 @@ news["label"].value_counts()
 print(news.loc[0, "text"][:1200])
 ```
 
-**Think:** What is one object in this dataset?  
+::: {.callout-tip title="Think"}
+What is one object in this dataset?  
 Each row corresponds to one document. The same object can therefore be viewed
 as both a record and a document.
+:::
 
 ## 2.3 Representation 1: Token Sequence
 
@@ -131,9 +132,11 @@ type(tokens), type(tokens[0])
 tokens[0][:30]
 ```
 
-**Think:** What information is preserved in a token-sequence representation?  
+::: {.callout-tip title="Think"}
+What information is preserved in a token-sequence representation?  
 The order of tokens is preserved, so we can still distinguish which words
 appear before or after others.
+:::
 
 ## 2.4 Representation 2: Document-Term Count Matrix
 
@@ -194,9 +197,11 @@ plt.ylabel("documents")
 plt.show()
 ```
 
-**Think:** Why is this matrix sparse?  
+::: {.callout-tip title="Think"}
+Why is this matrix sparse?  
 Each document contains only a small subset of the entire vocabulary. Therefore,
 most document-term entries are zero.
+:::
 
 ## 2.5 Representation 3: TF-IDF Vector Space
 
@@ -218,9 +223,11 @@ type(X_tfidf), X_tfidf.shape, X_tfidf.nnz
 The shape is similar to the count matrix, but the values now have a different
 meaning: each row is a TF-IDF document vector.
 
-**Think:** Can the representation change even when the matrix shape stays the same?  
+::: {.callout-tip title="Think"}
+Can the representation change even when the matrix shape stays the same?  
 Yes. The rows and columns can remain the same while the meaning of each value
 changes from a raw count to a TF-IDF weight.
+:::
 
 ## 2.6 Cosine Similarity
 
@@ -268,9 +275,11 @@ print("label:", news.loc[i, "label"])
 print(news.loc[i, "text"][:600])
 ```
 
-**Think:** Was this similarity stored in the original dataset?  
+::: {.callout-tip title="Think"}
+Was this similarity stored in the original dataset?  
 No. It is a derived quantity created by representing documents with TF-IDF
 vectors and comparing them with cosine similarity.
+:::
 
 ## 2.7 Representation 4: Document Similarity Graph
 
@@ -321,6 +330,8 @@ plt.axis("off")
 plt.show()
 ```
 
-**Think:** Were these edges present in the original 20 Newsgroups dataset?  
+::: {.callout-tip title="Think"}
+Were these edges present in the original 20 Newsgroups dataset?  
 No. They are derived edges. We created them by choosing a TF-IDF
 representation, cosine similarity, and a k-nearest-neighbor rule.
+:::

@@ -140,9 +140,11 @@ type(X_numeric), X_numeric.shape
 X_numeric.head()
 ```
 
-**Think:** Is this a different dataset?  
+::: {.callout-tip title="Think"}
+Is this a different dataset?  
 No. The passengers are the same. Only their representation has changed from
 mixed data types to numerical values.
+:::
 
 ## 1.3 Representation 2: Transaction Representation
 
@@ -196,8 +198,10 @@ for i, items in transactions.head().items():
     print(i, ":", items)
 ```
 
-**Think:** What changed from the original record representation?  
+::: {.callout-tip title="Think"}
+What changed from the original record representation?  
 The passenger is now represented as a set of attribute-value items.
+:::
 
 ## 1.4 Representation 3: Binary Item Matrix
 
@@ -233,8 +237,10 @@ The matrix has the following meaning:
 - Value = 1 if the passenger has that item
 - Value = 0 if the passenger does not have that item
 
-**Think:** Does the binary matrix contain new information?  
+::: {.callout-tip title="Think"}
+Does the binary matrix contain new information?  
 No. It represents the same transaction information in matrix form.
+:::
 
 ## 1.5 Representation 4: Passenger-Attribute Bipartite Graph
 

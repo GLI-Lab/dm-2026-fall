@@ -17,7 +17,7 @@ values that should be examined before analysis.
 In this lab, we use the **Titanic dataset** to practice data cleaning,
 aggregation, and sampling.
 
-::: {.callout-important}
+::: {.callout-note}
 ## Implement in `lab02_1.py` first
 
 This notebook calls functions from `lab02_1.py`. Find each
@@ -122,11 +122,19 @@ print(
 )
 ```
 
-::: {.callout-note title="Q. Practice"}
+For a categorical attribute such as `embarked` (`S`, `C`, `Q`), the median
+is not defined. A common replacement is the **mode**, the most frequent
+value. Together with the mean and the median, it is one of the three
+standard measures of central tendency.
+
+`Series.mode()` returns that most frequent value. If several values are
+tied, it returns all of them; the code below uses the first.
+
+::: {.callout-important title="Q. Practice"}
 
 Implement `fill_missing_with_mode()` in `lab02_1.py`.
-It should replace missing values in `embarked` with the most frequent
-category.
+It should replace missing values in `embarked` with the mode of that
+column.
 
 **Hint:** `Series.mode()` returns the most frequent value, and
 `Series.fillna()` replaces missing values.
@@ -152,7 +160,11 @@ print(
 
 :::
 
-**Think:** Why do `age` and `embarked` use different replacement values?
+::: {.callout-tip title="Think"}
+Why do `age` and `embarked` use different replacement values?  
+`age` is numerical, so the median is defined. `embarked` is categorical, so
+the median is not defined and we use the mode, the most frequent value.
+:::
 
 ## 1.3 Duplicate Records
 
@@ -197,7 +209,7 @@ titanic_with_duplicates[
 ]
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `drop_duplicate_rows()` in `lab02_1.py`.
 It should count duplicate rows and return a DataFrame with them removed.
@@ -267,7 +279,7 @@ print(
 )
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `iqr_outlier_bounds()` in `lab02_1.py`.
 It should return the lower and upper fences from `q1` and `q3`.
@@ -319,7 +331,11 @@ plot_fare_outliers(
 )
 ```
 
-**Think:** Does a statistical outlier always mean that the recorded value is wrong?
+::: {.callout-tip title="Think"}
+Does a statistical outlier always mean that the recorded value is wrong?  
+No. The IQR rule only flags values far from the bulk of the data. An unusual
+fare can still be a real first-class ticket.
+:::
 
 ## 1.5 Aggregation
 
@@ -346,7 +362,7 @@ class_summary
 
 Each row now represents one passenger class rather than one passenger.
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `summarize_by_class_and_sex()` in `lab02_1.py`.
 Group the passengers by `pclass` and `sex`. For each group, compute the mean
@@ -366,7 +382,11 @@ group_summary
 
 :::
 
-**Think:** What does one row represent before and after aggregation?
+::: {.callout-tip title="Think"}
+What does one row represent before and after aggregation?  
+Before aggregation, one row is one passenger. After aggregation, one row is
+one group, with summary values such as a mean survival rate or a median fare.
+:::
 
 ## 1.6 Random and Stratified Sampling
 
@@ -397,7 +417,7 @@ objects from each group.
 
 Here, we use `pclass` as the grouping attribute.
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `stratified_sample_by_class()` in `lab02_1.py`.
 It should group passengers by `pclass` and select up to 5 passengers from
@@ -430,5 +450,9 @@ stratified_sample[
 ].value_counts().sort_index()
 ```
 
-**Think:** Why can stratified sampling be useful when some groups contain
-much fewer objects than others?
+::: {.callout-tip title="Think"}
+Why can stratified sampling be useful when some groups contain
+much fewer objects than others?  
+Simple random sampling can miss small groups. Stratified sampling draws from
+each group, so rare classes still appear in the sample.
+:::

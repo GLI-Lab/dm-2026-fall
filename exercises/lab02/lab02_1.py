@@ -12,7 +12,7 @@ def fill_missing_with_mode(
     df: pd.DataFrame,
     column: str = "embarked",
 ) -> tuple[pd.DataFrame, str]:
-    """Fill missing values in `column` with its most frequent category.
+    """Fill missing values in `column` with its mode (most frequent value).
 
     Returns a copy of `df` and the mode used for filling.
 

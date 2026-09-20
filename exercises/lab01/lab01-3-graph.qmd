@@ -92,8 +92,10 @@ G.has_edge(0, 1)
 `degree` gives the number of edges connected to a node, while `neighbors()`
 returns the nodes directly connected to it.
 
-**Think:** What information does a graph store?  
+::: {.callout-tip title="Think"}
+What information does a graph store?  
 A graph stores nodes, their attributes, and the connections between nodes.
+:::
 
 ## 3.3 Representation 1: Graph Visualization
 
@@ -108,9 +110,11 @@ between two members.
 plot_karate_graph(G)
 ```
 
-**Think:** What information is easy to see in a graph visualization?  
+::: {.callout-tip title="Think"}
+What information is easy to see in a graph visualization?  
 We can visually inspect neighborhoods, highly connected nodes, and groups of
 nodes that appear close together.
+:::
 
 ## 3.4 Representation 2: Edge List
 
@@ -147,10 +151,12 @@ For example, the following code shows all edges connected to node `31`.
 list(G.edges(31))
 ```
 
-**Think:** Does the edge list contain different graph information from the
+::: {.callout-tip title="Think"}
+Does the edge list contain different graph information from the
 graph visualization?  
 No. A line in the visualization becomes a `(source, target)` pair in the
 table.
+:::
 
 ## 3.5 Representation 3: Adjacency List
 
@@ -174,9 +180,11 @@ for node in list(adjacency_list)[:10]:
 
 Each key is a node, and its value is the list of neighboring nodes.
 
-**Think:** How is the same connection represented here?  
+::: {.callout-tip title="Think"}
+How is the same connection represented here?  
 If node `1` appears in the neighbor list of node `0`, then nodes `0` and `1`
 are connected by an edge.
+:::
 
 ## 3.6 Representation 4: Adjacency Matrix
 
@@ -223,6 +231,8 @@ plot_adjacency_matrix(
 )
 ```
 
-**Think:** Is this different information from the graph visualization, edge
+::: {.callout-tip title="Think"}
+Is this different information from the graph visualization, edge
 list, or adjacency list?  
 No. The same connections are represented in matrix form.
+:::

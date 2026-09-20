@@ -15,7 +15,7 @@ import networkx as nx
 import numpy as np
 import pandas as pd
 
-from sklearn.datasets import load_iris, make_moons
+from sklearn.datasets import make_moons
 
 
 LAB_DIR = Path(__file__).resolve().parent
@@ -27,21 +27,11 @@ for path in (REPO_ROOT, LAB_DIR):
         sys.path.insert(0, text)
 
 
-def load_iris_data() -> pd.DataFrame:
-    iris = load_iris(as_frame=True)
-    data = iris.frame.copy()
-    data["species"] = data["target"].map(
-        dict(enumerate(iris.target_names))
-    )
-    return data.drop(columns=["target"])
+from data.loader import load_iris as load_iris_data
 
 
 def load_iris_graph_data():
-    iris = load_iris(as_frame=True)
-    frame = iris.frame.copy()
-    frame["species"] = frame["target"].map(
-        dict(enumerate(iris.target_names))
-    )
+    frame = load_iris_data()
     X = frame[["petal length (cm)", "petal width (cm)"]].to_numpy(
         dtype=float
     )

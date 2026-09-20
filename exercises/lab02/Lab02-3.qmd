@@ -17,7 +17,7 @@ Euclidean distances.
 We build $\epsilon$-graphs and kNN graphs, then assign edge weights using the
 heat kernel.
 
-::: {.callout-important}
+::: {.callout-note}
 ## Implement in `lab02_3.py` first
 
 This notebook calls functions from `lab02_3.py`. Find each
@@ -72,7 +72,8 @@ pd.set_option("display.max_colwidth", 100)
 
 ## 3.1 Euclidean Distance
 
-We first use Iris `petal length` and `petal width`.
+We first use Iris `petal length` and `petal width` from
+`data/record/iris.csv`.
 
 ```{python}
 X_iris, species, iris = (
@@ -142,7 +143,10 @@ plot_distance_matrix(
 )
 ```
 
-**Think:** What value should appear on the diagonal of a distance matrix?
+::: {.callout-tip title="Think"}
+What value should appear on the diagonal of a distance matrix?  
+Zero. The distance from an object to itself is $d(O_i,O_i)=0$.
+:::
 
 ## 3.2 Constructing a Nearest Neighbor Graph
 
@@ -207,7 +211,7 @@ A_small_epsilon
 
 `True` indicates that the two objects are connected.
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `epsilon_graph()` in `lab02_3.py`.
 Use `epsilon = 0.25` and construct the Iris $\epsilon$-graph.
@@ -243,8 +247,12 @@ plot_similarity_graph(
 )
 ```
 
-**Think:** Why can different objects have different numbers of neighbors in an
-$\epsilon$-graph?
+::: {.callout-tip title="Think"}
+Why can different objects have different numbers of neighbors in an
+$\epsilon$-graph?  
+$\epsilon$ is a fixed radius. A point in a dense region has many neighbors
+inside that radius; a point in a sparse region has few.
+:::
 
 #### kNN Graph
 
@@ -295,7 +303,7 @@ A_small_knn = (
 A_small_knn
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `knn_graph()` in `lab02_3.py`.
 Apply the same kNN rule to every Iris object using `K = 4`, then ignore
@@ -333,8 +341,13 @@ plot_similarity_graph(
 )
 ```
 
-**Think:** Why can a node have more than $K$ neighbors after direction is
-ignored?
+::: {.callout-tip title="Think"}
+Why can a node have more than $K$ neighbors after direction is
+ignored?  
+kNN is directed. If $A$ lists $B$ as a neighbor, the undirected graph keeps
+the edge even when $A$ is not among $B$'s $K$ nearest. Extra incoming edges
+raise the degree above $K$.
+:::
 
 ### Step 3. Heat-Kernel Weights
 
@@ -368,7 +381,7 @@ pd.DataFrame(
 ).round(3)
 ```
 
-::: {.callout-note title="Q. Practice"}
+::: {.callout-important title="Q. Practice"}
 
 Implement `apply_edge_weights()` in `lab02_3.py`.
 Keep heat-kernel weights only for the edges selected by the $\epsilon$-graph
@@ -422,7 +435,11 @@ plot_similarity_graph(
 )
 ```
 
-**Think:** What happens to $w_{ij}$ as the Euclidean distance increases?
+::: {.callout-tip title="Think"}
+What happens to $w_{ij}$ as the Euclidean distance increases?  
+The heat-kernel weight decays toward 0. Distant pairs contribute almost no
+similarity.
+:::
 
 ## 3.3 Similarity Graphs on Moons
 
@@ -567,5 +584,10 @@ plot_similarity_graph(
 )
 ```
 
-**Think:** How do the $\epsilon$-graph and kNN graph differ in selecting
-neighbors?
+::: {.callout-tip title="Think"}
+How do the $\epsilon$-graph and kNN graph differ in selecting
+neighbors?  
+The $\epsilon$-graph uses a distance threshold, so the number of neighbors
+varies. The kNN graph uses a neighbor count, so each node has $K$ outgoing
+neighbors.
+:::
