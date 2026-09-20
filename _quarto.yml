@@ -86,11 +86,11 @@ website:
             - section: "Lab2. Data Preprocessing"
               contents:
                 - text: "Cleaning, Aggregation, Sampling"
-                  href: exercises/lab02/Lab02-1.qmd
+                  href: exercises/lab02/lab02-1.qmd
                 - text: "Discretization, Binarization, Scaling"
-                  href: exercises/lab02/Lab02-2.qmd
+                  href: exercises/lab02/lab02-2.qmd
                 - text: "Similarity Graph"
-                  href: exercises/lab02/Lab02-3.qmd
+                  href: exercises/lab02/lab02-3.qmd
     - id: assignments
       title: "Assignments"
       collapse-level: 1
