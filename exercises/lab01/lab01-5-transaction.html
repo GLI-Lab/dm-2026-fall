@@ -142,10 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -185,8 +181,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -276,19 +278,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -342,7 +344,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -369,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>For market basket analysis, transactions are commonly represented as a binary transaction-item matrix, where <code>1</code> means that an item appears in a transaction and <code>0</code> means that it does not.</p>
 <section id="load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-the-data">5.1 Load the Data</h2>
-<div id="2d24e711" class="cell" data-execution_count="2">
+<div id="7b62f52e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> data.loader <span class="im">import</span> load_groceries</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>groceries <span class="op">=</span> load_groceries()</span>
@@ -379,7 +381,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>(pandas.DataFrame, (14963, 2))</code></pre>
 </div>
 </div>
-<div id="5effc637" class="cell" data-execution_count="3">
+<div id="ca69fc0a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>groceries.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
@@ -426,19 +428,31 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>Inspect one basket directly.</p>
-<div id="1378811c" class="cell" data-execution_count="4">
+<div id="c3dfcf4a" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>groceries.loc[<span class="dv">0</span>, <span class="st">"items"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>['tropical fruit', 'rolls/buns', 'candy']</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> What is one object in this dataset?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is one object in this dataset?<br>
 One object is a transaction (basket), represented as a collection of items purchased together.</p>
+</div>
+</div>
 </section>
 <section id="representation-1-basket-item-set-view" class="level2">
 <h2 class="anchored" data-anchor-id="representation-1-basket-item-set-view">5.2 Representation 1: Basket / Item-Set View</h2>
 <p>Unlike record data, transactions do not have a fixed number of attributes. Each basket can contain a different number of items.</p>
-<div id="24f7a2e1" class="cell" data-execution_count="5">
+<div id="3690c314" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        groceries.loc[i, <span class="st">"transaction_id"</span>],</span>
@@ -451,13 +465,25 @@ txn_00001 -&gt; ['whole milk', 'tropical fruit', 'chocolate']
 txn_00002 -&gt; ['pip fruit', 'other vegetables', 'flour']</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> How is this different from ordinary record data?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>How is this different from ordinary record data?<br>
 Different transactions can contain different numbers of items, so there is no fixed set of attribute columns in the raw basket representation.</p>
+</div>
+</div>
 </section>
 <section id="representation-2-long-table" class="level2">
 <h2 class="anchored" data-anchor-id="representation-2-long-table">5.3 Representation 2: Long Table</h2>
 <p>The same baskets can be expanded into a table with one row for each transaction-item occurrence.</p>
-<div id="b284e342" class="cell" data-execution_count="6">
+<div id="09f778db" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>groceries_long <span class="op">=</span> to_long_table(groceries)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(groceries_long), groceries_long.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -465,7 +491,7 @@ Different transactions can contain different numbers of items, so there is no fi
 <pre><code>(pandas.DataFrame, (38006, 2))</code></pre>
 </div>
 </div>
-<div id="2fb1aae7" class="cell" data-execution_count="7">
+<div id="0d0221d6" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>groceries_long.head(<span class="dv">12</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <div>
@@ -547,12 +573,24 @@ Different transactions can contain different numbers of items, so there is no fi
 </div>
 </div>
 <p>The same <code>transaction_id</code> now appears repeatedly because one transaction can contain several items.</p>
-<p><strong>Think:</strong> Did the underlying purchases change?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Did the underlying purchases change?<br>
 No.&nbsp;Only the representation changed from one row per basket to one row per transaction-item occurrence.</p>
+</div>
+</div>
 </section>
 <section id="representation-3-transaction-item-binary-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="representation-3-transaction-item-binary-matrix">5.4 Representation 3: Transaction-Item Binary Matrix</h2>
-<div id="248e102a" class="cell" data-execution_count="8">
+<div id="619de6bd" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>X_transaction, item_names <span class="op">=</span> build_transaction_item_matrix(groceries)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(X_transaction), X_transaction.shape</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -560,7 +598,7 @@ No.&nbsp;Only the representation changed from one row per basket to one row per 
 <pre><code>(scipy.sparse._csr.csr_matrix, (14963, 167))</code></pre>
 </div>
 </div>
-<div id="434d4cd6" class="cell" data-execution_count="9">
+<div id="b9c1925e" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>X_transaction.nnz</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>38006</code></pre>
@@ -574,7 +612,7 @@ No.&nbsp;Only the representation changed from one row per basket to one row per 
 <li>Zero = the item is not in the transaction</li>
 </ul>
 <p>View a small part of the matrix using the most frequent items.</p>
-<div id="82b12ba0" class="cell" data-execution_count="10">
+<div id="5d8c2adf" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>item_counts <span class="op">=</span> np.asarray(X_transaction.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>top_item_idx <span class="op">=</span> item_counts.argsort()[<span class="op">-</span><span class="dv">10</span>:][::<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -728,7 +766,7 @@ No.&nbsp;Only the representation changed from one row per basket to one row per 
 </div>
 </div>
 <p>Now inspect the sparse structure visually.</p>
-<div id="3aecec9e" class="cell" data-execution_count="11">
+<div id="7c414d2d" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>plt.spy(X_transaction[:<span class="dv">120</span>, :<span class="dv">120</span>], markersize<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"items"</span>)</span>
@@ -743,13 +781,25 @@ No.&nbsp;Only the representation changed from one row per basket to one row per 
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> Why is this matrix sparse?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Why is this matrix sparse?<br>
 Each basket contains only a small subset of all available items. Therefore, most transaction-item entries are zero.</p>
+</div>
+</div>
 </section>
 <section id="item-support" class="level2">
 <h2 class="anchored" data-anchor-id="item-support">5.5 Item Support</h2>
 <p>Once we have a binary transaction-item matrix, the support of an item becomes a simple summary of how frequently that item appears across transactions.</p>
-<div id="c1212b20" class="cell" data-execution_count="12">
+<div id="cf6e18ff" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>item_support <span class="op">=</span> compute_item_support(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    X_transaction,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    item_names,</span>
@@ -836,8 +886,20 @@ Each basket contains only a small subset of all available items. Therefore, most
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> What does a support of <code>0.10</code> mean for an item?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What does a support of <code>0.10</code> mean for an item?<br>
 It means that the item appears in 10% of all transactions.</p>
+</div>
+</div>
 <p>This is the same basic notion of support used later in frequent itemset and association-rule mining. In this first lab, we stop at the representation and simple summary rather than running Apriori.</p>
 </section>
 <section id="representation-4-item-co-occurrence-graph" class="level2">
@@ -851,7 +913,7 @@ It means that the item appears in 10% of all transactions.</p>
 <p>It measures the similarity between two items based on how often they appear together relative to how often either item appears.</p>
 <p>A higher value indicates a stronger relationship between two items.</p>
 <p>For visualization, we use the most frequent items and connect each item to its strongest co-occurring neighbors.</p>
-<div id="029a268f" class="cell" data-execution_count="13">
+<div id="bbcac54f" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>G_items <span class="op">=</span> build_item_cooccurrence_graph(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    X_transaction,</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    item_names,</span>
@@ -865,13 +927,13 @@ It means that the item appears in 10% of all transactions.</p>
 </div>
 </div>
 <p>Inspect the graph before drawing it.</p>
-<div id="f7ed0fab" class="cell" data-execution_count="14">
+<div id="6ae1cdfa" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>G_items.number_of_nodes(), G_items.number_of_edges()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="14">
 <pre><code>(15, 27)</code></pre>
 </div>
 </div>
-<div id="f5538db3" class="cell" data-execution_count="15">
+<div id="b8bb6f6c" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(G_items.edges(data<span class="op">=</span><span class="va">True</span>))[:<span class="dv">10</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <pre><code>[(0, 1, {'weight': 0.05594758064516129}),
@@ -886,7 +948,7 @@ It means that the item appears in 10% of all transactions.</p>
  (0, 10, {'weight': 0.03190789473684211})]</code></pre>
 </div>
 </div>
-<div id="5f2322f1" class="cell" data-execution_count="16">
+<div id="4a8c9b74" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>pos <span class="op">=</span> nx.spring_layout(</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    G_items,</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span>RANDOM_STATE,</span>
@@ -949,8 +1011,20 @@ It means that the item appears in 10% of all transactions.</p>
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> Were these item-item edges explicitly stored in the original data?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Were these item-item edges explicitly stored in the original data?<br>
 No.&nbsp;The original data only records which items occurred in each transaction. The item-item graph is a derived representation created by computing item similarity using co-occurrence information and Jaccard similarity.</p>
+</div>
+</div>
 
 
 </section>

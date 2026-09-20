@@ -139,10 +139,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -182,8 +178,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -273,19 +275,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -338,7 +340,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -374,7 +376,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">0. Setup</h2>
-<div id="d69cf3f0" class="cell" data-execution_count="1">
+<div id="215ac3f7" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns  <span class="co"># Higher-level visualization library built on top of Matplotlib</span></span>
@@ -403,7 +405,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <p>A <strong>loss curve</strong> is one of the first plots you draw in any ML project. It shows how training and validation loss change across epochs, and is the primary tool for diagnosing overfitting.</p>
-<div id="4e05b40b" class="cell" data-execution_count="2">
+<div id="8c29935a" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">11</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>train_loss <span class="op">=</span> np.array([<span class="fl">2.5</span>, <span class="fl">1.8</span>, <span class="fl">1.2</span>, <span class="fl">0.9</span>, <span class="fl">0.7</span>, <span class="fl">0.55</span>, <span class="fl">0.45</span>, <span class="fl">0.38</span>, <span class="fl">0.32</span>, <span class="fl">0.30</span>])</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>val_loss   <span class="op">=</span> np.array([<span class="fl">2.6</span>, <span class="fl">2.0</span>, <span class="fl">1.5</span>, <span class="fl">1.2</span>, <span class="fl">1.05</span>, <span class="fl">1.10</span>, <span class="fl">1.25</span>, <span class="fl">1.45</span>, <span class="fl">1.70</span>, <span class="fl">2.00</span>])</span>
@@ -433,7 +435,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="scatter-plots-feature-visualization" class="level2">
 <h2 class="anchored" data-anchor-id="scatter-plots-feature-visualization">2. Scatter Plots (Feature Visualization)</h2>
 <p>Scatter plots are one of the most important plots in Machine Learning. They allow you to visualize the relationship between two features and see if your classes are easily separable.</p>
-<div id="bd1779f8" class="cell" data-execution_count="3">
+<div id="2a229693" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">42</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>height_cats <span class="op">=</span> np.random.normal(<span class="dv">25</span>, <span class="dv">3</span>, <span class="dv">50</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>weight_cats <span class="op">=</span> height_cats <span class="op">*</span> <span class="fl">0.2</span> <span class="op">+</span> np.random.normal(<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">50</span>)</span>
@@ -461,7 +463,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>When you want to examine the relationship between two continuous variables, a <strong>joint plot</strong> combines a scatter plot in the center with marginal histograms on each axis. The marginal histograms show the individual distribution of each variable, while the scatter plot reveals whether the two variables are correlated.</p>
-<div id="77a453ae" class="cell" data-execution_count="4">
+<div id="7b5d1c3e" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>np.random.seed(<span class="dv">0</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>N <span class="op">=</span> <span class="dv">1000</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>x_N <span class="op">=</span> np.random.normal(size<span class="op">=</span>N)</span>
@@ -483,7 +485,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="histograms-checking-data-distributions" class="level2">
 <h2 class="anchored" data-anchor-id="histograms-checking-data-distributions">3. Histograms (Checking Data Distributions)</h2>
 <p>Machine learning models assume certain distributions in your data. Histograms help you verify if your features are normally distributed or if they are skewed and require normalization.</p>
-<div id="3821f068" class="cell" data-execution_count="5">
+<div id="2f01b33c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>prices <span class="op">=</span> np.random.lognormal(mean<span class="op">=</span><span class="fl">11.5</span>, sigma<span class="op">=</span><span class="fl">0.5</span>, size<span class="op">=</span><span class="dv">1000</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
@@ -502,7 +504,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="512fd542" class="cell" data-execution_count="6">
+<div id="bbd110ab" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> np.random.normal(loc<span class="op">=</span><span class="dv">70</span>, scale<span class="op">=</span><span class="dv">10</span>, size<span class="op">=</span><span class="dv">500</span>)</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">7</span>, <span class="dv">4</span>))</span>
@@ -525,7 +527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h2 class="anchored" data-anchor-id="subplots-for-comparing-multiple-metrics">4. Subplots for Comparing Multiple Metrics</h2>
 <p>When evaluating models, you rarely look at just one metric. Subplots let you show multiple related charts side-by-side. Using <code>sharey=True</code> keeps the y-axis scale identical across all panels, making it easy to compare magnitudes directly.</p>
 <p>The example below shows training loss curves for the same model trained with three different learning rates — a common hyperparameter comparison.</p>
-<div id="74725e97" class="cell" data-execution_count="7">
+<div id="8d693aa7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>epochs <span class="op">=</span> np.arange(<span class="dv">1</span>, <span class="dv">21</span>)</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulated training loss for three learning rates</span></span>

@@ -142,10 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -185,8 +181,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -276,19 +278,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -343,7 +345,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -369,7 +371,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-the-data">2.1 Load the Data</h2>
 <p><code>load_20newsgroups()</code> caches the corpus under <code>data/text/20newsgroups/</code>. The sampling step is a practical choice for this lab. The original dataset is kept unchanged, while we use a smaller subset to make inspection and visualization easier.</p>
-<div id="fd83100a" class="cell" data-execution_count="2">
+<div id="574777b5" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> data.loader <span class="im">import</span> load_20newsgroups</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>categories <span class="op">=</span> [</span>
@@ -411,7 +413,7 @@ After sampling:
 (400, 3)</code></pre>
 </div>
 </div>
-<div id="e3ae8707" class="cell" data-execution_count="3">
+<div id="73071f3e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>news.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
@@ -463,7 +465,7 @@ After sampling:
 </div>
 </div>
 </div>
-<div id="10e24408" class="cell" data-execution_count="4">
+<div id="0b2646e0" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>news[<span class="st">"label"</span>].value_counts()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="4">
 <pre><code>label
@@ -477,7 +479,7 @@ Name: count, dtype: int64</code></pre>
 </section>
 <section id="inspect-raw-text" class="level2">
 <h2 class="anchored" data-anchor-id="inspect-raw-text">2.2 Inspect Raw Text</h2>
-<div id="ca6207a2" class="cell" data-execution_count="5">
+<div id="5f156aaf" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(news.loc[<span class="dv">0</span>, <span class="st">"text"</span>][:<span class="dv">1200</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Hi Steve,
@@ -507,12 +509,24 @@ see anything there, then this is definitely a problem!
 One final word - if you're not interes</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> What is one object in this dataset?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What is one object in this dataset?<br>
 Each row corresponds to one document. The same object can therefore be viewed as both a record and a document.</p>
+</div>
+</div>
 </section>
 <section id="representation-1-token-sequence" class="level2">
 <h2 class="anchored" data-anchor-id="representation-1-token-sequence">2.3 Representation 1: Token Sequence</h2>
-<div id="b782c483" class="cell" data-execution_count="6">
+<div id="8ce241c6" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>tokens <span class="op">=</span> tokenize_documents(news[<span class="st">"text"</span>])</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="bu">type</span>(tokens), <span class="bu">type</span>(tokens[<span class="dv">0</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -520,7 +534,7 @@ Each row corresponds to one document. The same object can therefore be viewed as
 <pre><code>(list, list)</code></pre>
 </div>
 </div>
-<div id="557fb6c4" class="cell" data-execution_count="7">
+<div id="485ca458" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>tokens[<span class="dv">0</span>][:<span class="dv">30</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="7">
 <pre><code>['hi',
@@ -555,8 +569,20 @@ Each row corresponds to one document. The same object can therefore be viewed as
  'long']</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> What information is preserved in a token-sequence representation?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What information is preserved in a token-sequence representation?<br>
 The order of tokens is preserved, so we can still distinguish which words appear before or after others.</p>
+</div>
+</div>
 </section>
 <section id="representation-2-document-term-count-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="representation-2-document-term-count-matrix">2.4 Representation 2: Document-Term Count Matrix</h2>
@@ -588,7 +614,7 @@ The order of tokens is preserved, so we can still distinguish which words appear
 </table>
 <p>This representation converts unstructured text into a numerical matrix that can be used by machine learning and data mining algorithms.</p>
 <p>Here we limit the vocabulary size and remove very rare/common terms to obtain a more interpretable document-term matrix.</p>
-<div id="38e03ba9" class="cell" data-execution_count="8">
+<div id="37416d21" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>X_count, count_vectorizer <span class="op">=</span> build_count_matrix(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    news[<span class="st">"text"</span>],</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    max_features<span class="op">=</span><span class="dv">3000</span>,</span>
@@ -602,13 +628,13 @@ The order of tokens is preserved, so we can still distinguish which words appear
 <pre><code>(scipy.sparse._csr.csr_matrix, (400, 3000))</code></pre>
 </div>
 </div>
-<div id="dca856fa" class="cell" data-execution_count="9">
+<div id="d30dae21" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X_count.nnz</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="9">
 <pre><code>15683</code></pre>
 </div>
 </div>
-<div id="4ce4c43e" class="cell" data-execution_count="10">
+<div id="f87e05a4" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>terms <span class="op">=</span> count_vectorizer.get_feature_names_out()</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>term_counts <span class="op">=</span> np.asarray(X_count.<span class="bu">sum</span>(axis<span class="op">=</span><span class="dv">0</span>)).ravel()</span>
@@ -737,7 +763,7 @@ The order of tokens is preserved, so we can still distinguish which words appear
 </div>
 </div>
 </div>
-<div id="4122cd20" class="cell" data-execution_count="11">
+<div id="c491c05c" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>plt.figure(figsize<span class="op">=</span>(<span class="dv">8</span>, <span class="dv">4</span>))</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.spy(X_count[:<span class="dv">100</span>, :<span class="dv">500</span>], markersize<span class="op">=</span><span class="dv">1</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">"terms"</span>)</span>
@@ -752,13 +778,25 @@ The order of tokens is preserved, so we can still distinguish which words appear
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> Why is this matrix sparse?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Why is this matrix sparse?<br>
 Each document contains only a small subset of the entire vocabulary. Therefore, most document-term entries are zero.</p>
+</div>
+</div>
 </section>
 <section id="representation-3-tf-idf-vector-space" class="level2">
 <h2 class="anchored" data-anchor-id="representation-3-tf-idf-vector-space">2.5 Representation 3: TF-IDF Vector Space</h2>
 <p>Unlike count representation, TF-IDF gives higher weights to terms that are important within a document but less frequent across the corpus.</p>
-<div id="aa4408fb" class="cell" data-execution_count="12">
+<div id="d9389059" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>X_tfidf, tfidf_vectorizer <span class="op">=</span> build_tfidf_matrix(</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    news[<span class="st">"text"</span>],</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    max_features<span class="op">=</span><span class="dv">3000</span>,</span>
@@ -773,8 +811,20 @@ Each document contains only a small subset of the entire vocabulary. Therefore, 
 </div>
 </div>
 <p>The shape is similar to the count matrix, but the values now have a different meaning: each row is a TF-IDF document vector.</p>
-<p><strong>Think:</strong> Can the representation change even when the matrix shape stays the same?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Can the representation change even when the matrix shape stays the same?<br>
 Yes. The rows and columns can remain the same while the meaning of each value changes from a raw count to a TF-IDF weight.</p>
+</div>
+</div>
 </section>
 <section id="cosine-similarity" class="level2">
 <h2 class="anchored" data-anchor-id="cosine-similarity">2.6 Cosine Similarity</h2>
@@ -787,7 +837,7 @@ Yes. The rows and columns can remain the same while the meaning of each value ch
 <li>close to 0 → the two documents have different word usage patterns.</li>
 </ul>
 <p>Unlike comparing raw word counts, cosine similarity focuses on the direction of document vectors rather than their length, making it useful for comparing documents with different sizes.</p>
-<div id="69dba995" class="cell" data-execution_count="13">
+<div id="85f92908" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>scores <span class="op">=</span> compute_cosine_similarity(</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    X_tfidf,</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    query_index<span class="op">=</span><span class="dv">0</span>,</span>
@@ -798,7 +848,7 @@ Yes. The rows and columns can remain the same while the meaning of each value ch
 <pre><code>(400,)</code></pre>
 </div>
 </div>
-<div id="20e906dd" class="cell" data-execution_count="14">
+<div id="7403e894" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>scores[<span class="dv">0</span>] <span class="op">=</span> <span class="op">-</span><span class="dv">1</span></span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>top_idx <span class="op">=</span> scores.argsort()[<span class="op">-</span><span class="dv">5</span>:][::<span class="op">-</span><span class="dv">1</span>]</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -855,7 +905,7 @@ Yes. The rows and columns can remain the same while the meaning of each value ch
 </div>
 </div>
 </div>
-<div id="27c7eaa5" class="cell" data-execution_count="15">
+<div id="345be08a" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> top_idx[<span class="dv">0</span>]</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"similarity:"</span>, <span class="bu">round</span>(<span class="bu">float</span>(scores[i]), <span class="dv">3</span>))</span>
@@ -875,13 +925,25 @@ the time."
 board may be a bigger problem than not having the money.")</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> Was this similarity stored in the original dataset?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Was this similarity stored in the original dataset?<br>
 No.&nbsp;It is a derived quantity created by representing documents with TF-IDF vectors and comparing them with cosine similarity.</p>
+</div>
+</div>
 </section>
 <section id="representation-4-document-similarity-graph" class="level2">
 <h2 class="anchored" data-anchor-id="representation-4-document-similarity-graph">2.7 Representation 4: Document Similarity Graph</h2>
 <p>We create a new graph where documents are connected based on their similarity in the TF-IDF vector space.</p>
-<div id="39add1dd" class="cell" data-execution_count="16">
+<div id="c3562f2a" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> build_similarity_graph(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    X_tfidf,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    doc_ids<span class="op">=</span>news[<span class="st">"doc_id"</span>],</span>
@@ -895,13 +957,13 @@ No.&nbsp;It is a derived quantity created by representing documents with TF-IDF 
 <pre><code>networkx.classes.graph.Graph</code></pre>
 </div>
 </div>
-<div id="ba9a97b2" class="cell" data-execution_count="17">
+<div id="9bbfb96b" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>G.number_of_nodes(), G.number_of_edges()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>(80, 172)</code></pre>
 </div>
 </div>
-<div id="6e6ae683" class="cell" data-execution_count="18">
+<div id="fe1abfde" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(G.edges(data<span class="op">=</span><span class="va">True</span>))[:<span class="dv">10</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>[(0, 9, {'weight': 0.1444769784565948}),
@@ -916,7 +978,7 @@ No.&nbsp;It is a derived quantity created by representing documents with TF-IDF 
  (2, 2, {'weight': 0.0})]</code></pre>
 </div>
 </div>
-<div id="1368ce4f" class="cell" data-execution_count="19">
+<div id="0ce1265e" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>pos <span class="op">=</span> nx.spring_layout(</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    G,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    seed<span class="op">=</span>RANDOM_STATE,</span>
@@ -946,8 +1008,20 @@ No.&nbsp;It is a derived quantity created by representing documents with TF-IDF 
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> Were these edges present in the original 20 Newsgroups dataset?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Were these edges present in the original 20 Newsgroups dataset?<br>
 No.&nbsp;They are derived edges. We created them by choosing a TF-IDF representation, cosine similarity, and a k-nearest-neighbor rule.</p>
+</div>
+</div>
 
 
 </section>

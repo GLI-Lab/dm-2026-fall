@@ -168,10 +168,6 @@ window.Quarto = {
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -211,8 +207,14 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -302,19 +304,19 @@ window.Quarto = {
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -377,7 +379,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -418,7 +420,7 @@ window.Quarto = {
 <section id="lists" class="level3">
 <h3 class="anchored" data-anchor-id="lists">1.1 Lists</h3>
 <p>A <strong>list</strong> is an ordered, mutable sequence. In ML workflows, lists are commonly used to store feature names, file paths for a dataset, or a sequence of layer sizes in a network architecture.</p>
-<div id="06de2713" class="cell" data-execution_count="1">
+<div id="64876baf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Lists: Ordered, mutable sequences</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>features <span class="op">=</span> [<span class="st">'age'</span>, <span class="st">'income'</span>, <span class="st">'height'</span>, <span class="st">'weight'</span>]</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Original features:"</span>, features)</span>
@@ -438,7 +440,7 @@ Last feature  : blood_pressure</code></pre>
 </div>
 <p>A concrete ML example: when you define a multi-layer perceptron, you often store the number of units per hidden layer as a list and then iterate over it to build the network programmatically.</p>
 <p><code>enumerate(iterable)</code> wraps any iterable and yields <code>(index, value)</code> pairs. It replaces the manual counter pattern <code>i = 0; i += 1</code> and is the standard way to loop when you need both the position and the value simultaneously.</p>
-<div id="0048c927" class="cell" data-execution_count="2">
+<div id="17bc099d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Typical use case: defining a network architecture as a list</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>hidden_sizes <span class="op">=</span> [<span class="dv">128</span>, <span class="dv">64</span>, <span class="dv">32</span>]</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -454,7 +456,7 @@ Last feature  : blood_pressure</code></pre>
 <section id="dictionaries" class="level3">
 <h3 class="anchored" data-anchor-id="dictionaries">1.2 Dictionaries</h3>
 <p>A <strong>dictionary</strong> maps unique keys to values. In ML, dictionaries are the standard container for hyperparameters and experiment configurations, because they let you access any setting by name rather than by a fragile index.</p>
-<div id="ee859dcf" class="cell" data-execution_count="3">
+<div id="a96c7660" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dictionaries: Key-value pairs for storing configurations</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>hyperparameters <span class="op">=</span> {</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'learning_rate'</span>: <span class="fl">0.001</span>,</span>
@@ -490,7 +492,7 @@ Full config: {'learning_rate': 0.001, 'batch_size': 32, 'optimizer': 'Adam', 'ep
 <section id="functions-and-control-flow" class="level2">
 <h2 class="anchored" data-anchor-id="functions-and-control-flow">2. Functions and Control Flow</h2>
 <p>Machine learning codebases are built around modular functions: one function loads data, another computes a metric, another runs a single training step. Writing clean, well-named functions is what separates readable research code from unmaintainable spaghetti.</p>
-<div id="194c6985" class="cell" data-execution_count="4">
+<div id="0a6ab44d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> categorize_age(age):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Categorize a person's age into a life-stage label.</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -517,7 +519,7 @@ Age  72  -&gt;  Senior</code></pre>
 <p>Here is a more ML-flavored example. The function below computes <strong>accuracy</strong>, one of the most common evaluation metrics for classification.</p>
 <p><span class="math display">\[\text{Accuracy} = \frac{\text{Number of correct predictions}}{\text{Total number of predictions}}\]</span></p>
 <p><code>zip(a, b)</code> pairs up elements from two iterables by position, yielding <code>(a[0], b[0])</code>, <code>(a[1], b[1])</code>, and so on. In training loops it is used to iterate over batches of inputs and labels together: <code>for x_batch, y_batch in zip(x_batches, y_batches)</code>.</p>
-<div id="03d24ed5" class="cell" data-execution_count="5">
+<div id="ec0bcc55" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> compute_accuracy(y_true, y_pred):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Return the fraction of predictions that match the ground-truth labels."""</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    correct <span class="op">=</span> <span class="bu">sum</span>(t <span class="op">==</span> p <span class="cf">for</span> t, p <span class="kw">in</span> <span class="bu">zip</span>(y_true, y_pred))</span>
@@ -536,7 +538,7 @@ Age  72  -&gt;  Senior</code></pre>
 <h3 class="anchored" data-anchor-id="sorting-and-selection-with-key">Sorting and Selection with <code>key</code></h3>
 <p>The built-in functions <code>sorted</code>, <code>min</code>, and <code>max</code> all accept an optional <code>key</code> argument: a one-argument function applied to each element before comparison. This pattern appears constantly in ML when you need to find the best checkpoint, rank features by importance, or sort classes by frequency.</p>
 <p>A <strong>lambda</strong> is a compact, anonymous function defined inline. <code>lambda x: expression</code> is exactly equivalent to writing a named function that takes <code>x</code> and returns <code>expression</code> — just without giving it a name. Lambdas are almost always used as the <code>key</code> argument.</p>
-<div id="ae07ed86" class="cell" data-execution_count="6">
+<div id="16db0d77" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Find the epoch with the lowest validation loss</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Each element is (epoch_number, val_loss)</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>val_losses <span class="op">=</span> [(<span class="dv">1</span>, <span class="fl">2.4</span>), (<span class="dv">2</span>, <span class="fl">1.9</span>), (<span class="dv">3</span>, <span class="fl">1.5</span>), (<span class="dv">4</span>, <span class="fl">1.6</span>), (<span class="dv">5</span>, <span class="fl">1.8</span>)]</span>
@@ -547,7 +549,7 @@ Age  72  -&gt;  Senior</code></pre>
 <pre><code>Best epoch: 3, validation loss: 1.5</code></pre>
 </div>
 </div>
-<div id="5307440c" class="cell" data-execution_count="7">
+<div id="96363052" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort classes by frequency, highest first</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>class_counts <span class="op">=</span> {<span class="st">'cat'</span>: <span class="dv">120</span>, <span class="st">'dog'</span>: <span class="dv">340</span>, <span class="st">'bird'</span>: <span class="dv">85</span>}</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -571,7 +573,7 @@ Age  72  -&gt;  Senior</code></pre>
 <p>The <code>if condition</code> part is optional; omit it when you want to transform every element without filtering.</p>
 <section id="transforming-elements" class="level3">
 <h3 class="anchored" data-anchor-id="transforming-elements">3.1 Transforming Elements</h3>
-<div id="32e965cf" class="cell" data-execution_count="8">
+<div id="3938cbb3" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Standard for-loop approach</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>raw_text <span class="op">=</span> [<span class="st">"  Hello "</span>, <span class="st">"WORLD  "</span>, <span class="st">" machine learning"</span>]</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>clean_loop <span class="op">=</span> []</span>
@@ -592,7 +594,7 @@ Comprehension result: ['hello', 'world', 'machine learning']</code></pre>
 <section id="filtering-elements" class="level3">
 <h3 class="anchored" data-anchor-id="filtering-elements">3.2 Filtering Elements</h3>
 <p>Adding an <code>if</code> clause at the end turns a comprehension into a combined transform-and-filter operation.</p>
-<div id="d1a15902" class="cell" data-execution_count="9">
+<div id="d1590315" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>numbers <span class="op">=</span> [<span class="op">-</span><span class="dv">5</span>, <span class="dv">2</span>, <span class="op">-</span><span class="dv">1</span>, <span class="dv">10</span>, <span class="dv">8</span>]</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep only positive values (e.g., filtering out invalid sensor readings)</span></span>
@@ -603,7 +605,7 @@ Comprehension result: ['hello', 'world', 'machine learning']</code></pre>
 </div>
 </div>
 <p>A realistic ML example: collecting all image file paths in a directory that match a specific extension.</p>
-<div id="2de296bd" class="cell" data-execution_count="10">
+<div id="99ca79ae" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>all_files <span class="op">=</span> [</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">'img_001.jpg'</span>, <span class="st">'README.txt'</span>, <span class="st">'img_002.jpg'</span>,</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">'label.csv'</span>,  <span class="st">'img_003.png'</span></span>
@@ -633,7 +635,7 @@ Comprehension result: ['hello', 'world', 'machine learning']</code></pre>
 <span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.linear(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>You do not need to know PyTorch yet. The example below implements a <code>StandardScaler</code> — a preprocessing class that standardizes features to zero mean and unit variance — and demonstrates two patterns that appear throughout this course.</p>
 <p><strong>Stateful learning (fit → transform):</strong> The <code>fit</code> method examines training data and stores what it learned (here: mean and standard deviation) as attributes. The <code>transform</code> method then applies that knowledge to any data. Separating these two steps is a core design principle: statistics are computed <em>once</em> on training data and applied identically to validation and test data.</p>
-<div id="32428b8c" class="cell" data-execution_count="11">
+<div id="38547893" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> StandardScaler:</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Standardize features to zero mean and unit variance.</span></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>

@@ -8,7 +8,7 @@
 
 <meta name="author" content="Byungkook Oh">
 
-<title>Python Environment Setup – Data Mining</title>
+<title>Environment Setup (en) – Data Mining</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -139,10 +139,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -159,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup.html">Python Environment Setup</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup-en.html">Environment Setup (en)</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -182,8 +178,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/environment-setup.html" class="sidebar-item-text sidebar-link active">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -273,19 +275,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -319,9 +321,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup.html">Python Environment Setup</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup-en.html">Environment Setup (en)</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Python Environment Setup</h1>
+<h1 class="title">Environment Setup (en)</h1>
 </div>
 
 
@@ -339,7 +341,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -353,8 +355,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
 <p>This course supports two ways to run labs. Choose the one that fits your setup.</p>
-<p><strong>Option A (Local): pixi + VSCode or JupyterLab</strong> — Recommended for consistent, reproducible environments. All dependencies are pinned via a lock file, so your environment matches every other student’s exactly. Requires a one-time setup on your machine.</p>
-<p><strong>Option B (Cloud): Google Colab</strong> — No installation needed. Open any lab notebook directly in your browser using the Colab badge at the top of each notebook. Best if you do not want to manage a local environment.</p>
+<p><strong>Option A (Local): pixi + VSCode or JupyterLab.</strong> Recommended. Dependencies are pinned in a lock file, so every student gets the same environment. Requires a one-time setup on your machine.</p>
+<p><strong>Option B (Cloud): Google Colab.</strong> No installation. Open a lab notebook in the browser with the Colab badge at the top of each notebook. Use this if you do not want a local environment.</p>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -365,21 +367,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We recommend <strong>Option A</strong> for all students. The pixi environment guarantees that your code runs identically to the instructor’s setup, which makes debugging and grading straightforward.</p>
-<p>Option B is a convenient fallback if you do not want to manage a local environment. Note that Colab sessions are ephemeral and require re-running setup cells every time you reconnect.</p>
+<p><strong>Option A</strong> is recommended. The pixi environment matches the instructor setup, which makes debugging and grading straightforward.</p>
+<p>Option B is a fallback. Colab sessions are ephemeral. Re-run setup cells every time you reconnect.</p>
 </div>
 </div>
-<p>Both options provide access to all required packages. The sections below walk through each option in detail.</p>
+<p>Both options provide the required packages. The sections below walk through each option.</p>
 </section>
 <section id="option-a-local-pixi-vscode-or-jupyterlab" class="level2">
 <h2 class="anchored" data-anchor-id="option-a-local-pixi-vscode-or-jupyterlab">Option A (Local): pixi + VSCode or JupyterLab</h2>
 <section id="why-pixi" class="level3">
 <h3 class="anchored" data-anchor-id="why-pixi">Why pixi?</h3>
-<p>Compared to conda or mamba, pixi offers three main advantages for this course. It is significantly faster at solving and installing environments. It uses a lock file (<code>pixi.lock</code>) that pins every dependency to an exact version, so every student gets an identical environment. It also handles the common conflict between conda-managed and pip-managed packages in a single unified workflow.</p>
+<p>Compared to conda or mamba, pixi is faster at solving environments. It pins exact versions in <code>pixi.lock</code>, so every student gets the same packages. It also handles conda-managed and pip-managed packages in one workflow.</p>
 </section>
 <section id="prerequisites" class="level3">
 <h3 class="anchored" data-anchor-id="prerequisites">Prerequisites</h3>
-<p>Before starting, install the following tools on your machine.</p>
+<p>Install the following tools first.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -390,25 +392,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>This course environment supports <strong>Linux</strong> and <strong>macOS</strong> only. Windows users must use <strong>WSL2 (Windows Subsystem for Linux)</strong> to run in a Linux environment. Install WSL2 first, then follow the Linux instructions below inside your WSL2 terminal.</p>
+<p>This course environment supports <strong>Linux</strong> and <strong>macOS</strong> only. On Windows, use <strong>WSL2</strong> and follow the Linux steps inside Ubuntu.</p>
 <ol type="1">
 <li>Open PowerShell as Administrator and run:</li>
 </ol>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <ol start="2" type="1">
-<li>Restart your computer when prompted.</li>
-<li>Open the <strong>Ubuntu</strong> app from the Start menu to finish setup (username and password).</li>
-<li>All remaining steps in this guide should be run inside this Ubuntu terminal.</li>
+<li>Restart when prompted.</li>
+<li>Open the <strong>Ubuntu</strong> app from the Start menu and finish setup (username and password).</li>
+<li>Run the remaining steps in this Ubuntu terminal.</li>
 </ol>
-<p>For the full WSL2 installation guide, see <a href="https://learn.microsoft.com/en-us/windows/wsl/install" class="uri">https://learn.microsoft.com/en-us/windows/wsl/install</a>.</p>
+<p>WSL2 install guide: <a href="https://learn.microsoft.com/en-us/windows/wsl/install" class="uri">https://learn.microsoft.com/en-us/windows/wsl/install</a></p>
 </div>
 </div>
-<p><strong>git</strong> — Required for cloning the course repository.</p>
+<p><strong>git.</strong> Required to clone the course repository.</p>
 <ul>
-<li><strong>Linux (WSL2 included)</strong>: <code>sudo apt update &amp;&amp; sudo apt install git</code></li>
-<li><strong>macOS</strong>: Verify with <code>git --version</code>. If not installed, macOS will prompt you to install Xcode Command Line Tools automatically, or run <code>xcode-select --install</code>.</li>
+<li><strong>Linux (including WSL2):</strong> <code>sudo apt update &amp;&amp; sudo apt install git</code></li>
+<li><strong>macOS:</strong> Check with <code>git --version</code>. If it is missing, macOS prompts for Xcode Command Line Tools, or run <code>xcode-select --install</code>.</li>
 </ul>
-<p><strong>pixi</strong> — A fast, cross-platform package manager. <code>sudo</code> is not required — pixi installs to <code>~/.pixi/</code> under your own user account, and each project environment lives inside the project folder under <code>.pixi/envs/</code>. For the full installation guide, see <a href="https://pixi.prefix.dev/latest/installation" class="uri">https://pixi.prefix.dev/latest/installation</a>.</p>
+<p><strong>pixi.</strong> Fast, cross-platform package manager. <code>sudo</code> is not required. pixi installs to <code>~/.pixi/</code> under your user account. Each project environment lives in <code>.pixi/envs/</code> inside the project folder. Install guide: <a href="https://pixi.prefix.dev/latest/installation" class="uri">https://pixi.prefix.dev/latest/installation</a>.</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Choose one depending on what is available on your system</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://pixi.sh/install.sh <span class="kw">|</span> <span class="fu">sh</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># or</span></span>
@@ -420,26 +422,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify installation</span></span>
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> <span class="at">--version</span></span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Expected: pixi 0.63.2  (or newer)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p><strong>VSCode</strong> — Download and install from <a href="https://code.visualstudio.com" class="uri">https://code.visualstudio.com</a>. After installation, open the <strong>Extensions</strong> panel (<code>Ctrl+Shift+X</code> / <code>Cmd+Shift+X</code>) and install the <strong>Python</strong> extension by Microsoft. This provides Jupyter notebook support and Python IntelliSense. Windows users should also install the <strong>WSL</strong> extension to open projects inside WSL2 directly from VSCode.</p>
+<p><strong>VSCode.</strong> Download from <a href="https://code.visualstudio.com" class="uri">https://code.visualstudio.com</a>. Open <strong>Extensions</strong> (<code>Ctrl+Shift+X</code> / <code>Cmd+Shift+X</code>) and install the <strong>Python</strong> extension by Microsoft. That adds Jupyter notebook support and Python IntelliSense. On Windows, also install the <strong>WSL</strong> extension so VSCode can open the project inside WSL2.</p>
 </section>
 <section id="step-1-clone-the-course-repository" class="level3">
 <h3 class="anchored" data-anchor-id="step-1-clone-the-course-repository">Step 1: Clone the Course Repository</h3>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> students https://github.com/GLI-Lab/dm-2026-fall.git</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dm-2026-fall</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>After cloning, the repository structure will look like this:</p>
+<p>After cloning, the repository looks like this:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dm-2026-fall/</span>                  <span class="co"># course repository root</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> pixi.toml                  <span class="co"># dependency declarations</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> pixi.lock                  <span class="co"># exact pinned versions</span></span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> data/                      <span class="co"># shared datasets (paths are from the repo root)</span></span>
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> assignments/               <span class="co"># homework starter code</span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> exercises/                 <span class="co"># lab notebooks</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Shared datasets live in <code>data/</code> at the repository root. Lab 1 notebooks import <code>data.loader</code>, which always looks there; <code>lab01_setup.py</code> puts the repo root on <code>sys.path</code> even when the working directory is <code>exercises/lab01/</code>.</p>
+<p>Shared datasets live in <code>data/</code> at the repository root. Labs import <code>data.loader</code>, which finds files there and downloads anything missing. <code>lab01_setup.py</code> and Lab 2 <code>helper.py</code> put the repo root on <code>sys.path</code> even when the working directory is the lab folder.</p>
 </section>
 <section id="step-2-install-all-required-packages" class="level3">
 <h3 class="anchored" data-anchor-id="step-2-install-all-required-packages">Step 2: Install All Required Packages</h3>
-<p>Navigate into the repository folder and run:</p>
+<p>From the repository folder:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This reads <code>pixi.lock</code> and installs every package at its exact pinned version. The full dependency list is declared in <code>pixi.toml</code>:</p>
+<p>This reads <code>pixi.lock</code> and installs every package at its pinned version. The list is in <code>pixi.toml</code>:</p>
 <div class="code-with-filename">
 <div class="code-with-filename-file">
 <pre><strong>pixi.toml</strong></pre>
@@ -457,11 +459,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="dt">mlxtend</span> <span class="op">=</span> <span class="st">"*"</span></span>
 <span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="dt">gensim</span> <span class="op">=</span> <span class="st">"&gt;=4.3.3"</span></span>
 <span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="dt">jupyterlab</span> <span class="op">=</span> <span class="st">"*"</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a><span class="kw">[tasks]</span></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="dt">lab</span> <span class="op">=</span> <span class="st">"jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="dt">kagglehub</span> <span class="op">=</span> <span class="st">"&gt;=1.0.2,&lt;2"</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="kw">[tasks]</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="dt">lab</span> <span class="op">=</span> <span class="st">"jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>You do not need to install any of these separately — <code>pixi install</code> takes care of everything. This course does <strong>not</strong> require PyTorch or a GPU.</p>
+<p>You do not need to install these separately. <code>pixi install</code> handles them. This course does <strong>not</strong> require PyTorch or a GPU.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -472,25 +475,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>When <code>pixi.lock</code> exists (the normal case after cloning), pixi installs exact pinned versions with no solver step — this is fast.</p>
-<p>When no lock file exists, pixi reads constraints from <code>pixi.toml</code>, resolves versions, writes a new <code>pixi.lock</code>, then installs. This is slower due to the resolver, but only happens once.</p>
-<p>When <code>pixi.toml</code> is modified (e.g., after <code>pixi add &lt;package&gt;</code>), the lock file is updated automatically on the next <code>pixi install</code> or <code>pixi run</code>.</p>
+<p>When <code>pixi.lock</code> exists (the usual case after cloning), pixi installs pinned versions with no solver step. This is fast.</p>
+<p>When no lock file exists, pixi reads <code>pixi.toml</code>, resolves versions, writes <code>pixi.lock</code>, then installs. This is slower and happens only once.</p>
+<p>When <code>pixi.toml</code> changes (for example after <code>pixi add &lt;package&gt;</code>), the lock file updates on the next <code>pixi install</code> or <code>pixi run</code>.</p>
 </div>
 </div>
 </section>
 <section id="step-3-open-a-lab-notebook" class="level3">
 <h3 class="anchored" data-anchor-id="step-3-open-a-lab-notebook">Step 3: Open a Lab Notebook</h3>
-<p>You can open lab notebooks using either JupyterLab or VSCode. Both work with the pixi environment.</p>
-<p><strong>JupyterLab</strong> — Launch from the repository root:</p>
+<p>Open lab notebooks in JupyterLab or VSCode. Both use the pixi environment.</p>
+<p><strong>JupyterLab.</strong> Launch from the repository root:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run lab</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>This starts a JupyterLab server on port 8888. It does not open a browser automatically, so copy the URL printed in your terminal and paste it into your browser. The URL will look like this:</p>
+<p>This starts JupyterLab on port 8888. It does not open a browser. Copy the URL from the terminal into your browser. It looks like this:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">http://127.0.0.1:8888/lab?token=your_token_here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Use this command at the start of every lab session.</p>
-<p><strong>VSCode</strong> — Open the repository folder in VSCode, then select the pixi kernel for your notebooks:</p>
+<p><strong>VSCode.</strong> Open the repository folder, then select the pixi kernel:</p>
 <ol type="1">
 <li>Open any <code>.ipynb</code> file in VSCode.</li>
-<li>Click <strong>Select Kernel</strong> in the top-right corner of the notebook editor.</li>
-<li>Choose <strong>Python Environments</strong>, then select the interpreter located at <code>.pixi/envs/default/bin/python</code> inside the repository folder.</li>
+<li>Click <strong>Select Kernel</strong> in the top-right of the notebook editor.</li>
+<li>Choose <strong>Python Environments</strong>, then the interpreter at <code>.pixi/envs/default/bin/python</code> inside the repository.</li>
 </ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -502,22 +505,22 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For all regular lab work, <code>pixi run lab</code> or opening notebooks in VSCode is all you need. If you prefer staying in an activated shell for an extended session, run <code>pixi shell</code> to activate the environment directly, then launch tools from there. Exit with <code>exit</code> when done.</p>
+<p>For regular lab work, <code>pixi run lab</code> or opening notebooks in VSCode is enough. For a longer session in an activated shell, run <code>pixi shell</code>, then launch tools from there. Exit with <code>exit</code> when done.</p>
 </div>
 </div>
 </section>
 </section>
 <section id="option-b-cloud-google-colab" class="level2">
 <h2 class="anchored" data-anchor-id="option-b-cloud-google-colab">Option B (Cloud): Google Colab</h2>
-<p>Google Colab lets you run any lab notebook directly in your browser with no local installation. To open a lab, click the Colab badge at the top of each notebook:</p>
+<p>Google Colab runs a lab notebook in the browser with no local install. Open a lab with the Colab badge at the top of each notebook:</p>
 <p><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></p>
-<p>Colab already has many course packages pre-installed, including <code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>, and <code>sklearn</code>. You may need to install course-specific packages (<code>networkx</code>, <code>nltk</code>, <code>mlxtend</code>, <code>gensim</code>, …) by running the setup cell at the very top of each notebook, which will look like this:</p>
+<p>Colab already has many course packages, including <code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>, and <code>sklearn</code>. Install course-specific packages (<code>networkx</code>, <code>nltk</code>, <code>mlxtend</code>, <code>gensim</code>, <code>kagglehub</code>, …) with the setup cell at the top of each notebook:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run this cell only if you are on Google Colab</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">&lt;</span>course<span class="op">-</span>specific<span class="op">-</span>package<span class="op">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Lab notebooks that use datasets stored in the course repository (under <code>data/</code>) require an extra step on Colab. Since Colab cannot access your local file system, clone the course repository at the start of each session:</p>
+<p>Notebooks that use files under <code>data/</code> need an extra step on Colab. Colab cannot see your local disk, so clone the course repository at the start of each session:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Run this cell only if you are on Google Colab</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>git clone <span class="op">-</span>b students https:<span class="op">//</span>github.com<span class="op">/</span>GLI<span class="op">-</span>Lab<span class="op">/</span>dm<span class="op">-</span><span class="dv">2026</span><span class="op">-</span>fall.git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Each notebook will include this cell already. You just need to run it before proceeding.</p>
+<p>Each notebook already includes this cell. Run it before the rest.</p>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -528,8 +531,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Colab environments are <strong>ephemeral</strong>: any package you install or file you download is lost when the session ends or times out. You will need to re-run all setup cells at the start of every new session.</p>
-<p>For consistent, persistent environments across all labs, the local pixi setup (Option A) is strongly recommended.</p>
+<p>Colab environments are <strong>ephemeral</strong>. Packages you install and files you download disappear when the session ends or times out. Re-run all setup cells at the start of every new session.</p>
+<p>For a persistent environment across labs, use the local pixi setup (Option A).</p>
 </div>
 </div>
 

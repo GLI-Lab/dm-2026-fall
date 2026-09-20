@@ -142,10 +142,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span class="menu-text">Exercises</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../assignments/index.html"> 
-<span class="menu-text">Assignments</span></a>
-  </li>  
-  <li class="nav-item">
     <a class="nav-link" href="http://gli.konkuk.ac.kr"> <i class="bi bi-link-45deg" role="img">
 </i> 
 <span class="menu-text">GLI Lab</span></a>
@@ -185,8 +181,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/environment-setup.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Python Environment Setup</span></a>
+  <a href="../../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (한)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/environment-setup-en.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Environment Setup (en)</span></a>
   </div>
 </li>
           <li class="sidebar-item sidebar-item-section">
@@ -276,19 +278,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth2 ">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-1.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-1.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Cleaning, Aggregation, Sampling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-2.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-2.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Discretization, Binarization, Scaling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../../exercises/lab02/Lab02-3.html" class="sidebar-item-text sidebar-link">
+  <a href="../../exercises/lab02/lab02-3.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Similarity Graph</span></a>
   </div>
 </li>
@@ -341,7 +343,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.17</p>
+      <p class="date-modified">2026.09.20</p>
     </div>
   </div>
     
@@ -367,7 +369,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="load-the-data" class="level2">
 <h2 class="anchored" data-anchor-id="load-the-data">1.1 Load the Data</h2>
 <p><code>load_titanic()</code> reads <code>data/record/titanic.csv</code>. If that file is missing, it downloads the seaborn Titanic table and saves it there.</p>
-<div id="c42d8b51" class="cell" data-execution_count="2">
+<div id="a7f505a2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> data.loader <span class="im">import</span> load_titanic</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>titanic_raw <span class="op">=</span> load_titanic()</span>
@@ -377,7 +379,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>(pandas.DataFrame, (891, 15))</code></pre>
 </div>
 </div>
-<div id="24e4998e" class="cell" data-execution_count="3">
+<div id="25ae279e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>titanic_raw.columns.tolist()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <pre><code>['survived',
@@ -397,7 +399,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  'alone']</code></pre>
 </div>
 </div>
-<div id="9946fc31" class="cell" data-execution_count="4">
+<div id="1951cbd4" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>selected_columns <span class="op">=</span> [</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"survived"</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"pclass"</span>,</span>
@@ -415,7 +417,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>(pandas.DataFrame, (891, 7))</code></pre>
 </div>
 </div>
-<div id="1c9cef19" class="cell" data-execution_count="5">
+<div id="7076a987" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>titanic.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="5">
 <div>
@@ -491,7 +493,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<div id="e8164905" class="cell" data-execution_count="6">
+<div id="ac918ae8" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>titanic[<span class="st">"survived"</span>].value_counts()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="6">
 <pre><code>survived
@@ -505,19 +507,19 @@ Name: count, dtype: int64</code></pre>
 <h2 class="anchored" data-anchor-id="representation-1-numerical-feature-matrix">1.2 Representation 1: Numerical Feature Matrix</h2>
 <p>The same passenger records can be represented as <strong>numerical vectors</strong>.</p>
 <p><code>survived</code> is excluded because it represents the outcome rather than an input feature.</p>
-<div id="d64d71de" class="cell" data-execution_count="7">
+<div id="65e8edcd" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>X_numeric <span class="op">=</span> titanic.drop(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[<span class="st">"survived"</span>]</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>).copy()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Missing values in <code>age</code> and <code>embarked</code> are filled before conversion.</p>
-<div id="cee1e6cc" class="cell" data-execution_count="8">
+<div id="5f1e61f0" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>X_numeric <span class="op">=</span> fill_titanic_missing_values(</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    X_numeric</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>pd.get_dummies()</code> converts categorical values into binary (0/1) indicator columns.</p>
-<div id="434c9af6" class="cell" data-execution_count="9">
+<div id="f47f0f2b" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>X_numeric <span class="op">=</span> pd.get_dummies(</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    X_numeric,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    columns<span class="op">=</span>[</span>
@@ -534,7 +536,7 @@ Name: count, dtype: int64</code></pre>
 <pre><code>(pandas.DataFrame, (891, 12))</code></pre>
 </div>
 </div>
-<div id="8f3747a0" class="cell" data-execution_count="10">
+<div id="6fe69e84" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>X_numeric.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="10">
 <div>
@@ -640,14 +642,26 @@ Name: count, dtype: int64</code></pre>
 </div>
 </div>
 </div>
-<p><strong>Think:</strong> Is this a different dataset?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Is this a different dataset?<br>
 No.&nbsp;The passengers are the same. Only their representation has changed from mixed data types to numerical values.</p>
+</div>
+</div>
 </section>
 <section id="representation-2-transaction-representation" class="level2">
 <h2 class="anchored" data-anchor-id="representation-2-transaction-representation">1.3 Representation 2: Transaction Representation</h2>
 <p>The same passenger can also be represented as a <strong>set of attribute-value items</strong>.</p>
 <p><code>pd.cut()</code> and <code>pd.qcut()</code> discretize continuous values into categories.</p>
-<div id="236ebd21" class="cell" data-execution_count="11">
+<div id="520b8686" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>titanic_tx <span class="op">=</span> fill_titanic_missing_values(</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    titanic.copy()</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -676,7 +690,7 @@ No.&nbsp;The passengers are the same. Only their representation has changed from
 <span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p><code>build_transactions()</code> converts each passenger into a set of attribute-value items.</p>
-<div id="fc1a7f0a" class="cell" data-execution_count="12">
+<div id="f3b198a5" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>transactions <span class="op">=</span> build_transactions(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    titanic_tx</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -686,7 +700,7 @@ No.&nbsp;The passengers are the same. Only their representation has changed from
 <pre><code>(pandas.Series, list)</code></pre>
 </div>
 </div>
-<div id="44446271" class="cell" data-execution_count="13">
+<div id="0d65c588" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, items <span class="kw">in</span> transactions.head().items():</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(i, <span class="st">":"</span>, items)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
@@ -697,14 +711,26 @@ No.&nbsp;The passengers are the same. Only their representation has changed from
 4 : ['pclass=3', 'sex=male', 'embarked=S', 'alone=True', 'age_group=young_adult', 'fare_group=medium']</code></pre>
 </div>
 </div>
-<p><strong>Think:</strong> What changed from the original record representation?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>What changed from the original record representation?<br>
 The passenger is now represented as a set of attribute-value items.</p>
+</div>
+</div>
 </section>
 <section id="representation-3-binary-item-matrix" class="level2">
 <h2 class="anchored" data-anchor-id="representation-3-binary-item-matrix">1.4 Representation 3: Binary Item Matrix</h2>
 <p>The transaction representation can be converted into a <strong>binary matrix</strong>.</p>
 <p><code>MultiLabelBinarizer</code> converts each passenger’s set of items into binary (0/1) columns, one for each possible item.</p>
-<div id="a160409c" class="cell" data-execution_count="14">
+<div id="ebeb4af0" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>mlb <span class="op">=</span> MultiLabelBinarizer()</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>X_items <span class="op">=</span> mlb.fit_transform(</span>
@@ -722,7 +748,7 @@ The passenger is now represented as a set of attribute-value items.</p>
 <pre><code>(pandas.DataFrame, (891, 19))</code></pre>
 </div>
 </div>
-<div id="3b86cf56" class="cell" data-execution_count="15">
+<div id="f845f606" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>item_matrix.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="15">
 <div>
@@ -877,8 +903,20 @@ The passenger is now represented as a set of attribute-value items.</p>
 <li>Value = 1 if the passenger has that item</li>
 <li>Value = 0 if the passenger does not have that item</li>
 </ul>
-<p><strong>Think:</strong> Does the binary matrix contain new information?<br>
+<div class="callout callout-style-default callout-tip callout-titled" title="Think">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Think
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Does the binary matrix contain new information?<br>
 No.&nbsp;It represents the same transaction information in matrix form.</p>
+</div>
+</div>
 </section>
 <section id="representation-4-passenger-attribute-bipartite-graph" class="level2">
 <h2 class="anchored" data-anchor-id="representation-4-passenger-attribute-bipartite-graph">1.5 Representation 4: Passenger-Attribute Bipartite Graph</h2>
@@ -889,7 +927,7 @@ No.&nbsp;It represents the same transaction information in matrix form.</p>
 <li>Attribute-value nodes</li>
 </ul>
 <p>An edge connects a passenger to an attribute-value item that belongs to that passenger.</p>
-<div id="44c59b21" class="cell" data-execution_count="16">
+<div id="fa834328" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>G <span class="op">=</span> build_bipartite_graph(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    transactions,</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    n_show<span class="op">=</span><span class="dv">6</span>,</span>
@@ -900,13 +938,13 @@ No.&nbsp;It represents the same transaction information in matrix form.</p>
 <pre><code>networkx.classes.graph.Graph</code></pre>
 </div>
 </div>
-<div id="e7c4d545" class="cell" data-execution_count="17">
+<div id="43a9d511" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>G.number_of_nodes(), G.number_of_edges()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="17">
 <pre><code>(20, 36)</code></pre>
 </div>
 </div>
-<div id="8d4834ad" class="cell" data-execution_count="18">
+<div id="92877f46" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="bu">list</span>(G.edges())[:<span class="dv">10</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="18">
 <pre><code>[('Passenger 0', 'pclass=3'),
@@ -921,7 +959,7 @@ No.&nbsp;It represents the same transaction information in matrix form.</p>
  ('sex=male', 'Passenger 4')]</code></pre>
 </div>
 </div>
-<div id="e912635c" class="cell" data-fig-height="5.5" data-fig-width="7" data-execution_count="19">
+<div id="afbe0088" class="cell" data-fig-height="5.5" data-fig-width="7" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>plot_bipartite_graph(G)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display">
 <div class="quarto-figure quarto-figure-center">

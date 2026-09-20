@@ -8,7 +8,7 @@
 
 <meta name="author" content="Byungkook Oh">
 
-<title>Exercises Guide – Data Mining</title>
+<title>Environment Setup (한) – Data Mining</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -155,7 +155,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup-ko.html">Environment Setup (한)</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
     </div>
@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <ul class="list-unstyled mt-1">
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
-            <a href="../exercises/index.html" class="sidebar-item-text sidebar-link active">
+            <a href="../exercises/index.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Exercises</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
@@ -178,7 +178,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link">
+  <a href="../exercises/environment-setup-ko.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Environment Setup (한)</span></a>
   </div>
 </li>
@@ -305,24 +305,25 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#labs" id="toc-labs" class="nav-link active" data-scroll-target="#labs">Labs</a></li>
-  <li><a href="#datasets" id="toc-datasets" class="nav-link" data-scroll-target="#datasets">Datasets</a></li>
-  <li><a href="#workflow" id="toc-workflow" class="nav-link" data-scroll-target="#workflow">Workflow</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#option-a-로컬-pixi-vscode-또는-jupyterlab" id="toc-option-a-로컬-pixi-vscode-또는-jupyterlab" class="nav-link" data-scroll-target="#option-a-로컬-pixi-vscode-또는-jupyterlab">Option A (로컬): pixi + VSCode 또는 JupyterLab</a>
   <ul class="collapse">
-  <li><a href="#step-1-set-up-the-environment" id="toc-step-1-set-up-the-environment" class="nav-link" data-scroll-target="#step-1-set-up-the-environment">Step 1: Set Up the Environment</a></li>
-  <li><a href="#step-2-open-the-lab-notebook" id="toc-step-2-open-the-lab-notebook" class="nav-link" data-scroll-target="#step-2-open-the-lab-notebook">Step 2: Open the Lab Notebook</a></li>
-  <li><a href="#step-3-run-and-observe" id="toc-step-3-run-and-observe" class="nav-link" data-scroll-target="#step-3-run-and-observe">Step 3: Run and Observe</a></li>
-  <li><a href="#step-4-experiment-freely" id="toc-step-4-experiment-freely" class="nav-link" data-scroll-target="#step-4-experiment-freely">Step 4: Experiment Freely</a></li>
+  <li><a href="#pixi를-쓰는-이유" id="toc-pixi를-쓰는-이유" class="nav-link" data-scroll-target="#pixi를-쓰는-이유">pixi를 쓰는 이유</a></li>
+  <li><a href="#사전-요구사항" id="toc-사전-요구사항" class="nav-link" data-scroll-target="#사전-요구사항">사전 요구사항</a></li>
+  <li><a href="#step-1-수업-저장소-clone" id="toc-step-1-수업-저장소-clone" class="nav-link" data-scroll-target="#step-1-수업-저장소-clone">Step 1: 수업 저장소 clone</a></li>
+  <li><a href="#step-2-패키지-설치" id="toc-step-2-패키지-설치" class="nav-link" data-scroll-target="#step-2-패키지-설치">Step 2: 패키지 설치</a></li>
+  <li><a href="#step-3-실습-노트북-열기" id="toc-step-3-실습-노트북-열기" class="nav-link" data-scroll-target="#step-3-실습-노트북-열기">Step 3: 실습 노트북 열기</a></li>
   </ul></li>
+  <li><a href="#option-b-클라우드-google-colab" id="toc-option-b-클라우드-google-colab" class="nav-link" data-scroll-target="#option-b-클라우드-google-colab">Option B (클라우드): Google Colab</a></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default">
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../exercises/index.html">Exercises</a></li><li class="breadcrumb-item"><a href="../exercises/environment-setup-ko.html">Environment Setup (한)</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Exercises Guide</h1>
+<h1 class="title">Environment Setup (한)</h1>
 </div>
 
 
@@ -351,222 +352,191 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<section id="labs" class="level2">
-<h2 class="anchored" data-anchor-id="labs">Labs</h2>
-<p>Labs are <strong>not graded</strong>. They are the hands-on companion to each lecture unit. Each lab is a short session: load data, build representations, visualize them, and see what each form makes easy or hides.</p>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>이 수업은 실습 환경을 두 가지로 둠. 본인 환경에 맞는 쪽을 고름.</p>
+<p><strong>Option A (로컬): pixi + VSCode 또는 JupyterLab.</strong> 권장함. 의존성은 lock 파일에 고정되어 있어 학생마다 같은 환경이 됨. 컴퓨터에 한 번만 설치하면 됨.</p>
+<p><strong>Option B (클라우드): Google Colab.</strong> 설치가 필요 없음. 각 노트북 상단 Colab 배지로 브라우저에서 실습을 염. 로컬 환경을 안 만들 때 씀.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>권장
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><strong>Option A</strong>를 권장함. pixi 환경이 강의자 설정과 같아서 디버깅·채점이 수월함.</p>
+<p>Option B는 대안임. Colab 세션은 끝나면 사라짐. 다시 연결할 때마다 setup 셀을 다시 실행함.</p>
+</div>
+</div>
+<p>두 옵션 모두 필요한 패키지를 쓸 수 있음. 아래는 각 옵션의 절차임.</p>
+</section>
+<section id="option-a-로컬-pixi-vscode-또는-jupyterlab" class="level2">
+<h2 class="anchored" data-anchor-id="option-a-로컬-pixi-vscode-또는-jupyterlab">Option A (로컬): pixi + VSCode 또는 JupyterLab</h2>
+<section id="pixi를-쓰는-이유" class="level3">
+<h3 class="anchored" data-anchor-id="pixi를-쓰는-이유">pixi를 쓰는 이유</h3>
+<p>conda나 mamba보다 환경 해결이 빠름. <code>pixi.lock</code>에 버전을 고정해서 학생마다 같은 패키지를 씀. conda 패키지와 pip 패키지를 한 워크플로에서 다룸.</p>
+</section>
+<section id="사전-요구사항" class="level3">
+<h3 class="anchored" data-anchor-id="사전-요구사항">사전 요구사항</h3>
+<p>아래 도구를 먼저 설치함.</p>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Important</span>Midterm and Final
+<span class="screen-reader-only">Important</span>Windows 사용자
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Labs are not graded, but they show what the exams will test.</p>
-<ul>
-<li><strong>Each unit:</strong> the concepts in that week’s code and <strong>Think</strong> questions.</li>
-<li><strong>Midterm and final:</strong> lecture definitions and formulas, plus the labs covered up to that exam. You will explain <em>why</em> a method or representation is used. Library function names and notebook boilerplate will not be tested.</li>
-</ul>
+<p>이 수업 환경은 <strong>Linux</strong>와 <strong>macOS</strong>만 지원함. Windows에서는 <strong>WSL2</strong>를 쓰고, Ubuntu 안에서 Linux 절차를 따름.</p>
+<ol type="1">
+<li>PowerShell을 관리자 권한으로 연 뒤 실행함:</li>
+</ol>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode powershell code-with-copy"><code class="sourceCode powershell"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>wsl <span class="op">--</span>install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<ol start="2" type="1">
+<li>안내가 나오면 재시작함.</li>
+<li>시작 메뉴에서 <strong>Ubuntu</strong> 앱을 열어 초기 설정(사용자 이름·비밀번호)을 마침.</li>
+<li>이후 단계는 이 Ubuntu 터미널에서 실행함.</li>
+</ol>
+<p>WSL2 설치 안내: <a href="https://learn.microsoft.com/en-us/windows/wsl/install" class="uri">https://learn.microsoft.com/en-us/windows/wsl/install</a></p>
 </div>
 </div>
-<p><strong>Lab 0: Python Prerequisites</strong></p>
+<p><strong>git.</strong> 수업 저장소를 clone할 때 필요함.</p>
 <ul>
-<li><a href="lab00/python-basics.html">Lab 0-1</a>: Python Basics</li>
-<li><a href="lab00/numpy-basics.html">Lab 0-2</a>: NumPy Basics</li>
-<li><a href="lab00/matplotlib-basics.html">Lab 0-3</a>: Matplotlib Basics</li>
-<li><a href="lab00/pandas-basics.html">Lab 0-4</a>: Pandas Basics</li>
+<li><strong>Linux (WSL2 포함):</strong> <code>sudo apt update &amp;&amp; sudo apt install git</code></li>
+<li><strong>macOS:</strong> <code>git --version</code>으로 확인함. 없으면 macOS가 Xcode Command Line Tools 설치를 안내하거나, <code>xcode-select --install</code>을 실행함.</li>
 </ul>
-<p><strong>Lab 1: Exploring Data Representations</strong></p>
-<ul>
-<li><a href="lab01/lab01-1-record.html">Lab 1-1</a>: Record Data: Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)</li>
-<li><a href="lab01/lab01-2-text.html">Lab 1-2</a>: Text Data: 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)</li>
-<li><a href="lab01/lab01-3-graph.html">Lab 1-3</a>: Graph Data: Zachary’s Karate Club (visualization, edge list, adjacency list, adjacency matrix)</li>
-<li><a href="lab01/lab01-4-interaction.html">Lab 1-4</a>: Interaction Data: MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)</li>
-<li><a href="lab01/lab01-5-transaction.html">Lab 1-5</a>: Transaction Data: Groceries (baskets, long table, binary matrix, co-occurrence graph)</li>
-</ul>
-<p><strong>Lab 2: Data Preprocessing</strong></p>
-<ul>
-<li><a href="lab02/lab02-1.html">Lab 2-1</a>: Cleaning, aggregation, and sampling: Titanic</li>
-<li><a href="lab02/lab02-2.html">Lab 2-2</a>: Discretization, binarization, and scaling: Iris and Titanic</li>
-<li><a href="lab02/lab02-3.html">Lab 2-3</a>: Similarity graphs (ε-graph, kNN, heat kernel): Iris and Moons</li>
-</ul>
-<p><strong>Later labs (TBD)</strong></p>
-<p>Additional labs will be posted as the corresponding lecture units are covered.</p>
+<p><strong>pixi.</strong> 빠른 크로스 플랫폼 패키지 관리자. <code>sudo</code>는 필요 없음. 사용자 계정 아래 <code>~/.pixi/</code>에 설치됨. 프로젝트 환경은 프로젝트 폴더의 <code>.pixi/envs/</code>에 둠. 설치 안내: <a href="https://pixi.prefix.dev/latest/installation" class="uri">https://pixi.prefix.dev/latest/installation</a>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 시스템에 있는 쪽을 씀</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">-fsSL</span> https://pixi.sh/install.sh <span class="kw">|</span> <span class="fu">sh</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 또는</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> <span class="at">-qO-</span> https://pixi.sh/install.sh <span class="kw">|</span> <span class="fu">sh</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># PATH 반영을 위해 셸을 다시 읽음</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> ~/.bashrc     <span class="co"># zsh면 ~/.zshrc</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 설치 확인</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> <span class="at">--version</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co"># 예: pixi 0.63.2  (또는 그 이상)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>VSCode.</strong> <a href="https://code.visualstudio.com" class="uri">https://code.visualstudio.com</a>에서 설치함. <strong>Extensions</strong> (<code>Ctrl+Shift+X</code> / <code>Cmd+Shift+X</code>)에서 Microsoft <strong>Python</strong> 확장을 설치함. Jupyter 노트북과 Python IntelliSense를 씀. Windows에서는 <strong>WSL</strong> 확장도 설치해서 VSCode가 WSL2 안 프로젝트를 열게 함.</p>
 </section>
-<section id="datasets" class="level2">
-<h2 class="anchored" data-anchor-id="datasets">Datasets</h2>
-<p>Original files live in the repository <code>data/</code> folder, not beside each notebook. Labs import <code>data.loader</code>, which finds those files and downloads anything that is missing. Details: <code>data/README.md</code>.</p>
-<p>You do not copy files into the lab folder. If a file is already under <code>data/</code>, it is not downloaded again. Only missing files are fetched.</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run python <span class="at">-m</span> data</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> data.loader <span class="im">import</span> check_datasets</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>check_datasets()                <span class="co"># download if missing, then load</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>check_datasets(download<span class="op">=</span><span class="va">False</span>)  <span class="co"># local files only</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Type</th>
-<th style="text-align: left;">Dataset</th>
-<th style="text-align: left;">Path</th>
-<th style="text-align: left;">Auto-download</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Record</td>
-<td style="text-align: left;">Titanic</td>
-<td style="text-align: left;"><code>data/record/titanic.csv</code></td>
-<td style="text-align: left;">seaborn <code>sns.load_dataset("titanic")</code> if missing</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Record</td>
-<td style="text-align: left;">Iris</td>
-<td style="text-align: left;"><code>data/record/iris.csv</code></td>
-<td style="text-align: left;"><code>sklearn.datasets.load_iris</code> if missing</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Text</td>
-<td style="text-align: left;">20 Newsgroups</td>
-<td style="text-align: left;"><code>data/text/20newsgroups/</code></td>
-<td style="text-align: left;"><code>sklearn.datasets.fetch_20newsgroups</code> if missing</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Graph</td>
-<td style="text-align: left;">Zachary’s Karate Club</td>
-<td style="text-align: left;"><code>data/graph/karate/</code> (<code>nodes.csv</code>, <code>edges.csv</code>)</td>
-<td style="text-align: left;">NetworkX <code>karate_club_graph()</code> if missing</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Graph</td>
-<td style="text-align: left;">Cora</td>
-<td style="text-align: left;"><code>data/graph/cora/</code> (<code>nodes.csv</code>, <code>edges.csv</code>)</td>
-<td style="text-align: left;"><a href="https://temprl.com/nodes.csv">temprl.com/nodes.csv</a>, <a href="https://temprl.com/edges.csv">temprl.com/edges.csv</a> if missing (<a href="https://graphsandnetworks.com/the-cora-dataset/">Cora</a>)</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Interaction</td>
-<td style="text-align: left;">MovieLens 100K</td>
-<td style="text-align: left;"><code>data/interaction/Movielens/</code> (<code>u.data</code>, <code>u.item</code>, <code>u.user</code>)</td>
-<td style="text-align: left;">kagglehub <a href="https://www.kaggle.com/datasets/trishna8/movielens-100k-dataset"><code>trishna8/movielens-100k-dataset</code></a> if missing</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Transaction</td>
-<td style="text-align: left;">Groceries (arules)</td>
-<td style="text-align: left;"><code>data/transaction/groceries.csv</code></td>
-<td style="text-align: left;">shipped in the repo; else GitHub <a href="https://github.com/stedy/Machine-Learning-with-R-datasets/blob/master/groceries.csv"><code>stedy/Machine-Learning-with-R-datasets</code></a></td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Transaction</td>
-<td style="text-align: left;">Groceries Kaggle (raw)</td>
-<td style="text-align: left;"><code>data/transaction/groceries_kaggle(raw).csv</code></td>
-<td style="text-align: left;">kagglehub <a href="https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset"><code>heeraldedhia/groceries-dataset</code></a> if missing</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Transaction</td>
-<td style="text-align: left;">Groceries Kaggle (baskets)</td>
-<td style="text-align: left;"><code>data/transaction/groceries_kaggle.csv</code></td>
-<td style="text-align: left;">built from raw by <code>(Member_number, Date)</code></td>
-</tr>
-</tbody>
-</table>
-<p>Moons (Lab 2-3) is not under <code>data/</code>. It comes from <code>sklearn.datasets.make_moons</code>.</p>
-<p>Do not download files one by one in the browser. If kagglehub asks for auth, get an API token from <a href="https://www.kaggle.com/settings">Kaggle Settings</a> and put it at <code>~/.kaggle/kaggle.json</code>.</p>
-<p>MovieLens 100K needs a separate GroupLens redistribution permission. The repo ships code only. Each person downloads the data locally.</p>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 50%">
-<col style="width: 50%">
-</colgroup>
-<thead>
-<tr class="header">
-<th style="text-align: left;">Function</th>
-<th style="text-align: left;">Role</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;"><code>load_titanic()</code></td>
-<td style="text-align: left;">Titanic table</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>load_iris()</code></td>
-<td style="text-align: left;">Iris table</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>load_20newsgroups()</code></td>
-<td style="text-align: left;">20 Newsgroups documents</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>ensure_karate()</code> / <code>load_karate()</code></td>
-<td style="text-align: left;">Karate Club nodes, edges, and graph</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>ensure_cora()</code> / <code>load_cora()</code></td>
-<td style="text-align: left;">Cora citation network</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>ensure_movielens()</code> / <code>load_movielens_100k()</code> / <code>load_movies()</code> / <code>load_users()</code></td>
-<td style="text-align: left;">MovieLens folder and tables</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>ensure_groceries()</code> / <code>load_groceries(path)</code></td>
-<td style="text-align: left;">arules basket CSV</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>ensure_groceries_kaggle_raw()</code></td>
-<td style="text-align: left;">Kaggle long-format CSV</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;"><code>ensure_groceries_kaggle()</code></td>
-<td style="text-align: left;">Kaggle basket CSV</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;"><code>check_datasets()</code></td>
-<td style="text-align: left;">load all of the above and return a status table</td>
-</tr>
-</tbody>
-</table>
+<section id="step-1-수업-저장소-clone" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-수업-저장소-clone">Step 1: 수업 저장소 clone</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone <span class="at">-b</span> students https://github.com/GLI-Lab/dm-2026-fall.git</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> dm-2026-fall</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>clone 후 저장소 구조는 아래와 같음.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">dm-2026-fall/</span>                  <span class="co"># 수업 저장소 루트</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> pixi.toml                  <span class="co"># 의존성 선언</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> pixi.lock                  <span class="co"># 고정된 버전</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> data/                      <span class="co"># 공유 데이터셋 (경로는 저장소 루트 기준)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="ex">├──</span> assignments/               <span class="co"># 과제 스타터</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="ex">└──</span> exercises/                 <span class="co"># 실습 노트북</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>공유 데이터는 저장소 루트 <code>data/</code>에 둠. 실습은 <code>data.loader</code>를 import함. 로더가 그 경로에서 파일을 찾고, 없으면 받음. <code>lab01_setup.py</code>와 Lab 2 <code>helper.py</code>는 작업 폴더가 lab 폴더여도 저장소 루트를 <code>sys.path</code>에 넣음.</p>
 </section>
-<section id="workflow" class="level2">
-<h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
-<section id="step-1-set-up-the-environment" class="level3">
-<h3 class="anchored" data-anchor-id="step-1-set-up-the-environment">Step 1: Set Up the Environment</h3>
-<p>Follow <a href="environment-setup-ko.html">Environment Setup (한)</a> or <a href="environment-setup-en.html">Environment Setup (en)</a> before opening any lab. Activate the course <code>pixi</code> environment so NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.</p>
-</section>
-<section id="step-2-open-the-lab-notebook" class="level3">
-<h3 class="anchored" data-anchor-id="step-2-open-the-lab-notebook">Step 2: Open the Lab Notebook</h3>
-<p>Launch the notebook with JupyterLab or VS Code from the <strong>repository root</strong>. Open Lab 1 notebooks from <code>exercises/lab01/</code> and Lab 2 notebooks from <code>exercises/lab02/</code> so helpers import cleanly. <code>lab01_setup.py</code> and Lab 2 <code>helper.py</code> put the repository root on <code>sys.path</code> so <code>from data.loader import ...</code> works.</p>
+<section id="step-2-패키지-설치" class="level3">
+<h3 class="anchored" data-anchor-id="step-2-패키지-설치">Step 2: 패키지 설치</h3>
+<p>저장소 폴더에서 실행함.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> install</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>pixi.lock</code>을 읽고 고정 버전으로 설치함. 목록은 <code>pixi.toml</code>에 있음.</p>
+<div class="code-with-filename">
+<div class="code-with-filename-file">
+<pre><strong>pixi.toml</strong></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6" data-filename="pixi.toml"><pre class="sourceCode toml code-with-copy"><code class="sourceCode toml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">[dependencies]</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="dt">python</span> <span class="op">=</span> <span class="st">"3.12.*"</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dt">numpy</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="dt">scipy</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="dt">pandas</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="dt">scikit-learn</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="dt">matplotlib</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="dt">seaborn</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="dt">nltk</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="dt">networkx</span> <span class="op">=</span> <span class="st">"&gt;=3.1"</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="dt">mlxtend</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="dt">gensim</span> <span class="op">=</span> <span class="st">"&gt;=4.3.3"</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="dt">jupyterlab</span> <span class="op">=</span> <span class="st">"*"</span></span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a><span class="dt">kagglehub</span> <span class="op">=</span> <span class="st">"&gt;=1.0.2,&lt;2"</span></span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="kw">[tasks]</span></span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="dt">lab</span> <span class="op">=</span> <span class="st">"jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>따로 설치할 필요 없음. <code>pixi install</code>이 처리함. 이 수업은 PyTorch나 GPU가 <strong>필요 없음</strong>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Running Cells in Order
+<span class="screen-reader-only">Note</span><code>pixi install</code> 동작
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports are missing.</p>
+<p><code>pixi.lock</code>이 있으면 (clone 후 보통 이 경우) solver 없이 고정 버전만 설치함. 빠름.</p>
+<p>lock 파일이 없으면 <code>pixi.toml</code>을 읽고 버전을 푼 뒤 <code>pixi.lock</code>을 쓰고 설치함. 한 번만 느림.</p>
+<p><code>pixi.toml</code>이 바뀌면 (<code>pixi add &lt;package&gt;</code> 등) 다음 <code>pixi install</code> 또는 <code>pixi run</code>에서 lock이 갱신됨.</p>
 </div>
 </div>
 </section>
-<section id="step-3-run-and-observe" class="level3">
-<h3 class="anchored" data-anchor-id="step-3-run-and-observe">Step 3: Run and Observe</h3>
-<p><strong>Lab 0 and Lab 1</strong> do not ask you to fill in <code>TODO</code> blocks. Working code is provided. Run the cells, read the notes, and see how the same observations look as a matrix, a graph, a sequence, or a set of transactions. Watch shapes, sparsity, and what was stored versus derived.</p>
-<p><strong>Lab 2:</strong> implement the <code>TODO</code> functions in <code>lab02_*.py</code> first, restart the kernel, then run the matching notebook from the top. On the course site, Practice outputs are the expected results after those functions are implemented.</p>
+<section id="step-3-실습-노트북-열기" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-실습-노트북-열기">Step 3: 실습 노트북 열기</h3>
+<p>JupyterLab 또는 VSCode로 염. 둘 다 pixi 환경을 씀.</p>
+<p><strong>JupyterLab.</strong> 저장소 루트에서 실행함.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run lab</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>포트 8888에서 JupyterLab이 뜸. 브라우저는 자동으로 안 염. 터미널에 나온 URL을 브라우저에 붙임. 형태는 아래와 같음.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">http://127.0.0.1:8888/lab?token=your_token_here</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>실습을 시작할 때마다 이 명령을 씀.</p>
+<p><strong>VSCode.</strong> 저장소 폴더를 연 뒤 pixi 커널을 고름.</p>
+<ol type="1">
+<li>VSCode에서 <code>.ipynb</code>를 염.</li>
+<li>노트북 오른쪽 위 <strong>Select Kernel</strong>을 누름.</li>
+<li><strong>Python Environments</strong>에서 저장소 안 <code>.pixi/envs/default/bin/python</code>을 고름.</li>
+</ol>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>평소 작업
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>평소 실습은 <code>pixi run lab</code>이거나 VSCode에서 노트북을 여는 것으로 충분함. 셸을 오래 쓰려면 <code>pixi shell</code>로 환경을 켠 뒤 도구를 실행함. 끝나면 <code>exit</code>.</p>
+</div>
+</div>
 </section>
-<section id="step-4-experiment-freely" class="level3">
-<h3 class="anchored" data-anchor-id="step-4-experiment-freely">Step 4: Experiment Freely</h3>
-<p>Labs are for exploration. After you have run the provided code, change things:</p>
-<ul>
-<li>Subsample users, items, documents, or transactions and watch the representations change.</li>
-<li>Swap one representation for another (for example a count matrix vs.&nbsp;TF-IDF, or an adjacency list vs.&nbsp;an adjacency matrix).</li>
-<li>Break things on purpose (a missing path, a wrong key, a dense matrix that should have stayed sparse) and read the error.</li>
-</ul>
-<p>Graded homework is posted on the <a href="../assignments/index.html">Assignments</a> page. Starter files appear in <code>assignments/</code> as each unit is released.</p>
+</section>
+<section id="option-b-클라우드-google-colab" class="level2">
+<h2 class="anchored" data-anchor-id="option-b-클라우드-google-colab">Option B (클라우드): Google Colab</h2>
+<p>Google Colab은 로컬 설치 없이 브라우저에서 실습 노트북을 실행함. 각 노트북 상단 Colab 배지로 염.</p>
+<p><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></p>
+<p>Colab에는 <code>numpy</code>, <code>pandas</code>, <code>matplotlib</code>, <code>sklearn</code> 등이 이미 있음. 수업 전용 패키지(<code>networkx</code>, <code>nltk</code>, <code>mlxtend</code>, <code>gensim</code>, <code>kagglehub</code> 등)는 노트북 맨 위 setup 셀로 설치함.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Google Colab에서만 이 셀을 실행함</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">&lt;</span>course<span class="op">-</span>specific<span class="op">-</span>package<span class="op">&gt;</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><code>data/</code> 아래 파일을 쓰는 노트북은 Colab에서 한 단계가 더 필요함. Colab은 로컬 디스크를 못 보므로, 세션 시작할 때 수업 저장소를 clone함.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Google Colab에서만 이 셀을 실행함</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>git clone <span class="op">-</span>b students https:<span class="op">//</span>github.com<span class="op">/</span>GLI<span class="op">-</span>Lab<span class="op">/</span>dm<span class="op">-</span><span class="dv">2026</span><span class="op">-</span>fall.git</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>이 셀은 노트북에 이미 있음. 나머지보다 먼저 실행함.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Colab 제한
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Colab 환경은 <strong>일시적</strong>임. 설치한 패키지와 받은 파일은 세션이 끝나거나 끊기면 사라짐. 새 세션마다 setup 셀을 다시 실행함.</p>
+<p>실습마다 같은 환경을 유지하려면 로컬 pixi (Option A)를 씀.</p>
+</div>
+</div>
 
 
-</section>
 </section>
 
 </main> <!-- /main -->
