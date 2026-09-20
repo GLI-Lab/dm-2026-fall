@@ -63,10 +63,17 @@ quarto --version
 ```
 
 ## 4. 로컬에서 작업하기
- 
+
 ```bash
 pixi install                 # 최초 1회
-pixi run quarto preview      # 파일을 저장하면 해당 문서만 다시 렌더링 + 브라우저 자동 새로고침
+
+# 1. _freeze / _site 갱신. freeze: auto라 바뀐 qmd만 다시 실행 (마크다운만 바꿔도 해당 파일은 다시 그림)
+pixi run quarto render
+#    qmd는 그대로인데 CSV 등 외부 데이터만 바뀐 경우
+pixi run quarto render -M freeze:false
+
+# 2. 브라우저로 확인. 저장하면 그 .qmd만 다시 그림 (마크다운 포함)
+pixi run quarto preview
 ```
 
 ## 5. 서버에 상시 프리뷰 띄우기 (PM2)
@@ -74,13 +81,20 @@ pixi run quarto preview      # 파일을 저장하면 해당 문서만 다시 �
 터미널을 종료해도 렌더링 결과를 계속 확인할 때
 
 ```bash
-# 수업서버 Preview 서버 시작 (파일 변경 시 자동 렌더링)
-pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4000 --host 0.0.0.0
-# 수업서버 Preview 서버 시작 (변경 감지 없음)
-pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4000 --host 0.0.0.0 --no-watch-inputs
+# 기존 _site를 띄움. 저장하면 그 .qmd만 다시 그림 (마크다운 포함). 시작 시 전체 재실행은 하지 않음
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0
+
+# (추천) 시작할 때 사이트 전체를 한 번 render한 뒤 띄움 (freeze: auto라 안 바뀐 qmd는 _freeze 재사용). 이후 저장 시 해당 파일만 다시 그림
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0 --render all
+
+# qmd는 그대로인데 CSV 등 외부 데이터만 바뀐 경우: 시작 시 freeze를 끄고 전부 다시 실행
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0 --render all -M freeze:false
+
+# 기존 _site만 서빙. 변경 감지 없음 (저장해도 다시 그리지 않음)
+pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.0.0.0 --no-watch-inputs
 ```
 
-접속: `http://<서버IP>:4000`
+접속: `http://<서버IP>:4001`
 
 ```bash
 # 재시작 / 제거
@@ -117,4 +131,4 @@ git commit -m "..."
 git push
 ```
 
-즉, `qmd`만 수정하고 렌더 결과를 갱신하지 않으면 원본과 산출물이 서로 어긋날 수 있습니다.
+즉, `qmd`만 수정하고 렌더 결과를 갱신하지 않으면 원본과 산출물이 서로 어긋날 수 있습니다. CSV만 바뀐 경우에는 4절의 `quarto render -M freeze:false`를 쓰면 됩니다.
