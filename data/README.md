@@ -21,6 +21,7 @@ check_datasets(download=False)  # 로컬만 검사
 | 타입 | 데이터 | 경로 | 자동 다운로드 |
 |:---|:---|:---|:---|
 | Record | Titanic | `record/titanic.csv` | 없으면 seaborn `sns.load_dataset("titanic")` |
+| Record | Iris | `record/iris.csv` | 없으면 `sklearn.datasets.load_iris` |
 | Text | 20 Newsgroups | `text/20newsgroups/` | 없으면 `sklearn.datasets.fetch_20newsgroups` |
 | Graph | Zachary's Karate Club | `graph/karate/` (`nodes.csv`, `edges.csv`) | 없으면 NetworkX `karate_club_graph()`로 저장 |
 | Graph | Cora | `graph/cora/` (`nodes.csv`, `edges.csv`) | 없으면 [temprl.com/nodes.csv](https://temprl.com/nodes.csv), [temprl.com/edges.csv](https://temprl.com/edges.csv) ([Cora 설명](https://graphsandnetworks.com/the-cora-dataset/)) |
@@ -38,6 +39,7 @@ MovieLens 100K는 GroupLens 재배포 허가가 따로 필요합니다. 저장�
 | 함수 | 역할 |
 |:---|:---|
 | `load_titanic()` | Titanic 표 |
+| `load_iris()` | Iris 표 |
 | `load_20newsgroups()` | 20 Newsgroups 문서 |
 | `ensure_karate()` / `load_karate()` | Karate Club 노드·엣지와 그래프 |
 | `ensure_cora()` / `load_cora()` | Cora 인용 네트워크 |

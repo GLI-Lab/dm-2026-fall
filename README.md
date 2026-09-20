@@ -25,7 +25,7 @@ Always start Jupyter **from the repository root** so that `data/` paths resolve 
 
 Install Pixi: <https://pixi.sh/latest/getting_started/installation/>
 
-Windows: use **WSL2**, then follow the Linux steps inside Ubuntu. See the [environment setup](https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup.html) page for details.
+Windows: use **WSL2**, then follow the Linux steps inside Ubuntu. See [Environment Setup (한)](https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup-ko.html) or [Environment Setup (en)](https://gli.konkuk.ac.kr/board/lectures/dm-2026-fall/exercises/environment-setup-en.html).
 
 Clone this branch and enter the repo:
 

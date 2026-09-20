@@ -1,6 +1,6 @@
 """Lab 02-2 — functions you implement.
 
-Iris and figures live in helper.py. Titanic is loaded by data.loader.
+Iris and Titanic are loaded by data.loader. Figures live in helper.py.
 """
 
 from __future__ import annotations
