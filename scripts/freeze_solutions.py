@@ -7,7 +7,11 @@ starter .py files may stay as TODO. This script:
 1. Copies each gitignored *-solution.py over the matching starter .py
 2. Strips `#| eval: false` from .qmd files that import those modules
    (the committed .qmd must match the one used to write freeze)
-3. Renders those .qmd files with freeze:false so cells actually run
+3. Deletes that notebook's `_freeze` (qmd-only hash would otherwise skip
+   a re-run after only the .py changed), then `quarto render` with the
+   project `freeze: auto` so `_freeze` is written again.
+   Do not pass `-M freeze:false`: that flag turns freeze off and deletes
+   the public `_freeze` after the run.
 4. Restores tracked starter .py files from git (TODO). Freeze stays.
 
 Does not commit. Does not put `#| eval: false` back.
@@ -150,6 +154,21 @@ def freeze_dir_for(qmd: Path) -> Path:
     return REPO_ROOT / "_freeze" / relative.with_suffix("")
 
 
+def hidden_freeze_dir_for(qmd: Path) -> Path:
+    relative = qmd.resolve().relative_to(REPO_ROOT)
+    return REPO_ROOT / ".quarto" / "_freeze" / relative.with_suffix("")
+
+
+def drop_freeze_dirs(qmd: Path) -> list[Path]:
+    """Remove public and hidden freeze so the next render actually executes."""
+    removed = []
+    for path in (freeze_dir_for(qmd), hidden_freeze_dir_for(qmd)):
+        if path.exists():
+            shutil.rmtree(path)
+            removed.append(path)
+    return removed
+
+
 def collect_solutions(paths: list[Path]) -> list[Path]:
     if not paths:
         return iter_solution_py(REPO_ROOT)
@@ -270,9 +289,11 @@ def main(argv: list[str]) -> int:
 
         for qmd in qmds:
             relative = qmd.relative_to(REPO_ROOT)
+            for dropped in drop_freeze_dirs(qmd):
+                print(f"dropped freeze {dropped.relative_to(REPO_ROOT)}")
             print(f"render {relative}")
             subprocess.run(
-                [quarto, "render", str(relative), "-M", "freeze:false"],
+                [quarto, "render", str(relative)],
                 cwd=REPO_ROOT,
                 check=True,
             )

@@ -41,8 +41,8 @@ website:
         text: Home
       - href: exercises/index.qmd
         text: Exercises 
-      - href: assignments/index.qmd
-        text: Assignments
+      # - href: assignments/index.qmd
+      #   text: Assignments
       - icon: link-45deg
         href: http://gli.konkuk.ac.kr
         text: GLI Lab
@@ -60,7 +60,10 @@ website:
         - section: "Exercises"
           href: exercises/index.qmd
           contents:
-            - exercises/environment-setup.qmd
+            - text: "Environment Setup (한)"
+              href: exercises/environment-setup-ko.qmd
+            - text: "Environment Setup (en)"
+              href: exercises/environment-setup-en.qmd
             - section: "Lab0. Python Prerequisites"
               contents:
                 - text: "Python Basics (⭐)"
@@ -91,12 +94,12 @@ website:
                   href: exercises/lab02/lab02-2.qmd
                 - text: "Similarity Graph"
                   href: exercises/lab02/lab02-3.qmd
-    - id: assignments
-      title: "Assignments"
-      collapse-level: 1
-      align: left
-      contents:
-        - section: "Assignments"
-          href: assignments/index.qmd
-          contents:
-            - text: "TBA"
+    # - id: assignments
+    #   title: "Assignments"
+    #   collapse-level: 1
+    #   align: left
+    #   contents:
+    #     - section: "Assignments"
+    #       href: assignments/index.qmd
+    #       contents:
+    #         - text: "TBA"

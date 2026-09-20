@@ -1,0 +1,192 @@
+---
+title: "Environment Setup (en)"
+---
+
+## Overview
+
+This course supports two ways to run labs. Choose the one that fits your setup.
+
+**Option A (Local): pixi + VSCode or JupyterLab.** Recommended. Dependencies are pinned in a lock file, so every student gets the same environment. Requires a one-time setup on your machine.
+
+**Option B (Cloud): Google Colab.** No installation. Open a lab notebook in the browser with the Colab badge at the top of each notebook. Use this if you do not want a local environment.
+
+::: {.callout-tip}
+## Recommendation
+
+**Option A** is recommended. The pixi environment matches the instructor setup, which makes debugging and grading straightforward.
+
+Option B is a fallback. Colab sessions are ephemeral. Re-run setup cells every time you reconnect.
+:::
+
+Both options provide the required packages. The sections below walk through each option.
+
+## Option A (Local): pixi + VSCode or JupyterLab
+
+### Why pixi?
+
+Compared to conda or mamba, pixi is faster at solving environments. It pins exact versions in `pixi.lock`, so every student gets the same packages. It also handles conda-managed and pip-managed packages in one workflow.
+
+### Prerequisites
+
+Install the following tools first.
+
+::: {.callout-important}
+## Windows Users
+
+This course environment supports **Linux** and **macOS** only. On Windows, use **WSL2** and follow the Linux steps inside Ubuntu.
+
+1. Open PowerShell as Administrator and run:
+```powershell
+wsl --install
+```
+2. Restart when prompted.
+3. Open the **Ubuntu** app from the Start menu and finish setup (username and password).
+4. Run the remaining steps in this Ubuntu terminal.
+
+WSL2 install guide: <https://learn.microsoft.com/en-us/windows/wsl/install>
+:::
+
+**git.** Required to clone the course repository.
+
+- **Linux (including WSL2):** `sudo apt update && sudo apt install git`
+- **macOS:** Check with `git --version`. If it is missing, macOS prompts for Xcode Command Line Tools, or run `xcode-select --install`.
+
+**pixi.** Fast, cross-platform package manager. `sudo` is not required. pixi installs to `~/.pixi/` under your user account. Each project environment lives in `.pixi/envs/` inside the project folder. Install guide: <https://pixi.prefix.dev/latest/installation>.
+
+```bash
+# Choose one depending on what is available on your system
+curl -fsSL https://pixi.sh/install.sh | sh
+# or
+wget -qO- https://pixi.sh/install.sh | sh
+
+# Reload your shell to apply PATH changes
+source ~/.bashrc     # use ~/.zshrc if you are on zsh
+
+# Verify installation
+pixi --version
+# Expected: pixi 0.63.2  (or newer)
+```
+
+**VSCode.** Download from <https://code.visualstudio.com>. Open **Extensions** (`Ctrl+Shift+X` / `Cmd+Shift+X`) and install the **Python** extension by Microsoft. That adds Jupyter notebook support and Python IntelliSense. On Windows, also install the **WSL** extension so VSCode can open the project inside WSL2.
+
+### Step 1: Clone the Course Repository
+
+```bash
+git clone -b students https://github.com/GLI-Lab/dm-2026-fall.git
+cd dm-2026-fall
+```
+
+After cloning, the repository looks like this:
+
+```bash
+dm-2026-fall/                  # course repository root
+├── pixi.toml                  # dependency declarations
+├── pixi.lock                  # exact pinned versions
+├── data/                      # shared datasets (paths are from the repo root)
+├── assignments/               # homework starter code
+└── exercises/                 # lab notebooks
+```
+
+Shared datasets live in `data/` at the repository root. Labs import `data.loader`, which finds files there and downloads anything missing. `lab01_setup.py` and Lab 2 `helper.py` put the repo root on `sys.path` even when the working directory is the lab folder.
+
+### Step 2: Install All Required Packages
+
+From the repository folder:
+
+```bash
+pixi install
+```
+
+This reads `pixi.lock` and installs every package at its pinned version. The list is in `pixi.toml`:
+
+```{.toml filename="pixi.toml"}
+[dependencies]
+python = "3.12.*"
+numpy = "*"
+scipy = "*"
+pandas = "*"
+scikit-learn = "*"
+matplotlib = "*"
+seaborn = "*"
+nltk = "*"
+networkx = ">=3.1"
+mlxtend = "*"
+gensim = ">=4.3.3"
+jupyterlab = "*"
+kagglehub = ">=1.0.2,<2"
+
+[tasks]
+lab = "jupyter lab --ip=0.0.0.0 --port=8888 --no-browser"
+```
+
+You do not need to install these separately. `pixi install` handles them. This course does **not** require PyTorch or a GPU.
+
+::: {.callout-note}
+## How `pixi install` Behaves
+
+When `pixi.lock` exists (the usual case after cloning), pixi installs pinned versions with no solver step. This is fast.
+
+When no lock file exists, pixi reads `pixi.toml`, resolves versions, writes `pixi.lock`, then installs. This is slower and happens only once.
+
+When `pixi.toml` changes (for example after `pixi add <package>`), the lock file updates on the next `pixi install` or `pixi run`.
+:::
+
+### Step 3: Open a Lab Notebook
+
+Open lab notebooks in JupyterLab or VSCode. Both use the pixi environment.
+
+**JupyterLab.** Launch from the repository root:
+
+```bash
+pixi run lab
+```
+
+This starts JupyterLab on port 8888. It does not open a browser. Copy the URL from the terminal into your browser. It looks like this:
+
+```bash
+http://127.0.0.1:8888/lab?token=your_token_here
+```
+
+Use this command at the start of every lab session.
+
+**VSCode.** Open the repository folder, then select the pixi kernel:
+
+1. Open any `.ipynb` file in VSCode.
+2. Click **Select Kernel** in the top-right of the notebook editor.
+3. Choose **Python Environments**, then the interpreter at `.pixi/envs/default/bin/python` inside the repository.
+
+::: {.callout-note}
+## Everyday Workflow
+
+For regular lab work, `pixi run lab` or opening notebooks in VSCode is enough. For a longer session in an activated shell, run `pixi shell`, then launch tools from there. Exit with `exit` when done.
+:::
+
+## Option B (Cloud): Google Colab
+
+Google Colab runs a lab notebook in the browser with no local install. Open a lab with the Colab badge at the top of each notebook:
+
+![](https://colab.research.google.com/assets/colab-badge.svg)
+
+Colab already has many course packages, including `numpy`, `pandas`, `matplotlib`, and `sklearn`. Install course-specific packages (`networkx`, `nltk`, `mlxtend`, `gensim`, `kagglehub`, ...) with the setup cell at the top of each notebook:
+
+```{.python}
+# Run this cell only if you are on Google Colab
+!pip install <course-specific-package>
+```
+
+Notebooks that use files under `data/` need an extra step on Colab. Colab cannot see your local disk, so clone the course repository at the start of each session:
+
+```{.python}
+# Run this cell only if you are on Google Colab
+!git clone -b students https://github.com/GLI-Lab/dm-2026-fall.git
+```
+
+Each notebook already includes this cell. Run it before the rest.
+
+::: {.callout-warning}
+## Colab Limitations
+
+Colab environments are **ephemeral**. Packages you install and files you download disappear when the session ends or times out. Re-run all setup cells at the start of every new session.
+
+For a persistent environment across labs, use the local pixi setup (Option A).
+:::
