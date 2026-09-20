@@ -25,6 +25,10 @@ This notebook calls functions from `lab02_1.py`. Find each
 and write your implementation. Restart the kernel after editing the `.py`
 file, then run this notebook from the top.
 
+On the course site, Practice cell outputs are the expected results after
+those functions are implemented. Your local notebook will not produce them
+until the TODOs are done.
+
 Check your functions with:
 
 ```bash
@@ -140,7 +144,6 @@ column.
 `Series.fillna()` replaces missing values.
 
 ```{python}
-#| eval: false
 
 titanic_clean, embarked_mode = fill_missing_with_mode(
     titanic_clean,
@@ -217,7 +220,6 @@ It should count duplicate rows and return a DataFrame with them removed.
 **Hint:** Use `duplicated().sum()` and `drop_duplicates()`.
 
 ```{python}
-#| eval: false
 
 titanic_without_duplicates, duplicate_count = drop_duplicate_rows(
     titanic_with_duplicates
@@ -287,7 +289,6 @@ It should return the lower and upper fences from `q1` and `q3`.
 **Hint:** Use `q3 - q1` for the IQR.
 
 ```{python}
-#| eval: false
 
 lower, upper = iqr_outlier_bounds(
     q1,
@@ -321,7 +322,6 @@ After implementing the function, run the following cell to visualize the
 potential outliers.
 
 ```{python}
-#| eval: false
 #| fig-cap: "Potential fare outliers using the IQR rule"
 
 plot_fare_outliers(
@@ -371,7 +371,6 @@ of `survived` and the median of `fare`.
 **Hint:** Use `groupby(["pclass", "sex"])` followed by `agg({...})`.
 
 ```{python}
-#| eval: false
 
 group_summary = summarize_by_class_and_sex(
     titanic
@@ -426,7 +425,6 @@ each group.
 **Hint:** Loop over `df.groupby("pclass")` and `sample()` each group.
 
 ```{python}
-#| eval: false
 
 stratified_sample = stratified_sample_by_class(
     titanic,
@@ -443,7 +441,6 @@ After implementing the function, run the following cell to check how many
 passengers were selected from each class.
 
 ```{python}
-#| eval: false
 
 stratified_sample[
     "pclass"

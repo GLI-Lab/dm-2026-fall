@@ -25,6 +25,10 @@ This notebook calls functions from `lab02_3.py`. Find each
 and write your implementation. Restart the kernel after editing the `.py`
 file, then run this notebook from the top.
 
+On the course site, Practice cell outputs are the expected results after
+those functions are implemented. Your local notebook will not produce them
+until the TODOs are done.
+
 The same functions are reused on the Moons data in the last section, so
 implement them before that part.
 
@@ -219,7 +223,6 @@ Use `epsilon = 0.25` and construct the Iris $\epsilon$-graph.
 **Hint:** Compare `D` with `epsilon`, then set the diagonal to `False`.
 
 ```{python}
-#| eval: false
 
 epsilon = 0.25
 
@@ -236,7 +239,6 @@ graph_summary(
 :::
 
 ```{python}
-#| eval: false
 #| fig-cap: "Iris epsilon graph"
 
 plot_similarity_graph(
@@ -313,7 +315,6 @@ direction.
 and keep the first `K` indices. Symmetrize with a transpose.
 
 ```{python}
-#| eval: false
 
 K = 4
 
@@ -330,7 +331,6 @@ graph_summary(
 :::
 
 ```{python}
-#| eval: false
 #| fig-cap: "Iris kNN graph"
 
 plot_similarity_graph(
@@ -390,7 +390,6 @@ and kNN graph.
 **Hint:** Use `np.where()` with the adjacency matrix and `W`.
 
 ```{python}
-#| eval: false
 
 W_epsilon = apply_edge_weights(
     W,
@@ -410,7 +409,6 @@ pd.DataFrame(
 :::
 
 ```{python}
-#| eval: false
 #| fig-cap: "Iris epsilon graph with heat-kernel weights"
 
 plot_similarity_graph(
@@ -423,7 +421,6 @@ plot_similarity_graph(
 ```
 
 ```{python}
-#| eval: false
 #| fig-cap: "Iris kNN graph with heat-kernel weights"
 
 plot_similarity_graph(
@@ -467,7 +464,6 @@ The labels `y_moons` are used only for visualization.
 ### $\epsilon$-Graph
 
 ```{python}
-#| eval: false
 
 epsilon_moons = 0.22
 
@@ -482,7 +478,6 @@ graph_summary(
 ```
 
 ```{python}
-#| eval: false
 #| fig-cap: "Moons epsilon graph"
 
 plot_similarity_graph(
@@ -496,7 +491,6 @@ plot_similarity_graph(
 ### kNN Graph
 
 ```{python}
-#| eval: false
 
 K_moons = 4
 
@@ -511,7 +505,6 @@ graph_summary(
 ```
 
 ```{python}
-#| eval: false
 #| fig-cap: "Moons kNN graph"
 
 plot_similarity_graph(
@@ -538,7 +531,6 @@ w_{ij}
 $$
 
 ```{python}
-#| eval: false
 
 t_moons = epsilon_moons
 
@@ -559,7 +551,6 @@ W_moons_knn = apply_edge_weights(
 ```
 
 ```{python}
-#| eval: false
 #| fig-cap: "Weighted Moons epsilon graph"
 
 plot_similarity_graph(
@@ -572,7 +563,6 @@ plot_similarity_graph(
 ```
 
 ```{python}
-#| eval: false
 #| fig-cap: "Weighted Moons kNN graph"
 
 plot_similarity_graph(

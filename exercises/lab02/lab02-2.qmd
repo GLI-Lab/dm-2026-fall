@@ -24,6 +24,10 @@ This notebook calls functions from `lab02_2.py`. Find each
 and write your implementation. Restart the kernel after editing the `.py`
 file, then run this notebook from the top.
 
+On the course site, Practice cell outputs are the expected results after
+those functions are implemented. Your local notebook will not produce them
+until the TODOs are done.
+
 Check your functions with:
 
 ```bash
@@ -170,7 +174,6 @@ Create an equal-frequency discretizer with three bins and transform
 **Hint:** Use `strategy="quantile"` and `fit_transform()`.
 
 ```{python}
-#| eval: false
 
 quantile, quantile_bins = equal_frequency_discretize(
     petal_length,
@@ -208,7 +211,6 @@ groups in the data. Clustering-based discretization uses the data distribution
 to place boundaries.
 
 ```{python}
-#| eval: false
 #| fig-cap: "Discretization boundaries for the same Iris attribute"
 
 boundaries = {
@@ -350,7 +352,6 @@ It should return the weighted entropy of the two intervals.
 interval. Use `entropy()` from `helper.py`.
 
 ```{python}
-#| eval: false
 
 split_score = weighted_split_entropy(
     left_labels,
@@ -528,7 +529,6 @@ Convert the categorical attribute `sex` into binary variables.
 **Hint:** Use `pd.get_dummies()` with `prefix="sex"` and `dtype=int`.
 
 ```{python}
-#| eval: false
 
 sex_binary = binarize_categorical(
     titanic["sex"],
@@ -681,7 +681,6 @@ $$
 `X.quantile(0.75) - X.quantile(0.25)`.
 
 ```{python}
-#| eval: false
 
 minmax = minmax_scale(X)
 robust = robust_scale(X)
@@ -706,7 +705,6 @@ display(
 :::
 
 ```{python}
-#| eval: false
 #| fig-cap: "Comparison of numerical scaling methods"
 
 plot_scaling({

@@ -4,7 +4,7 @@ title: "Exercises Guide"
 
 ## Labs
 
-Labs are **not graded**. They are the hands-on companion to each lecture unit. Each lab is a short, focused session designed to help you build intuition for data mining concepts by working directly with data and code. You will load datasets, construct alternative representations, visualize them, and interpret what each representation makes easy — or hides — so that by the time you reach a homework assignment, the underlying data structures feel familiar.
+Labs are **not graded**. They are the hands-on companion to each lecture unit. Each lab is a short session: load data, build representations, visualize them, and see what each form makes easy or hides.
 
 ::: {.callout-important}
 ## Midterm and Final
@@ -15,21 +15,7 @@ Labs are not graded, but they show what the exams will test.
 - **Midterm and final:** lecture definitions and formulas, plus the labs covered up to that exam. You will explain *why* a method or representation is used. Library function names and notebook boilerplate will not be tested.
 :::
 
-::: {.callout-note}
-## Before Choosing an Algorithm, Choose a Representation
-
-A dataset does not have only one useful form. The same collection of observations can be a table of records, a sequence, a matrix, a set of transactions, or a graph. Labs in this course start from that idea: **the representation you choose determines which algorithms you can apply.**
-:::
-
-::: {.callout-note}
-## Labs Marked TBD
-
-Labs marked as TBD have tentative topics that may be added, removed, or reordered as the course progresses.
-:::
-
 **Lab 0: Python Prerequisites**
-
-Get comfortable with the Python stack used throughout the course before working with real datasets.
 
 - [Lab 0-1](lab00/python-basics.html): Python Basics
 - [Lab 0-2](lab00/numpy-basics.html): NumPy Basics
@@ -38,21 +24,17 @@ Get comfortable with the Python stack used throughout the course before working 
 
 **Lab 1: Exploring Data Representations**
 
-Five notebooks, five data types. For each type you will construct several representations of the *same* underlying data and compare what each one reveals. Work through the parts in order; later parts reuse the same comparison habit (table → matrix → graph).
-
-- [Lab 1-1](lab01/lab01-1-record.html): Record Data — Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)
-- [Lab 1-2](lab01/lab01-2-text.html): Text Data — 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)
-- [Lab 1-3](lab01/lab01-3-graph.html): Graph Data — Zachary's Karate Club (visualization, edge list, adjacency list, adjacency matrix)
-- [Lab 1-4](lab01/lab01-4-interaction.html): Interaction Data — MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
-- [Lab 1-5](lab01/lab01-5-transaction.html): Transaction Data — Groceries (baskets, long table, binary matrix, co-occurrence graph)
+- [Lab 1-1](lab01/lab01-1-record.html): Record Data: Titanic (numerical matrix, transactions, binary item matrix, bipartite graph)
+- [Lab 1-2](lab01/lab01-2-text.html): Text Data: 20 Newsgroups (token sequences, count matrix, TF-IDF, similarity graph)
+- [Lab 1-3](lab01/lab01-3-graph.html): Graph Data: Zachary's Karate Club (visualization, edge list, adjacency list, adjacency matrix)
+- [Lab 1-4](lab01/lab01-4-interaction.html): Interaction Data: MovieLens 100K (utility matrix, binary matrix, bipartite graph, user/item projections)
+- [Lab 1-5](lab01/lab01-5-transaction.html): Transaction Data: Groceries (baskets, long table, binary matrix, co-occurrence graph)
 
 **Lab 2: Data Preprocessing**
 
-Three notebooks on this week's preprocessing topics. Work through the notebooks in order, and implement the `TODO` functions in the matching `.py` file before running the practice cells.
-
-- [Lab 2-1](lab02/lab02-1.html): Cleaning, aggregation, and sampling — Titanic
-- [Lab 2-2](lab02/lab02-2.html): Discretization, binarization, and scaling — Iris and Titanic
-- [Lab 2-3](lab02/lab02-3.html): Similarity graphs (ε-graph, kNN, heat kernel) — Iris and Moons
+- [Lab 2-1](lab02/lab02-1.html): Cleaning, aggregation, and sampling: Titanic
+- [Lab 2-2](lab02/lab02-2.html): Discretization, binarization, and scaling: Iris and Titanic
+- [Lab 2-3](lab02/lab02-3.html): Similarity graphs (ε-graph, kNN, heat kernel): Iris and Moons
 
 **Later labs (TBD)**
 
@@ -60,115 +42,79 @@ Additional labs will be posted as the corresponding lecture units are covered.
 
 ## Datasets
 
-Original files live in the repository `data/` folder, not beside each notebook. Labs import `data.loader`, which finds those files and downloads anything that is missing. See `data/README.md` for paths and sources.
+Original files live in the repository `data/` folder, not beside each notebook. Labs import `data.loader`, which finds those files and downloads anything that is missing. Details: `data/README.md`.
 
-| Path | Dataset | Used in |
-|:---|:---|:---|
-| `data/record/titanic.csv` | Titanic | Lab 1-1, Lab 2-1, Lab 2-2 (`load_titanic()`; seaborn if missing) |
-| `data/record/iris.csv` | Iris | Lab 2-2, Lab 2-3 (`load_iris()`; sklearn if missing) |
-| `data/text/20newsgroups/` | 20 Newsgroups | Lab 1-2 (`load_20newsgroups()`; sklearn cache if missing) |
-| `data/graph/karate/` | Zachary's Karate Club | Lab 1-3 (`load_karate()`; NetworkX if missing) |
-| `data/interaction/Movielens/` | MovieLens 100K | Lab 1-4 (`load_movielens_100k()`; kagglehub if missing) |
-| `data/transaction/groceries_kaggle.csv` | Groceries baskets from Kaggle | Lab 1-5 (`load_groceries()`; kagglehub if missing) |
-| scikit-learn `make_moons` | Moons | Lab 2-3 |
+You do not copy files into the lab folder. If a file is already under `data/`, it is not downloaded again. Only missing files are fetched.
 
-::: {.callout-important}
-## Datasets Are Downloaded on First Run
+```bash
+pixi run python -m data
+```
 
-You do not need to copy files into the lab folder. Run the load cell; if the file is already under `data/`, nothing is downloaded.
+```python
+from data.loader import check_datasets
+check_datasets()                # download if missing, then load
+check_datasets(download=False)  # local files only
+```
 
-**MovieLens 100K** is not shipped with the repository. If `u.data`, `u.item`, and `u.user` are missing, Lab 1-4 downloads them with `kagglehub` from [Kaggle](https://www.kaggle.com/datasets/trishna8/movielens-100k-dataset) into `data/interaction/Movielens/`. MovieLens 100K may not be redistributed without separate permission from GroupLens.
+| Type | Dataset | Path | Auto-download |
+|:---|:---|:---|:---|
+| Record | Titanic | `data/record/titanic.csv` | seaborn `sns.load_dataset("titanic")` if missing |
+| Record | Iris | `data/record/iris.csv` | `sklearn.datasets.load_iris` if missing |
+| Text | 20 Newsgroups | `data/text/20newsgroups/` | `sklearn.datasets.fetch_20newsgroups` if missing |
+| Graph | Zachary's Karate Club | `data/graph/karate/` (`nodes.csv`, `edges.csv`) | NetworkX `karate_club_graph()` if missing |
+| Graph | Cora | `data/graph/cora/` (`nodes.csv`, `edges.csv`) | [temprl.com/nodes.csv](https://temprl.com/nodes.csv), [temprl.com/edges.csv](https://temprl.com/edges.csv) if missing ([Cora](https://graphsandnetworks.com/the-cora-dataset/)) |
+| Interaction | MovieLens 100K | `data/interaction/Movielens/` (`u.data`, `u.item`, `u.user`) | kagglehub [`trishna8/movielens-100k-dataset`](https://www.kaggle.com/datasets/trishna8/movielens-100k-dataset) if missing |
+| Transaction | Groceries (arules) | `data/transaction/groceries.csv` | shipped in the repo; else GitHub [`stedy/Machine-Learning-with-R-datasets`](https://github.com/stedy/Machine-Learning-with-R-datasets/blob/master/groceries.csv) |
+| Transaction | Groceries Kaggle (raw) | `data/transaction/groceries_kaggle(raw).csv` | kagglehub [`heeraldedhia/groceries-dataset`](https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset) if missing |
+| Transaction | Groceries Kaggle (baskets) | `data/transaction/groceries_kaggle.csv` | built from raw by `(Member_number, Date)` |
 
-**20 Newsgroups** is cached under `data/text/20newsgroups/` on first run. **Groceries** uses the Kaggle long-format file `data/transaction/groceries_kaggle(raw).csv`, grouped into baskets as `data/transaction/groceries_kaggle.csv`. If the processed file is missing, Lab 1-5 downloads [heeraldedhia/groceries-dataset](https://www.kaggle.com/datasets/heeraldedhia/groceries-dataset) with `kagglehub`. Titanic, Iris, and Karate Club are written under `data/` the first time they are loaded.
-:::
+Moons (Lab 2-3) is not under `data/`. It comes from `sklearn.datasets.make_moons`.
 
-## What You Will Receive
+Do not download files one by one in the browser. If kagglehub asks for auth, get an API token from [Kaggle Settings](https://www.kaggle.com/settings) and put it at `~/.kaggle/kaggle.json`.
 
-### Lab 0
+MovieLens 100K needs a separate GroupLens redistribution permission. The repo ships code only. Each person downloads the data locally.
 
-Each prerequisite lab is a single guided notebook with explanations and complete, runnable code:
-
-- `python-basics.qmd`, `numpy-basics.qmd`, `matplotlib-basics.qmd`, `pandas-basics.qmd`
-
-### Lab 1 and later
-
-Starting with Lab 1, each lab lives in its own folder (`exercises/lab01/`, …) and is split so that **construction** and **interpretation** stay separate:
-
-- `lab01-1-record.qmd`, `lab01-2-text.qmd`, `lab01-3-graph.qmd`, `lab01-4-interaction.qmd`, `lab01-5-transaction.qmd`: The notebooks you read and run. Each loads data with `data.loader`, inspects returned objects, visualizes them, and asks you to interpret the results.
-- `lab01_*.py`: Helper modules beside the notebooks that *construct* representations and draw figures. You do not need to rewrite these to complete the lab; you import them and study what they return.
-- `data.loader`: Locates original files under the repository `data/` folder and downloads them if they are missing.
-
-For Lab 1 the helpers are `lab01_record.py`, `lab01_text.py`, `lab01_graph.py`, `lab01_interaction.py`, and `lab01_transaction.py`.
-
-### Lab 2
-
-Lab 2 lives in `exercises/lab02/` and is split by preprocessing topic. Unlike Lab 1, you **implement** the `TODO` functions in `lab02_*.py`, then run the notebooks.
-
-- `lab02-1.qmd`, `lab02-2.qmd`, `lab02-3.qmd`: The notebooks you read and run. Each loads data, shows a worked example, and calls the functions you write.
-- `lab02_1.py`, `lab02_2.py`, `lab02_3.py`: **Submission files.** Find each `# ========== TODO ==========` block, remove `raise NotImplementedError`, and implement the function. Check with `python -m doctest lab02_1.py -v` (and the matching files for parts 2 and 3).
-- `helper.py`: Path setup, dataset loaders, and plotting. Do not edit this file. Importing it puts the repository root on `sys.path` so `from data.loader import ...` works.
-- `data.loader`: Loads Titanic from `data/record/titanic.csv` and Iris from `data/record/iris.csv`. Moons come from scikit-learn.
-
-Graded homework is posted separately on the [Assignments](/assignments/index.html) page. Starter files will appear in `assignments/` as each unit is released.
+| Function | Role |
+|:---|:---|
+| `load_titanic()` | Titanic table |
+| `load_iris()` | Iris table |
+| `load_20newsgroups()` | 20 Newsgroups documents |
+| `ensure_karate()` / `load_karate()` | Karate Club nodes, edges, and graph |
+| `ensure_cora()` / `load_cora()` | Cora citation network |
+| `ensure_movielens()` / `load_movielens_100k()` / `load_movies()` / `load_users()` | MovieLens folder and tables |
+| `ensure_groceries()` / `load_groceries(path)` | arules basket CSV |
+| `ensure_groceries_kaggle_raw()` | Kaggle long-format CSV |
+| `ensure_groceries_kaggle()` | Kaggle basket CSV |
+| `check_datasets()` | load all of the above and return a status table |
 
 ## Workflow
 
 ### Step 1: Set Up the Environment
 
-Follow the [Python Environment Setup](environment-setup.html) guide before opening any lab. Activate the course `pixi` environment (or use Colab) so that NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.
+Follow [Environment Setup (한)](environment-setup-ko.html) or [Environment Setup (en)](environment-setup-en.html) before opening any lab. Activate the course `pixi` environment so NumPy, pandas, scikit-learn, NetworkX, and the other shared packages are available.
 
 ### Step 2: Open the Lab Notebook
 
-Launch the notebook using JupyterLab, VS Code, or Google Colab. Open Lab 1 notebooks from `exercises/lab01/` and Lab 2 notebooks from `exercises/lab02/` so that helper modules import cleanly. `lab01_setup.py` and Lab 2's `helper.py` also put the repository root on `sys.path` so `from data.loader import ...` works. Each notebook opens with a short overview of the data type (or skill) you are about to explore and why it matters for data mining.
+Launch the notebook with JupyterLab or VS Code from the **repository root**. Open Lab 1 notebooks from `exercises/lab01/` and Lab 2 notebooks from `exercises/lab02/` so helpers import cleanly. `lab01_setup.py` and Lab 2 `helper.py` put the repository root on `sys.path` so `from data.loader import ...` works.
 
 ::: {.callout-note}
 ## Running Cells in Order
 
-Always run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports from earlier cells are missing.
+Run notebook cells from top to bottom. If you skip a cell or run them out of order, later cells may fail because variables or imports are missing.
 :::
 
 ### Step 3: Run and Observe
 
-Unlike the homework-style notebooks in Lab 2, **Lab 0 and Lab 1 do not require you to write code from scratch or fill in `TODO` blocks.** Working code is provided. Your primary task is to run the cells, read the accompanying explanations, and understand how the *same* observations look as a matrix, a graph, a sequence, or a set of transactions. Pay attention to shapes, sparsity, and what is observed versus derived.
+**Lab 0 and Lab 1** do not ask you to fill in `TODO` blocks. Working code is provided. Run the cells, read the notes, and see how the same observations look as a matrix, a graph, a sequence, or a set of transactions. Watch shapes, sparsity, and what was stored versus derived.
 
-Lab 2 is different: implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook from top to bottom.
+**Lab 2:** implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook from the top. On the course site, Practice outputs are the expected results after those functions are implemented.
 
 ### Step 4: Experiment Freely
 
-Labs are exploratory playgrounds. Once you have run the provided code, change things:
+Labs are for exploration. After you have run the provided code, change things:
 
 - Subsample users, items, documents, or transactions and watch the representations change.
-- Swap one representation for another (for example, a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).
-- Break things on purpose — a missing file path, a wrong key, a dense matrix that should have stayed sparse — and read the error.
+- Swap one representation for another (for example a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).
+- Break things on purpose (a missing path, a wrong key, a dense matrix that should have stayed sparse) and read the error.
 
-Tinkering freely is one of the best ways to build intuition before tackling the homework.
-
-## Navigating the Notebook Structure
-
-### Lab 0
-
-Each prerequisite notebook follows a skill-oriented layout:
-
-- **Objectives** lists the specific Python skills you will practice. Read this before you start.
-- Short concept notes explain why that library shows up in data mining workflows.
-- Numbered sections walk through examples you should run in order.
-
-### Lab 1
-
-Lab 1 is organized by **data type**, one notebook per type:
-
-- **Overview** restates the theme of the lab: one dataset, many representations.
-- **Lab 1-1 through Lab 1-5** each load one dataset, build several representations, and visualize or inspect them.
-- **Think** callouts at the end of a part ask you to say what was *stored* in the original data versus what was *derived* (for example, an item–item co-occurrence graph).
-
-When a lab imports `data.loader`, treat that as the place where original files are found and loaded. When it imports a `lab01_*.py` module, treat that file as the place where representations are built, and treat the notebook as the place where you look at the result.
-
-### Lab 2
-
-Lab 2 is organized by **preprocessing topic**, one notebook per topic:
-
-- **Lab 2-1** cleans Titanic records, then aggregates and samples them.
-- **Lab 2-2** changes how attributes are represented: discretization, binarization, a log transform, and scaling.
-- **Lab 2-3** builds ε-graphs and kNN graphs and weights edges with the heat kernel.
-
-When a notebook imports `lab02_*.py`, that is the file you edit. The notebook is where you inspect the result after the functions are implemented.
+Graded homework is posted on the [Assignments](/assignments/index.html) page. Starter files appear in `assignments/` as each unit is released.
