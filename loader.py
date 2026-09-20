@@ -34,6 +34,7 @@ GROCERIES_PAGE = f"https://www.kaggle.com/datasets/{GROCERIES_HANDLE}"
 GROCERIES_LONG_COLUMNS = {"Member_number", "Date", "itemDescription"}
 
 TITANIC_CSV = DATA_ROOT / "record" / "titanic.csv"
+IRIS_CSV = DATA_ROOT / "record" / "iris.csv"
 TEXT_DIR = DATA_ROOT / "text" / "20newsgroups"
 KARATE_DIR = DATA_ROOT / "graph" / "karate"
 KARATE_NODES = KARATE_DIR / "nodes.csv"
@@ -343,6 +344,22 @@ def load_titanic() -> pd.DataFrame:
     return df
 
 
+def load_iris() -> pd.DataFrame:
+    """Load Iris from data/record/iris.csv, writing sklearn's table if missing."""
+    if IRIS_CSV.is_file():
+        return pd.read_csv(IRIS_CSV)
+
+    from sklearn.datasets import load_iris as _sklearn_iris
+
+    bunch = _sklearn_iris(as_frame=True)
+    df = bunch.frame.copy()
+    df["species"] = df["target"].map(dict(enumerate(bunch.target_names)))
+    df = df.drop(columns=["target"])
+    IRIS_CSV.parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(IRIS_CSV, index=False)
+    return df
+
+
 def load_20newsgroups(
     *,
     root: str | Path | None = None,
@@ -494,6 +511,14 @@ def check_datasets(*, download: bool = True) -> pd.DataFrame:
         "seaborn (sns.load_dataset) if missing",
         titanic_local,
         lambda: f"{load_titanic().shape[0]} rows × {load_titanic().shape[1]} columns",
+    )
+
+    iris_local = IRIS_CSV.is_file()
+    run(
+        "record", "Iris", IRIS_CSV,
+        "sklearn.datasets.load_iris if missing",
+        iris_local,
+        lambda: f"{load_iris().shape[0]} rows × {load_iris().shape[1]} columns",
     )
 
     text_local = TEXT_DIR.is_dir() and any(TEXT_DIR.rglob("*.pkz"))
