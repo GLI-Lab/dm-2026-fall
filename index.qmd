@@ -2,92 +2,56 @@
 title: "Data Mining"
 ---
 
-This site is your central hub for all coding materials: environment setup, in-class Lab notebooks, and Homework starter code.
+This site is the hub for coding materials: [environment setup](/exercises/environment-setup-ko.html) and in-class labs.
 
-This practicum is about **data pattern mining**: discovering frequent, sequential, structural, and relational patterns in data. The representation you choose — records, matrices, transactions, sequences, or graphs — determines which patterns you can find. Labs and homeworks implement that idea in Python.
+This practicum is **data pattern mining**: frequent, sequential, structural, and relational patterns. The representation you choose (records, matrices, transactions, sequences, or graphs) determines which patterns you can find. Labs and homeworks implement that idea in Python.
 
 ::: {.callout-note}
 ## Konkuk eCampus
 
-**Konkuk eCampus** is used for official lecture slides, announcements, grade tracking, and homework `.py` submissions.
-:::
-
-::: {.callout-tip}
-## Help Us Improve
-
-This site is actively maintained. If you spot a typo, a broken link, or incorrect code, please reach out via eCampus. Your feedback keeps the materials accurate and up to date.
+**Konkuk eCampus** is used for lecture slides, announcements, grades, and homework `.py` submissions.
 :::
 
 ## Labs and Homeworks
 
-This practicum is organized into two types of activities: **Labs** for exploration and **Homeworks** for evaluation.
+**Labs** are for exploration. They are **not graded**. **Homeworks** are for evaluation.
 
 ### Labs (In-Class Exercises)
 
-Labs accompany each lecture unit. You receive Jupyter notebooks with complete, runnable code. Your job is to run them, read the explanations, and build intuition for the material covered in lecture.
+Labs go with each lecture unit. Setup, datasets, and a full lab list: [Exercises Guide](/exercises/index.html).
 
-Lab 0 notebooks follow a skill-oriented layout:
+- **Lab 0 and Lab 1:** working code is provided. Run the cells and read the notes.
+- **Lab 2:** implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook. On the course site, Practice outputs are the expected results after those functions are implemented.
 
-- **Objectives** — the specific Python skills you will practice. Read this first.
-- Short concept notes and numbered examples — executable cells to run, observe, and tinker with.
-
-Starting with Lab 1, each unit lives in its own folder (`exercises/lab01/`, …) and is split by **data type** — one notebook per type. `data.loader` locates and downloads the original files under the repository `data/` folder; helper `.py` files beside the notebooks construct representations. **Think** prompts ask what was stored in the original data versus what was derived.
-
-Lab 2 is split by **preprocessing topic**. The notebooks show worked examples; you implement the `TODO` functions in `lab02_1.py`, `lab02_2.py`, and `lab02_3.py`, then run the matching notebook.
-
-**Workflow:**
-
-1. **Run and Observe.** Execute cells top to bottom. Trace how each representation makes some patterns easy to see — and hides others.
-2. **Tinker Freely.** Change a representation, a similarity measure, or a frequency threshold, or intentionally break things to see what errors appear. Labs are low-stakes playgrounds — the best time to make mistakes.
+Follow [Environment Setup (한)](/exercises/environment-setup-ko.html) or [Environment Setup (en)](/exercises/environment-setup-en.html). Start Jupyter from the repository root.
 
 ::: {.callout-warning}
 ## Always Run Cells Top to Bottom
 
-Skipping cells or running them out of order causes later cells to fail due to missing variables or imports. If something breaks unexpectedly, restart the kernel and re-run from the top.
+If you skip cells or run them out of order, later cells fail (missing variables or imports). If something breaks, restart the kernel and re-run from the top.
 :::
 
 ### Homeworks (Graded)
 
-There are 8 homework assignments. All deadlines are at **11:59 PM KST**.
-
-- **Grading:** Evaluated by an autograder against your submitted `.py` files. Your score comes from both the provided doctests and **additional hidden test cases**. Passing all local doctests is a good sign, but it does not guarantee full credit.
-- **Format:** You receive a `.py` submission file and a `.ipynb` notebook for experimentation.
-
-**Workflow:**
-
-1. **Explore.** Open `hwXX.ipynb` and experiment freely. The notebook imports your functions from the `.py` file, so changes are reflected after a kernel restart.
-2. **Implement.** Find the `TODO` blocks in the `.py` file, remove `raise NotImplementedError`, and write your solution. See the [Assignments Guide](/assignments/index.html) for a full walkthrough.
-3. **Test.** Run `python -m doctest hwXX.py -v` in your terminal before submitting.
-4. **Submit.** Upload **only** the `.py` files to eCampus. Do not rename them and do not submit the notebook.
-
-::: {.callout-warning}
-## Two Things to Watch Out For
-
-**Restart the kernel after editing `.py` files.** Changes are not picked up until you restart and re-run all cells.
-
-**Remove `raise NotImplementedError` before submitting.** If this line remains in a function, it will always throw an error — even if your code above it is correct.
-:::
+Graded work is the `.py` files in the schedule below. Submit them to eCampus. Other units will be posted later.
 
 ## Schedule & Materials
 
-The timeline and specific contents below are subject to change as the course progresses. Labs marked as TBD have tentative topics that may be added, removed, or reordered.
+The timeline below may change. Labs marked TBD may be added, removed, or reordered.
 
-| Unit | Topic | Labs (Ungraded) | HW (Graded) |
+| Unit | Topic | Labs (Ungraded) | HW (Graded `.py`) |
 |:---|:---|:---|:---|
 | **0** | Python Prerequisites | [Lab0-1](/exercises/lab00/python-basics.html) · [Lab0-2](/exercises/lab00/numpy-basics.html) · [Lab0-3](/exercises/lab00/matplotlib-basics.html) · [Lab0-4](/exercises/lab00/pandas-basics.html) | - |
-| **1** | Data Representations | [Lab1-1](/exercises/lab01/lab01-1-record.html) · [Lab1-2](/exercises/lab01/lab01-2-text.html) · [Lab1-3](/exercises/lab01/lab01-3-graph.html) · [Lab1-4](/exercises/lab01/lab01-4-interaction.html) · [Lab1-5](/exercises/lab01/lab01-5-transaction.html) | TBD |
+| **1** | Data Representations | [Lab1-1](/exercises/lab01/lab01-1-record.html) · [Lab1-2](/exercises/lab01/lab01-2-text.html) · [Lab1-3](/exercises/lab01/lab01-3-graph.html) · [Lab1-4](/exercises/lab01/lab01-4-interaction.html) · [Lab1-5](/exercises/lab01/lab01-5-transaction.html) | - |
 | **2** | Data Preprocessing | [Lab2-1](/exercises/lab02/lab02-1.html) · [Lab2-2](/exercises/lab02/lab02-2.html) · [Lab2-3](/exercises/lab02/lab02-3.html) | `lab02_1.py` · `lab02_2.py` · `lab02_3.py` |
-
 
 ## Course Policies
 
 ### Autograder Rules
 
-To avoid losing credit on a correct solution, follow these rules exactly:
-
-- **Do not change function signatures.** Keep function names and parameters exactly as given.
+- **Do not change function signatures.** Keep names and parameters as given.
 - **Do not modify docstrings.** The doctests inside them are used for grading.
-- **Match the output format exactly.** Wrong type, wrong shape, or stray `print` statements will fail the autograder even if your logic is correct.
+- **Match the output format exactly.** Wrong type, wrong shape, or extra `print` statements fail the autograder even if the logic is right.
 - **Use only the packages already imported.** Do not add extra `import` statements.
 
 ### Late Submission Policy
@@ -103,13 +67,13 @@ Late submissions are accepted up to 3 days after the deadline:
 
 ### Collaboration & Academic Integrity
 
-Our goal is for every student to genuinely understand the course material.
+The goal is that every student understands the material.
 
-**Homeworks are individual.** You may not share code or written solutions with others, regardless of their enrollment status.
+**Homeworks are individual.** Do not share code or written solutions, regardless of enrollment status.
 
-**High-level discussion is welcome.** After spending at least 10 minutes on a problem yourself, you may discuss it verbally or sketch ideas on a whiteboard. You may not take away any written or electronic record from those sessions — no notes, no photos, no code, no messages.
+**High-level discussion is welcome.** After at least 10 minutes on a problem yourself, you may talk it through or sketch on a whiteboard. Do not take away a written or electronic record: no notes, photos, code, or messages.
 
-**On AI assistance.** You are permitted to use AI tools (ChatGPT, GitHub Copilot, etc.) as a learning aid — to clarify concepts, understand error messages, or explore unfamiliar syntax. However, two things are non-negotiable:
+**On AI assistance.** You may use AI tools (ChatGPT, GitHub Copilot, and similar) as a learning aid: to clarify concepts, read error messages, or check unfamiliar syntax. Two rules are fixed:
 
-- **Understand what you submit.** You must be able to explain every line of your code. If you cannot, that is a violation of academic integrity regardless of how it was written.
-- **Read the documentation yourself.** AI-generated answers can be wrong, outdated, or misleading. Learning to navigate official documentation (NumPy, pandas, Python) directly is a core skill of this course. Treat AI as a starting point, not a final answer.
+- **Understand what you submit.** You must be able to explain every line. If you cannot, that is an integrity violation, however the code was written.
+- **Read the documentation yourself.** AI answers can be wrong or outdated. Navigating official docs (NumPy, pandas, Python) is part of the course. Treat AI as a starting point, not the final answer.

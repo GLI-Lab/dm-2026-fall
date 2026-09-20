@@ -116,5 +116,3 @@ Labs are for exploration. After you have run the provided code, change things:
 - Subsample users, items, documents, or transactions and watch the representations change.
 - Swap one representation for another (for example a count matrix vs. TF-IDF, or an adjacency list vs. an adjacency matrix).
 - Break things on purpose (a missing path, a wrong key, a dense matrix that should have stayed sparse) and read the error.
-
-Graded homework is posted on the [Assignments](/assignments/index.html) page. Starter files appear in `assignments/` as each unit is released.

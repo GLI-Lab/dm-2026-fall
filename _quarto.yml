@@ -5,6 +5,7 @@ project:
   render:
     - "**/*.qmd"
     - "!**/*-solution.qmd"
+    - "!assignments/index.qmd"
 
 metadata:
   author: "Byungkook Oh"
