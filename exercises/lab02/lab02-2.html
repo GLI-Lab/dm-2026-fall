@@ -325,6 +325,29 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab3. Similarity and Dissimilarity</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/lab03-1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Distance Measures</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/lab03-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Similarity Measures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -377,7 +400,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.20</p>
+      <p class="date-modified">2026.09.21</p>
     </div>
   </div>
     
@@ -390,8 +413,13 @@ window.Quarto = {
 
 <section id="overview" class="level1">
 <h1>Overview</h1>
-<p>Preprocessing can change how the same attribute is represented.</p>
-<p>In this lab, we use <strong>Iris</strong> and <strong>Titanic</strong> to examine discretization, binarization, functional transformation, and scaling.</p>
+<p>In this lab, we use <strong>Iris</strong> and <strong>Titanic</strong> to examine four questions:</p>
+<ol type="1">
+<li>How do equal-width, equal-frequency, and k-means discretization differ?</li>
+<li>What extra information does supervised discretization use?</li>
+<li>How does one-hot binarization encode a categorical attribute?</li>
+<li>How do min-max and robust scaling put attributes on comparable ranges?</li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -412,7 +440,7 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="load-the-data">2.1 Load the Data</h2>
 <p><code>load_iris()</code> reads <code>data/record/iris.csv</code>. If that file is missing, it writes the scikit-learn Iris table there.</p>
 <p><code>load_titanic()</code> reads <code>data/record/titanic.csv</code>. If that file is missing, it downloads the seaborn Titanic table and saves it there.</p>
-<div id="d94d4b54" class="cell" data-execution_count="2">
+<div id="13929cb4" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>iris <span class="op">=</span> load_iris()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>titanic <span class="op">=</span> load_titanic()</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -479,7 +507,7 @@ window.Quarto = {
 </div>
 </div>
 </div>
-<div id="26901e4f" class="cell" data-execution_count="3">
+<div id="ae5d1ad1" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>titanic.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="3">
 <div>
@@ -609,7 +637,7 @@ window.Quarto = {
 <p>Discretization transforms a <strong>continuous attribute</strong> into a <strong>categorical attribute</strong>.</p>
 <p>In unsupervised discretization, boundaries are selected without class labels.</p>
 <p>We use Iris <code>petal length (cm)</code>.</p>
-<div id="c69e8659" class="cell" data-execution_count="4">
+<div id="fde57b64" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>petal_length <span class="op">=</span> iris[[</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal length (cm)"</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>]]</span>
@@ -669,7 +697,7 @@ window.Quarto = {
 <section id="equal-width" class="level3">
 <h3 class="anchored" data-anchor-id="equal-width">Equal Width</h3>
 <p>Equal-width discretization divides the value range into intervals with the same width.</p>
-<div id="27a96e94" class="cell" data-execution_count="5">
+<div id="866aff7a" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>uniform <span class="op">=</span> KBinsDiscretizer(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    n_bins<span class="op">=</span><span class="dv">3</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    encode<span class="op">=</span><span class="st">"ordinal"</span>,</span>
@@ -687,7 +715,7 @@ window.Quarto = {
 </div>
 </div>
 <p>The transformed values are ordinal bin numbers. We map them to categorical labels to make the discretized representation easier to read.</p>
-<div id="5f188d4a" class="cell" data-execution_count="6">
+<div id="826c5bbf" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>label_mapping <span class="op">=</span> {</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="dv">0</span>: <span class="st">"low"</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="dv">1</span>: <span class="st">"medium"</span>,</span>
@@ -769,7 +797,7 @@ window.Quarto = {
 <div class="callout-body-container callout-body">
 <p>Implement <code>equal_frequency_discretize()</code> in <code>lab02_2.py</code>. Create an equal-frequency discretizer with three bins and transform <code>petal_length</code>.</p>
 <p><strong>Hint:</strong> Use <code>strategy="quantile"</code> and <code>fit_transform()</code>.</p>
-<div id="c32320d9" class="cell" data-execution_count="7">
+<div id="dff589e5" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>quantile, quantile_bins <span class="op">=</span> equal_frequency_discretize(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    petal_length,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    n_bins<span class="op">=</span><span class="dv">3</span>,</span>
@@ -786,7 +814,7 @@ window.Quarto = {
 <section id="clustering-based" class="level3">
 <h3 class="anchored" data-anchor-id="clustering-based">Clustering-Based</h3>
 <p>K-means discretization places boundaries according to one-dimensional clusters.</p>
-<div id="99896e80" class="cell" data-execution_count="8">
+<div id="d27598da" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>kmeans <span class="op">=</span> KBinsDiscretizer(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    n_bins<span class="op">=</span><span class="dv">3</span>,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    encode<span class="op">=</span><span class="st">"ordinal"</span>,</span>
@@ -804,7 +832,7 @@ window.Quarto = {
 </div>
 </div>
 <p>Equal width considers the value range, while equal frequency considers the number of objects in each interval. Neither method necessarily finds natural groups in the data. Clustering-based discretization uses the data distribution to place boundaries.</p>
-<div id="2381424d" class="cell" data-execution_count="9">
+<div id="9c00e2b6" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>boundaries <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Equal width"</span>: uniform.bin_edges_[<span class="dv">0</span>],</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Equal frequency"</span>: quantile.bin_edges_[<span class="dv">0</span>],</span>
@@ -855,7 +883,7 @@ p_{ij},
 \]</span></p>
 <p>where <span class="math inline">\(p_{ij}\)</span> is the fraction of objects in interval <span class="math inline">\(i\)</span> that belong to class <span class="math inline">\(j\)</span>.</p>
 <p><code>entropy()</code> is provided in <code>helper.py</code>. A pure interval has entropy 0, while an evenly mixed interval has higher entropy.</p>
-<div id="d36f5599" class="cell" data-execution_count="10">
+<div id="e96dc8da" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pure <span class="op">=</span> np.array([</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"A"</span>, <span class="st">"A"</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>])</span>
@@ -880,7 +908,7 @@ Mixed entropy: 1.0</code></pre>
 </div>
 <p>To evaluate a candidate boundary, we first choose one threshold and split the attribute into two intervals.</p>
 <p>Here, <code>threshold = 2.45</code> is one candidate boundary for <code>petal length (cm)</code>.</p>
-<div id="fc2f5e88" class="cell" data-execution_count="11">
+<div id="cbbc5ea9" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>x <span class="op">=</span> iris[</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal length (cm)"</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>].to_numpy()</span>
@@ -952,7 +980,7 @@ e
 <div class="callout-body-container callout-body">
 <p>Implement <code>weighted_split_entropy()</code> in <code>lab02_2.py</code>. It should return the weighted entropy of the two intervals.</p>
 <p><strong>Hint:</strong> Weight each interval entropy by the proportion of objects in that interval. Use <code>entropy()</code> from <code>helper.py</code>.</p>
-<div id="186f274a" class="cell" data-execution_count="12">
+<div id="1cb37350" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>split_score <span class="op">=</span> weighted_split_entropy(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    left_labels,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    right_labels,</span>
@@ -970,7 +998,7 @@ e
 </div>
 <p>A good supervised boundary minimizes the weighted entropy.</p>
 <p>We can repeat the same calculation for all candidate thresholds.</p>
-<div id="462ab575" class="cell" data-execution_count="13">
+<div id="62bf04d5" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> split_entropy(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    x,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    y,</span>
@@ -1045,7 +1073,7 @@ e
 Minimum weighted entropy: 0.6667</code></pre>
 </div>
 </div>
-<div id="a3df3a3b" class="cell" data-execution_count="14">
+<div id="f5f32149" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>plot_entropy_thresholds(</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    candidate_thresholds,</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    scores,</span>
@@ -1086,7 +1114,7 @@ Class labels. Unsupervised methods look only at the attribute values.</p>
 <p>For example, five categories require only three binary variables with compact encoding, but five variables with one-hot encoding.</p>
 <p>Compact encoding uses fewer variables, but its binary codes can create associations that are not present in the original categorical data.</p>
 <p>In this lab, we use <strong>one-hot encoding</strong> with <code>pd.get_dummies()</code>.</p>
-<div id="e6c88900" class="cell" data-execution_count="15">
+<div id="6d3220dd" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>embarked_binary <span class="op">=</span> pd.get_dummies(</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    titanic[<span class="st">"embarked"</span>],</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    prefix<span class="op">=</span><span class="st">"embarked"</span>,</span>
@@ -1145,7 +1173,7 @@ Class labels. Unsupervised methods look only at the attribute values.</p>
 </div>
 </div>
 <p>Each binary column represents one category. A value of <code>1</code> indicates that the passenger belongs to that category, and <code>0</code> indicates otherwise.</p>
-<div id="2a2a7201" class="cell" data-execution_count="16">
+<div id="d0633f23" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>num_categories <span class="op">=</span> (</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    titanic[<span class="st">"embarked"</span>]</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    .nunique()</span>
@@ -1191,7 +1219,7 @@ One-hot variables: 3</code></pre>
 <div class="callout-body-container callout-body">
 <p>Implement <code>binarize_categorical()</code> in <code>lab02_2.py</code>. Convert the categorical attribute <code>sex</code> into binary variables.</p>
 <p><strong>Hint:</strong> Use <code>pd.get_dummies()</code> with <code>prefix="sex"</code> and <code>dtype=int</code>.</p>
-<div id="62326786" class="cell" data-execution_count="17">
+<div id="05e73598" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sex_binary <span class="op">=</span> binarize_categorical(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    titanic[<span class="st">"sex"</span>],</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    prefix<span class="op">=</span><span class="st">"sex"</span>,</span>
@@ -1277,7 +1305,7 @@ The bit patterns impose closeness that the original categories do not have. Two 
 <h2 class="anchored" data-anchor-id="functional-transformation">2.5 Functional Transformation</h2>
 <p>A functional transformation applies a mathematical function to a numerical attribute.</p>
 <p>Titanic <code>fare</code> has a long right tail, so we apply a log transformation.</p>
-<div id="12cf68fe" class="cell" data-execution_count="18">
+<div id="75cefb08" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>fare <span class="op">=</span> (</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    titanic[<span class="st">"fare"</span>]</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    .dropna()</span>
@@ -1335,7 +1363,7 @@ The bit patterns impose closeness that the original categories do not have. Two 
 </div>
 </div>
 </div>
-<div id="20709f1b" class="cell" data-execution_count="19">
+<div id="7e17aee3" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plot_log_transformation(</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    fare,</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    fare_log,</span>
@@ -1368,7 +1396,7 @@ The tail is compressed. Large fares move closer to the rest of the distribution.
 <h2 class="anchored" data-anchor-id="scaling">2.6 Scaling</h2>
 <p>Scaling places numerical attributes on comparable scales.</p>
 <p>We compare Titanic <code>age</code> and <code>fare</code>.</p>
-<div id="c957240a" class="cell" data-execution_count="20">
+<div id="ee0c5f75" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>X <span class="op">=</span> titanic[[</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"age"</span>,</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"fare"</span>,</span>
@@ -1454,7 +1482,7 @@ z
 =
 \frac{x-\mu}{\sigma}.
 \]</span></p>
-<div id="69bed2e9" class="cell" data-execution_count="21">
+<div id="c166a0ba" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>zscore <span class="op">=</span> (</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    X <span class="op">-</span> X.mean()</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>) <span class="op">/</span> X.std(</span>
@@ -1528,7 +1556,7 @@ x'
 \frac{x-\mu}
 {x_{\max}-x_{\min}}.
 \]</span></p>
-<div id="b7cf1ef1" class="cell" data-execution_count="22">
+<div id="bc6f02f0" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>mean_normalized <span class="op">=</span> (</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    X <span class="op">-</span> X.mean()</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>) <span class="op">/</span> (</span>
@@ -1620,7 +1648,7 @@ x_{\text{robust}}
 {IQR(x)}
 \]</span></p>
 <p><strong>Hint:</strong> For the IQR, use <code>X.quantile(0.75) - X.quantile(0.25)</code>.</p>
-<div id="b6ed93f9" class="cell" data-execution_count="23">
+<div id="7207c27e" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>minmax <span class="op">=</span> minmax_scale(X)</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>robust <span class="op">=</span> robust_scale(X)</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1764,7 +1792,7 @@ x_{\text{robust}}
 </div>
 </div>
 </div>
-<div id="40d4bf48" class="cell" data-execution_count="24">
+<div id="44470993" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>plot_scaling({</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Original"</span>: X,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Min-Max"</span>: minmax,</span>

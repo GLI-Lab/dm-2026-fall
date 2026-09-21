@@ -325,6 +325,29 @@ window.Quarto = {
 </li>
       </ul>
   </li>
+          <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false">
+ <span class="menu-text">Lab3. Similarity and Dissimilarity</span></a>
+          <a class="sidebar-item-toggle text-start collapsed" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="false" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth2 ">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/lab03-1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Distance Measures</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../../exercises/lab03/lab03-2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Similarity Measures</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
       </ul>
   </li>
     </ul>
@@ -379,7 +402,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">2026.09.20</p>
+      <p class="date-modified">2026.09.21</p>
     </div>
   </div>
     
@@ -392,8 +415,12 @@ window.Quarto = {
 
 <section id="overview" class="level1">
 <h1>Overview</h1>
-<p>In this lab, we use <strong>Iris</strong> and <strong>Moons</strong> to construct similarity graphs from Euclidean distances.</p>
-<p>We build <span class="math inline">\(\epsilon\)</span>-graphs and kNN graphs, then assign edge weights using the heat kernel.</p>
+<p>In this lab, we use <strong>Iris</strong> and <strong>Moons</strong> to examine three questions:</p>
+<ol type="1">
+<li>How does an <span class="math inline">\(\epsilon\)</span>-graph decide which pairs become edges?</li>
+<li>How does a kNN graph select neighbors, and why can a node’s degree exceed <span class="math inline">\(k\)</span>?</li>
+<li>How do heat-kernel weights decay as Euclidean distance grows?</li>
+</ol>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -413,17 +440,20 @@ window.Quarto = {
 </div>
 <section id="euclidean-distance" class="level2">
 <h2 class="anchored" data-anchor-id="euclidean-distance">3.1 Euclidean Distance</h2>
-<p>We first use Iris <code>petal length</code> and <code>petal width</code> from <code>data/record/iris.csv</code>.</p>
-<div id="494c637e" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>X_iris, species, iris <span class="op">=</span> (</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    load_iris_graph_data()</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>iris[[</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal length (cm)"</span>,</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal width (cm)"</span>,</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"species"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>]].head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>We first use Iris <code>petal length</code> and <code>petal width</code> from <code>data/record/iris.csv</code>. <code>load_iris()</code> writes that file if it is missing.</p>
+<div id="8845547f" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>iris <span class="op">=</span> load_iris()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>X_iris <span class="op">=</span> iris[[</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal length (cm)"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal width (cm)"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>]].to_numpy(dtype<span class="op">=</span><span class="bu">float</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>species <span class="op">=</span> iris[<span class="st">"species"</span>].to_numpy()</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>iris[[</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal length (cm)"</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"petal width (cm)"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"species"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>]].head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-display" data-execution_count="2">
 <div>
 
@@ -483,7 +513,7 @@ d(O_i,O_j)
 (x_{ip}-x_{jp})^2
 }.
 \]</span></p>
-<div id="0c2aabdc" class="cell" data-execution_count="3">
+<div id="bf0d8099" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> <span class="dv">0</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>j <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -502,7 +532,7 @@ d(O_i,O_j)
 </div>
 </div>
 <p>Now compute the Euclidean distance for every pair of Iris objects.</p>
-<div id="2e29cf20" class="cell" data-execution_count="4">
+<div id="564cb1b2" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>D_iris <span class="op">=</span> pairwise_distances(</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    X_iris,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    metric<span class="op">=</span><span class="st">"euclidean"</span>,</span>
@@ -597,7 +627,7 @@ d(O_i,O_j)
 </div>
 </div>
 <p>Each entry <code>D_iris[i, j]</code> is <span class="math inline">\(d(O_i,O_j)\)</span>.</p>
-<div id="7a209a91" class="cell" data-execution_count="5">
+<div id="94b680ea" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plot_distance_matrix(</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    D_iris,</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    title<span class="op">=</span><span class="st">"Iris Euclidean Distance Matrix"</span>,</span>
@@ -637,7 +667,7 @@ Zero. The distance from an object to itself is <span class="math inline">\(d(O_i
 <section id="step-1.-create-nodes" class="level3">
 <h3 class="anchored" data-anchor-id="step-1.-create-nodes">Step 1. Create Nodes</h3>
 <p>Each Iris object becomes one node.</p>
-<div id="8469e2fd" class="cell" data-execution_count="6">
+<div id="eb5ad325" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Number of nodes:"</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">len</span>(X_iris),</span>
@@ -650,7 +680,7 @@ Zero. The distance from an object to itself is <span class="math inline">\(d(O_i
 <section id="step-2.-create-edges" class="level3">
 <h3 class="anchored" data-anchor-id="step-2.-create-edges">Step 2. Create Edges</h3>
 <p>We first use a small distance matrix to see how each graph is constructed.</p>
-<div id="8cdab672" class="cell" data-execution_count="7">
+<div id="502e3895" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>D_small <span class="op">=</span> np.array([</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.0</span>, <span class="fl">0.2</span>, <span class="fl">0.8</span>],</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    [<span class="fl">0.2</span>, <span class="fl">0.0</span>, <span class="fl">0.5</span>],</span>
@@ -673,7 +703,7 @@ d(O_i,O_j)
 \epsilon.
 \]</span></p>
 <p>For example, with <span class="math inline">\(\epsilon=0.4\)</span>:</p>
-<div id="f76e8850" class="cell" data-execution_count="8">
+<div id="bc0cd777" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>epsilon_small <span class="op">=</span> <span class="fl">0.4</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>A_small_epsilon <span class="op">=</span> (</span>
@@ -706,7 +736,7 @@ d(O_i,O_j)
 <div class="callout-body-container callout-body">
 <p>Implement <code>epsilon_graph()</code> in <code>lab02_3.py</code>. Use <code>epsilon = 0.25</code> and construct the Iris <span class="math inline">\(\epsilon\)</span>-graph.</p>
 <p><strong>Hint:</strong> Compare <code>D</code> with <code>epsilon</code>, then set the diagonal to <code>False</code>.</p>
-<div id="c820f2f1" class="cell" data-execution_count="9">
+<div id="9a9bf2d0" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>epsilon <span class="op">=</span> <span class="fl">0.25</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>A_epsilon <span class="op">=</span> epsilon_graph(</span>
@@ -728,7 +758,7 @@ dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div id="4b3f73df" class="cell" data-execution_count="10">
+<div id="2a1468d4" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    X_iris,</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    A_epsilon,</span>
@@ -768,7 +798,7 @@ O_i
 O_j.
 \]</span></p>
 <p>For the same distance matrix, use <span class="math inline">\(K=1\)</span>:</p>
-<div id="83211461" class="cell" data-execution_count="11">
+<div id="668f6d11" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>K_small <span class="op">=</span> <span class="dv">1</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>n_small <span class="op">=</span> D_small.shape[<span class="dv">0</span>]</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -798,7 +828,7 @@ O_j.
 </div>
 </div>
 <p>Each row shows the nearest-neighbor edge selected from one object. The direction is often ignored.</p>
-<div id="b84e1a81" class="cell" data-execution_count="12">
+<div id="503e1d05" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>A_small_knn <span class="op">=</span> (</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    A_small_knn_directed</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="op">|</span> A_small_knn_directed.T</span>
@@ -823,7 +853,7 @@ O_j.
 <div class="callout-body-container callout-body">
 <p>Implement <code>knn_graph()</code> in <code>lab02_3.py</code>. Apply the same kNN rule to every Iris object using <code>K = 4</code>, then ignore direction.</p>
 <p><strong>Hint:</strong> For each row, set the self-distance to <code>inf</code>, sort the distances, and keep the first <code>K</code> indices. Symmetrize with a transpose.</p>
-<div id="2a57fc57" class="cell" data-execution_count="13">
+<div id="12ee6ecb" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>K <span class="op">=</span> <span class="dv">4</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>A_knn <span class="op">=</span> knn_graph(</span>
@@ -845,7 +875,7 @@ dtype: float64</code></pre>
 </div>
 </div>
 </div>
-<div id="f286c6be" class="cell" data-execution_count="14">
+<div id="42e8b4b5" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    X_iris,</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    A_knn,</span>
@@ -891,7 +921,7 @@ w_{ij}
 \]</span></p>
 <p>Here, <span class="math inline">\(t\)</span> controls how quickly similarity decreases with distance.</p>
 <p>Because <code>D_iris</code> contains <strong>Euclidean distances</strong>, the heat-kernel similarity matrix is computed directly from <code>D_iris</code>.</p>
-<div id="52f51d8d" class="cell" data-execution_count="15">
+<div id="09b4e55b" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>t <span class="op">=</span> <span class="fl">1.0</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>W <span class="op">=</span> np.exp(</span>
@@ -991,7 +1021,7 @@ w_{ij}
 <div class="callout-body-container callout-body">
 <p>Implement <code>apply_edge_weights()</code> in <code>lab02_3.py</code>. Keep heat-kernel weights only for the edges selected by the <span class="math inline">\(\epsilon\)</span>-graph and kNN graph.</p>
 <p><strong>Hint:</strong> Use <code>np.where()</code> with the adjacency matrix and <code>W</code>.</p>
-<div id="84a0f651" class="cell" data-execution_count="16">
+<div id="20cd548e" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>W_epsilon <span class="op">=</span> apply_edge_weights(</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    W,</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    A_epsilon,</span>
@@ -1084,7 +1114,7 @@ w_{ij}
 </div>
 </div>
 </div>
-<div id="ee6bcca6" class="cell" data-execution_count="17">
+<div id="1c9d2956" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    X_iris,</span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    A_epsilon,</span>
@@ -1101,7 +1131,7 @@ w_{ij}
 </div>
 </div>
 </div>
-<div id="28911d76" class="cell" data-execution_count="18">
+<div id="626f4f73" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    X_iris,</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    A_knn,</span>
@@ -1137,7 +1167,7 @@ The heat-kernel weight decays toward 0. Distant pairs contribute almost no simil
 <section id="similarity-graphs-on-moons" class="level2">
 <h2 class="anchored" data-anchor-id="similarity-graphs-on-moons">3.3 Similarity Graphs on Moons</h2>
 <p>We now apply the <strong>same functions</strong> to the Moons dataset. Do not reimplement the graph rules here. Reuse <code>epsilon_graph()</code>, <code>knn_graph()</code>, and <code>apply_edge_weights()</code> from <code>lab02_3.py</code>.</p>
-<div id="6a84de1a" class="cell" data-execution_count="19">
+<div id="23b3f76e" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>X_moons, y_moons <span class="op">=</span> (</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    load_moons_graph_data()</span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>)</span>
@@ -1230,7 +1260,7 @@ The heat-kernel weight decays toward 0. Distant pairs contribute almost no simil
 <p>The labels <code>y_moons</code> are used only for visualization.</p>
 <section id="epsilon-graph-1" class="level3">
 <h3 class="anchored" data-anchor-id="epsilon-graph-1"><span class="math inline">\(\epsilon\)</span>-Graph</h3>
-<div id="5ba54c1f" class="cell" data-execution_count="20">
+<div id="49e7067a" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>epsilon_moons <span class="op">=</span> <span class="fl">0.22</span></span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>A_moons_epsilon <span class="op">=</span> epsilon_graph(</span>
@@ -1250,7 +1280,7 @@ mean_degree      7.014286
 dtype: float64</code></pre>
 </div>
 </div>
-<div id="7883752d" class="cell" data-execution_count="21">
+<div id="f3e3a1d3" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    X_moons,</span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    A_moons_epsilon,</span>
@@ -1269,7 +1299,7 @@ dtype: float64</code></pre>
 </section>
 <section id="knn-graph-1" class="level3">
 <h3 class="anchored" data-anchor-id="knn-graph-1">kNN Graph</h3>
-<div id="7f4375bb" class="cell" data-execution_count="22">
+<div id="db5643a8" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>K_moons <span class="op">=</span> <span class="dv">4</span></span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>A_moons_knn <span class="op">=</span> knn_graph(</span>
@@ -1289,7 +1319,7 @@ mean_degree      4.928571
 dtype: float64</code></pre>
 </div>
 </div>
-<div id="cb141c9b" class="cell" data-execution_count="23">
+<div id="df911e36" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    X_moons,</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    A_moons_knn,</span>
@@ -1318,7 +1348,7 @@ w_{ij}
 {t^2}
 \right).
 \]</span></p>
-<div id="17fec343" class="cell" data-execution_count="24">
+<div id="7c392d95" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>t_moons <span class="op">=</span> epsilon_moons</span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>W_moons <span class="op">=</span> np.exp(</span>
@@ -1336,7 +1366,7 @@ w_{ij}
 <span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    A_moons_knn,</span>
 <span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f69a768f" class="cell" data-execution_count="25">
+<div id="b079595e" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    X_moons,</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    A_moons_epsilon,</span>
@@ -1353,7 +1383,7 @@ w_{ij}
 </div>
 </div>
 </div>
-<div id="b698acba" class="cell" data-execution_count="26">
+<div id="3a8385ab" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>plot_similarity_graph(</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    X_moons,</span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    A_moons_knn,</span>
