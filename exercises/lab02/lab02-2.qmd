@@ -11,10 +11,12 @@ execute:
 
 # Overview
 
-Preprocessing can change how the same attribute is represented.
+In this lab, we use **Iris** and **Titanic** to examine four questions:
 
-In this lab, we use **Iris** and **Titanic** to examine discretization,
-binarization, functional transformation, and scaling.
+1. How do equal-width, equal-frequency, and k-means discretization differ?
+2. What extra information does supervised discretization use?
+3. How does one-hot binarization encode a categorical attribute?
+4. How do min-max and robust scaling put attributes on comparable ranges?
 
 ::: {.callout-note}
 ## Implement in `lab02_2.py` first

@@ -1,0 +1,887 @@
+---
+title: "Lab 03-1. Distance Measures for Numerical and Mixed Data"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+In this lab, we use **Iris** and **Titanic** to examine four questions:
+
+1. How do Euclidean, Manhattan, and Minkowski distances differ?
+2. How does Mahalanobis distance use feature correlation?
+3. How can feature scaling change nearest-neighbor rankings?
+4. How can numerical and categorical attributes be compared together?
+
+::: {.callout-note}
+## Implement in `lab03_1.py` first
+
+This notebook calls functions from `lab03_1.py`. Find each
+`# ========== TODO ==========` block, remove `raise NotImplementedError`,
+and write your implementation. Restart the kernel after editing the `.py`
+file, then run this notebook from the top.
+
+On the course site, Practice cell outputs are the expected results after those functions are implemented. Your local notebook will not produce them until the TODOs are done.
+
+Check your functions with:
+
+```bash
+python -m doctest lab03_1.py -v
+```
+:::
+
+
+```{python}
+#| label: setup-distance-measures
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab03")
+if not (_lab / "helper.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import helper
+import numpy as np
+import pandas as pd
+
+from sklearn.preprocessing import StandardScaler
+
+from data.loader import load_iris, load_titanic
+from lab03_1 import (
+    euclidean_distance,
+    gower_distance,
+    mahalanobis_distance,
+    manhattan_distance,
+    minkowski_distance,
+    neighbor_ranking,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 1.1 Distance Measures on Iris
+
+The Iris dataset represents each flower with four numerical attributes.
+`load_iris()` reads `data/record/iris.csv`. If that file is missing, it
+writes the scikit-learn Iris table there.
+
+```{python}
+iris = load_iris()
+feature_columns = [
+    "sepal length (cm)",
+    "sepal width (cm)",
+    "petal length (cm)",
+    "petal width (cm)",
+]
+X_iris = iris[feature_columns].to_numpy(dtype=float)
+
+iris[feature_columns + ["species"]].head()
+```
+
+For vectors $x=(x_1,\ldots,x_d)$ and $y=(y_1,\ldots,y_d)$, Minkowski distance is
+
+$$
+L_p(x,y)
+=
+\left(
+\sum_{i=1}^{d}|x_i-y_i|^p
+\right)^{1/p}.
+$$
+
+Two common special cases are
+
+$$
+L_1(x,y)=\sum_i |x_i-y_i|
+$$
+
+and
+
+$$
+L_2(x,y)=\sqrt{\sum_i (x_i-y_i)^2}.
+$$
+
+Thus, $L_1$ is Manhattan distance and $L_2$ is Euclidean distance.
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 1. Euclidean, Manhattan, and Minkowski Distance**
+
+Implement the following functions in `lab03_1.py`:
+
+- `euclidean_distance()`
+- `manhattan_distance()`
+- `minkowski_distance()`
+- `neighbor_ranking()`
+
+First verify that Minkowski distance with $p=1$ and $p=2$ matches the two
+special cases. Then compare the five nearest neighbors of the same Iris
+flower under Manhattan and Euclidean distance.
+
+**Hint:** The query object itself should not appear in its neighbor list.
+
+```{python}
+x = X_iris[0]
+y = X_iris[1]
+
+print(
+    "Manhattan:",
+    round(manhattan_distance(x, y), 4),
+)
+print(
+    "Minkowski p=1:",
+    round(minkowski_distance(x, y, p=1), 4),
+)
+print(
+    "Euclidean:",
+    round(euclidean_distance(x, y), 4),
+)
+print(
+    "Minkowski p=2:",
+    round(minkowski_distance(x, y, p=2), 4),
+)
+```
+
+```{python}
+query_pos = 10
+
+idx_l1, dist_l1 = neighbor_ranking(
+    X_iris,
+    query_pos,
+    manhattan_distance,
+    k=5,
+)
+
+idx_l2, dist_l2 = neighbor_ranking(
+    X_iris,
+    query_pos,
+    euclidean_distance,
+    k=5,
+)
+
+print(
+    "Query:",
+    query_pos,
+    iris.iloc[query_pos]["species"],
+)
+
+l1_neighbors = iris.iloc[idx_l1][
+    feature_columns + ["species"]
+].copy()
+l1_neighbors.insert(0, "object", idx_l1)
+l1_neighbors["distance"] = dist_l1
+
+l2_neighbors = iris.iloc[idx_l2][
+    feature_columns + ["species"]
+].copy()
+l2_neighbors.insert(0, "object", idx_l2)
+l2_neighbors["distance"] = dist_l2
+
+print("Manhattan Top-5")
+display(l1_neighbors.round(3))
+
+print("Euclidean Top-5")
+display(l2_neighbors.round(3))
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can Manhattan and Euclidean distance produce different neighbor rankings?  
+Manhattan distance adds all coordinate differences directly, while Euclidean
+distance squares them before summing. Large differences in a few coordinates
+therefore affect the two measures differently.
+:::
+
+## 1.2 Mahalanobis Distance and Feature Correlation
+
+Euclidean distance treats every direction the same. If two attributes move
+together, a step along that shared direction is a common pattern, while a
+step against it is unusual. **Mahalanobis distance** uses the inverse
+covariance matrix to make that distinction:
+
+$$
+d_M(x,y)
+=
+\sqrt{(x-y)^{\top}\Sigma^{-1}(x-y)}.
+$$
+
+If $\Sigma = I$, Mahalanobis distance reduces to Euclidean distance.
+
+Titanic `age` and `fare` are almost uncorrelated, so Mahalanobis would mostly
+repeat the scale story in the next section. Iris **petal length** and **petal
+width** have correlation about $0.96$, which is the setting where the two
+distances disagree. We z-score the two petal attributes first so remaining
+neighbor changes come from correlation, not from raw units.
+
+```{python}
+petal_columns = [
+    "petal length (cm)",
+    "petal width (cm)",
+]
+X_petal = iris[petal_columns].to_numpy(dtype=float)
+X_petal_scaled = StandardScaler().fit_transform(X_petal)
+
+petal_corr = pd.DataFrame(
+    X_petal,
+    columns=petal_columns,
+).corr().round(3)
+
+petal_corr
+```
+
+Estimate $\Sigma$ on the standardized petal cloud, then invert it.
+
+```{python}
+petal_cov = np.cov(X_petal_scaled, rowvar=False)
+petal_cov_inv = np.linalg.inv(petal_cov)
+
+print("Covariance")
+display(pd.DataFrame(
+    petal_cov,
+    index=petal_columns,
+    columns=petal_columns,
+).round(3))
+
+print("Inverse covariance")
+display(pd.DataFrame(
+    petal_cov_inv,
+    index=petal_columns,
+    columns=petal_columns,
+).round(3))
+```
+
+The notebook selects a flower whose nearest neighbor changes when Euclidean
+distance is replaced by Mahalanobis distance.
+
+```{python}
+#| label: select-mahalanobis-query
+#| include: false
+
+def _select_mahalanobis_query(
+    X,
+    cov_inv,
+    k=5,
+):
+    best_query = None
+    best_score = None
+
+    for query_pos in range(len(X)):
+        euc_idx, euc_dist = neighbor_ranking(
+            X,
+            query_pos,
+            euclidean_distance,
+            k=k,
+        )
+        mah_idx, mah_dist = neighbor_ranking(
+            X,
+            query_pos,
+            mahalanobis_distance,
+            k=k,
+            cov_inv=cov_inv,
+        )
+
+        if (
+            np.isclose(euc_dist, 0.0).any()
+            or np.isclose(mah_dist, 0.0).any()
+        ):
+            continue
+
+        nn_flip = int(euc_idx[0] != mah_idx[0])
+        overlap = len(set(euc_idx.tolist()) & set(mah_idx.tolist()))
+        story = (
+            float(np.linalg.norm(X[mah_idx[0]] - X[query_pos]))
+            - float(np.linalg.norm(X[euc_idx[0]] - X[query_pos]))
+        )
+
+        # Prefer a 1-NN flip, then a smaller Top-k overlap, then a larger
+        # Euclidean gap between the two neighbors.
+        score = (
+            -nn_flip,
+            overlap,
+            -story,
+        )
+
+        if best_score is None or score < best_score:
+            best_query = query_pos
+            best_score = score
+
+    return best_query
+
+
+mahalanobis_query_pos = _select_mahalanobis_query(
+    X_petal_scaled,
+    petal_cov_inv,
+    k=5,
+)
+```
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 2. Mahalanobis Distance on Iris Petals**
+
+Implement `mahalanobis_distance()` in `lab03_1.py`. Use your
+`neighbor_ranking()` function to compare the five nearest flowers under
+Euclidean distance and Mahalanobis distance on the standardized petal
+coordinates.
+
+**Hint:** Pass `cov_inv=petal_cov_inv` as a keyword argument to
+`neighbor_ranking()`. If `cov_inv` is `np.eye(2)`, the two rankings should
+match.
+
+```{python}
+print(
+    "Identity-matrix check (should match Euclidean):",
+    round(
+        mahalanobis_distance(
+            X_petal_scaled[0],
+            X_petal_scaled[1],
+            np.eye(2),
+        ),
+        4,
+    ),
+    round(
+        euclidean_distance(
+            X_petal_scaled[0],
+            X_petal_scaled[1],
+        ),
+        4,
+    ),
+)
+```
+
+```{python}
+query_pos = mahalanobis_query_pos
+
+euc_idx, euc_dist = neighbor_ranking(
+    X_petal_scaled,
+    query_pos,
+    euclidean_distance,
+    k=5,
+)
+mah_idx, mah_dist = neighbor_ranking(
+    X_petal_scaled,
+    query_pos,
+    mahalanobis_distance,
+    k=5,
+    cov_inv=petal_cov_inv,
+)
+
+print(
+    "Query:",
+    query_pos,
+    iris.iloc[query_pos]["species"],
+)
+
+euc_neighbors = iris.iloc[euc_idx][
+    petal_columns + ["species"]
+].copy()
+euc_neighbors.insert(0, "object", euc_idx)
+euc_neighbors["distance"] = euc_dist
+
+mah_neighbors = iris.iloc[mah_idx][
+    petal_columns + ["species"]
+].copy()
+mah_neighbors.insert(0, "object", mah_idx)
+mah_neighbors["distance"] = mah_dist
+
+print("Euclidean Top-5")
+display(euc_neighbors.round(3))
+
+print("Mahalanobis Top-5")
+display(mah_neighbors.round(3))
+```
+
+```{python}
+#| fig-cap: "Standardized petal length and width: Euclidean vs Mahalanobis nearest neighbor"
+
+helper.plot_mahalanobis_neighbors(
+    X_petal_scaled,
+    iris["species"].to_numpy(),
+    query_pos,
+    int(euc_idx[0]),
+    int(mah_idx[0]),
+    xlabel="petal length (z-score)",
+    ylabel="petal width (z-score)",
+)
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can Euclidean and Mahalanobis neighbors differ after z-score
+standardization?  
+Z-score only equalizes the variance of each axis. Euclidean distance still
+treats the two axes as independent, so a step against the petal
+length-width trend can look as close as a step along it. Mahalanobis
+distance uses the off-diagonal covariance: movement along the elongated
+cloud is cheaper, and movement across it is more expensive.
+:::
+
+## 1.3 Feature Scale and Neighbor Ranking
+
+Distance measures operate on the numerical values given to them. If one
+attribute is measured on a much larger scale than another, it can dominate
+the distance.
+
+We use Titanic `age` and `fare` to observe this effect.
+
+```{python}
+titanic = load_titanic()
+
+numeric = (
+    titanic[["age", "fare"]]
+    .dropna()
+    .copy()
+)
+
+numeric.insert(
+    0,
+    "passenger_index",
+    numeric.index,
+)
+numeric = numeric.reset_index(drop=True)
+
+numeric.head()
+```
+
+`age` is measured in years, while `fare` can have a much larger numerical
+range.
+
+```{python}
+numeric[["age", "fare"]].agg([
+    "min",
+    "max",
+    "mean",
+    "std",
+]).round(2)
+```
+
+Prepare both the raw and standardized representations. For a clear comparison,
+the notebook selects a query passenger whose Top-5 neighborhoods differ
+between the two representations.
+
+```{python}
+#| label: select-scaling-query
+#| include: false
+
+X_raw = numeric[["age", "fare"]].to_numpy(dtype=float)
+X_scaled = StandardScaler().fit_transform(X_raw)
+
+
+def _select_scaling_query(
+    X_raw,
+    X_scaled,
+    k=5,
+):
+    best_query = None
+    best_overlap = k + 1
+
+    for query_pos in range(len(X_raw)):
+        raw_idx, raw_dist = neighbor_ranking(
+            X_raw,
+            query_pos,
+            euclidean_distance,
+            k=k,
+        )
+        scaled_idx, scaled_dist = neighbor_ranking(
+            X_scaled,
+            query_pos,
+            euclidean_distance,
+            k=k,
+        )
+
+        # Prefer a query without exact duplicates on age and fare.
+        if (
+            np.isclose(raw_dist, 0.0).any()
+            or np.isclose(scaled_dist, 0.0).any()
+        ):
+            continue
+
+        overlap = len(
+            set(raw_idx.tolist())
+            & set(scaled_idx.tolist())
+        )
+
+        if overlap < best_overlap:
+            best_query = query_pos
+            best_overlap = overlap
+
+            if overlap <= 1:
+                break
+
+    # Fallback: choose the query with the smallest Top-k overlap.
+    if best_query is None:
+        for query_pos in range(len(X_raw)):
+            raw_idx, _ = neighbor_ranking(
+                X_raw,
+                query_pos,
+                euclidean_distance,
+                k=k,
+            )
+            scaled_idx, _ = neighbor_ranking(
+                X_scaled,
+                query_pos,
+                euclidean_distance,
+                k=k,
+            )
+
+            overlap = len(
+                set(raw_idx.tolist())
+                & set(scaled_idx.tolist())
+            )
+
+            if overlap < best_overlap:
+                best_query = query_pos
+                best_overlap = overlap
+
+    return best_query
+
+
+scaling_query_pos = _select_scaling_query(
+    X_raw,
+    X_scaled,
+    k=5,
+)
+```
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 3. Nearest Neighbors Before and After Standardization**
+
+Use your `euclidean_distance()` and `neighbor_ranking()` implementations to
+find the five nearest passengers before and after z-score standardization.
+
+Standardization itself is provided by `StandardScaler` because scaling was
+implemented in the previous lab. Focus on how the **neighbor ranking changes**
+when `age` and `fare` are put on comparable scales.
+
+```{python}
+query_pos = scaling_query_pos
+
+raw_idx, raw_dist = neighbor_ranking(
+    X_raw,
+    query_pos,
+    euclidean_distance,
+    k=5,
+)
+
+scaled_idx, scaled_dist = neighbor_ranking(
+    X_scaled,
+    query_pos,
+    euclidean_distance,
+    k=5,
+)
+
+print("Query passenger")
+display(
+    numeric.iloc[[query_pos]]
+    .reset_index(drop=True)
+)
+
+raw_neighbors = (
+    numeric.iloc[raw_idx]
+    .copy()
+    .reset_index(drop=True)
+)
+raw_neighbors.insert(
+    0,
+    "rank",
+    np.arange(1, len(raw_neighbors) + 1),
+)
+raw_neighbors["distance"] = raw_dist
+
+scaled_neighbors = (
+    numeric.iloc[scaled_idx]
+    .copy()
+    .reset_index(drop=True)
+)
+scaled_neighbors.insert(
+    0,
+    "rank",
+    np.arange(1, len(scaled_neighbors) + 1),
+)
+scaled_neighbors["distance"] = scaled_dist
+
+print("Raw Age/Fare Top-5")
+display(raw_neighbors.round(3))
+
+print("Standardized Age/Fare Top-5")
+display(scaled_neighbors.round(3))
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can the nearest-neighbor ranking change after standardization?  
+The distance formula is unchanged, but the relative contribution of each
+attribute changes. On the raw scale, the larger numerical variation of
+`fare` can dominate Euclidean distance. After standardization, `age` and
+`fare` contribute on comparable scales, so a different set of passengers can
+become nearest neighbors.
+:::
+
+## 1.4 Gower Distance for Mixed-Type Records
+
+Real records often contain numerical and categorical attributes together.
+For this exercise, use the following Titanic attributes:
+
+- numerical: `age`, `fare`
+- categorical: `sex`, `pclass`, `embarked`
+
+For a numerical attribute $k$, Gower uses a range-normalized difference:
+
+$$
+d_k(i,j)
+=
+\frac{|x_{ik}-x_{jk}|}{R_k},
+$$
+
+where $R_k$ is the range of that attribute.
+
+For a categorical attribute,
+
+$$
+d_k(i,j)
+=
+\begin{cases}
+0, & x_{ik}=x_{jk}\\
+1, & x_{ik}\ne x_{jk}.
+\end{cases}
+$$
+
+The final Gower distance is the average of the per-attribute distances.
+To keep this implementation focused, we use complete records only and treat
+`pclass` as categorical.
+
+```{python}
+mixed_columns = [
+    "age",
+    "fare",
+    "sex",
+    "pclass",
+    "embarked",
+]
+
+mixed = (
+    titanic[mixed_columns]
+    .dropna()
+    .copy()
+)
+
+mixed.insert(
+    0,
+    "passenger_index",
+    mixed.index,
+)
+mixed = mixed.reset_index(drop=True)
+
+mixed.head()
+```
+
+Prepare the mixed-type representation and a numerical-only representation for
+comparison. The notebook selects a query whose Gower neighbors are not exact
+duplicates and whose neighborhood differs from the numerical-only result.
+
+```{python}
+#| label: prepare-gower-query
+#| include: false
+
+X_mixed = mixed[mixed_columns].to_numpy(dtype=object)
+
+numeric_indices = [0, 1]
+categorical_indices = [2, 3, 4]
+
+numeric_ranges = [
+    mixed["age"].max() - mixed["age"].min(),
+    mixed["fare"].max() - mixed["fare"].min(),
+]
+
+X_mixed_numeric = StandardScaler().fit_transform(
+    mixed[["age", "fare"]]
+)
+
+
+def _select_gower_query(
+    X_mixed,
+    X_numeric,
+    k=5,
+):
+    best_query = None
+    best_score = None
+
+    for query_pos in range(len(X_mixed)):
+        gower_idx, gower_dist = neighbor_ranking(
+            X_mixed,
+            query_pos,
+            gower_distance,
+            k=k,
+            numeric_indices=numeric_indices,
+            categorical_indices=categorical_indices,
+            numeric_ranges=numeric_ranges,
+        )
+
+        numeric_idx, _ = neighbor_ranking(
+            X_numeric,
+            query_pos,
+            euclidean_distance,
+            k=k,
+        )
+
+        zero_count = int(
+            np.isclose(gower_dist, 0.0).sum()
+        )
+        overlap = len(
+            set(gower_idx.tolist())
+            & set(numeric_idx.tolist())
+        )
+
+        # Prefer no exact duplicates, then less overlap between the two rankings.
+        score = (
+            zero_count,
+            overlap,
+        )
+
+        if best_score is None or score < best_score:
+            best_query = query_pos
+            best_score = score
+
+            if score == (0, 0):
+                break
+
+    return best_query
+
+
+gower_query_pos = _select_gower_query(
+    X_mixed,
+    X_mixed_numeric,
+    k=5,
+)
+```
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 4. Gower Distance on Titanic**
+
+Implement `gower_distance()` in `lab03_1.py` and use it to find the five
+nearest passengers to the selected mixed-type record.
+
+**Hint:** Each numerical attribute contributes a value in $[0,1]$ after range
+normalization. A categorical match contributes 0 distance and a mismatch
+contributes 1.
+
+```{python}
+print(
+    "Example Gower distance between the first two records:",
+    round(
+        gower_distance(
+            X_mixed[0],
+            X_mixed[1],
+            numeric_indices=numeric_indices,
+            categorical_indices=categorical_indices,
+            numeric_ranges=numeric_ranges,
+        ),
+        4,
+    ),
+)
+```
+
+```{python}
+query_pos = gower_query_pos
+
+gower_idx, gower_dist = neighbor_ranking(
+    X_mixed,
+    query_pos,
+    gower_distance,
+    k=5,
+    numeric_indices=numeric_indices,
+    categorical_indices=categorical_indices,
+    numeric_ranges=numeric_ranges,
+)
+
+numeric_idx, numeric_dist = neighbor_ranking(
+    X_mixed_numeric,
+    query_pos,
+    euclidean_distance,
+    k=5,
+)
+
+print("Query passenger")
+display(
+    mixed.iloc[[query_pos]]
+    .reset_index(drop=True)
+)
+```
+
+```{python}
+gower_neighbors = (
+    mixed.iloc[gower_idx]
+    .copy()
+    .reset_index(drop=True)
+)
+gower_neighbors.insert(
+    0,
+    "rank",
+    np.arange(1, len(gower_neighbors) + 1),
+)
+gower_neighbors["gower_distance"] = gower_dist
+
+print("Gower Top-5")
+display(gower_neighbors.round(3))
+```
+
+```{python}
+numeric_neighbors = (
+    mixed.iloc[numeric_idx]
+    .copy()
+    .reset_index(drop=True)
+)
+numeric_neighbors.insert(
+    0,
+    "rank",
+    np.arange(1, len(numeric_neighbors) + 1),
+)
+numeric_neighbors["distance"] = numeric_dist
+
+print("Standardized Age/Fare Top-5")
+display(numeric_neighbors.round(3))
+```
+
+Finally, compare the passenger IDs returned by the two definitions of
+distance.
+
+```{python}
+comparison = pd.DataFrame({
+    "rank": np.arange(1, 6),
+    "Gower passenger": (
+        mixed.iloc[gower_idx]["passenger_index"]
+        .to_numpy()
+    ),
+    "Gower distance": gower_dist,
+    "Numeric-only passenger": (
+        mixed.iloc[numeric_idx]["passenger_index"]
+        .to_numpy()
+    ),
+    "Numeric-only distance": numeric_dist,
+})
+
+comparison.round(3)
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can Gower and standardized Euclidean distance return different neighbors?  
+Standardized Euclidean distance compares only `age` and `fare`. Gower uses the
+same numerical information together with agreement on `sex`, `pclass`, and
+`embarked`. The two measures therefore encode different definitions of
+similarity, so they can produce different nearest-neighbor rankings.
+:::
+

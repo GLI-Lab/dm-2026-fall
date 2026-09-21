@@ -95,6 +95,12 @@ website:
                   href: exercises/lab02/lab02-2.qmd
                 - text: "Similarity Graph"
                   href: exercises/lab02/lab02-3.qmd
+            - section: "Lab3. Similarity and Dissimilarity"
+              contents:
+                - text: "Distance Measures"
+                  href: exercises/lab03/lab03-1.qmd
+                - text: "Similarity Measures"
+                  href: exercises/lab03/lab03-2.qmd
     # - id: assignments
     #   title: "Assignments"
     #   collapse-level: 1

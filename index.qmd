@@ -21,7 +21,7 @@ This practicum is **data pattern mining**: frequent, sequential, structural, and
 Labs go with each lecture unit. Setup, datasets, and a full lab list: [Exercises Guide](/exercises/index.html).
 
 - **Lab 0 and Lab 1:** working code is provided. Run the cells and read the notes.
-- **Lab 2:** implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook. On the course site, Practice outputs are the expected results after those functions are implemented.
+- **Lab 2 onward:** implement the `TODO` functions in that unit's `labXX_*.py` first, restart the kernel, then run the matching notebook. On the course site, Practice outputs are the expected results after those functions are implemented.
 
 Follow [Environment Setup (한)](/exercises/environment-setup-ko.html) or [Environment Setup (en)](/exercises/environment-setup-en.html). Start Jupyter from the repository root.
 
@@ -44,6 +44,7 @@ The timeline below may change. Labs marked TBD may be added, removed, or reorder
 | **0** | Python Prerequisites | [Lab0-1](/exercises/lab00/python-basics.html) · [Lab0-2](/exercises/lab00/numpy-basics.html) · [Lab0-3](/exercises/lab00/matplotlib-basics.html) · [Lab0-4](/exercises/lab00/pandas-basics.html) | - |
 | **1** | Data Representations | [Lab1-1](/exercises/lab01/lab01-1-record.html) · [Lab1-2](/exercises/lab01/lab01-2-text.html) · [Lab1-3](/exercises/lab01/lab01-3-graph.html) · [Lab1-4](/exercises/lab01/lab01-4-interaction.html) · [Lab1-5](/exercises/lab01/lab01-5-transaction.html) | - |
 | **2** | Data Preprocessing | [Lab2-1](/exercises/lab02/lab02-1.html) · [Lab2-2](/exercises/lab02/lab02-2.html) · [Lab2-3](/exercises/lab02/lab02-3.html) | `lab02_1.py` · `lab02_2.py` · `lab02_3.py` |
+| **3** | Similarity and Dissimilarity | [Lab3-1](/exercises/lab03/lab03-1.html) · [Lab3-2](/exercises/lab03/lab03-2.html) | `lab03_1.py` · `lab03_2.py` |
 
 ## Course Policies
 

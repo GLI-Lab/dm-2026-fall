@@ -36,6 +36,11 @@ Labs are not graded, but they show what the exams will test.
 - [Lab 2-2](lab02/lab02-2.html): Discretization, binarization, and scaling: Iris and Titanic
 - [Lab 2-3](lab02/lab02-3.html): Similarity graphs (ε-graph, kNN, heat kernel): Iris and Moons
 
+**Lab 3: Similarity and Dissimilarity**
+
+- [Lab 3-1](lab03/lab03-1.html): Distance measures (Euclidean, Manhattan, Minkowski, Mahalanobis, Gower): Iris and Titanic
+- [Lab 3-2](lab03/lab03-2.html): Similarity measures (SMC, Jaccard, cosine, Pearson): Groceries and MovieLens
+
 **Later labs (TBD)**
 
 Additional labs will be posted as the corresponding lecture units are covered.
@@ -95,7 +100,7 @@ Follow [Environment Setup (한)](environment-setup-ko.html) or [Environment Setu
 
 ### Step 2: Open the Lab Notebook
 
-Launch the notebook with JupyterLab or VS Code from the **repository root**. Open Lab 1 notebooks from `exercises/lab01/` and Lab 2 notebooks from `exercises/lab02/` so helpers import cleanly. `lab01_setup.py` and Lab 2 `helper.py` put the repository root on `sys.path` so `from data.loader import ...` works.
+Launch the notebook with JupyterLab or VS Code from the **repository root**. Open Lab 1 notebooks from `exercises/lab01/`, Lab 2 from `exercises/lab02/`, and Lab 3 from `exercises/lab03/` so helpers import cleanly. `lab01_setup.py` and Lab 2–3 `helper.py` put the repository root on `sys.path` so `from data.loader import ...` works.
 
 ::: {.callout-note}
 ## Running Cells in Order
@@ -107,7 +112,7 @@ Run notebook cells from top to bottom. If you skip a cell or run them out of ord
 
 **Lab 0 and Lab 1** do not ask you to fill in `TODO` blocks. Working code is provided. Run the cells, read the notes, and see how the same observations look as a matrix, a graph, a sequence, or a set of transactions. Watch shapes, sparsity, and what was stored versus derived.
 
-**Lab 2:** implement the `TODO` functions in `lab02_*.py` first, restart the kernel, then run the matching notebook from the top. On the course site, Practice outputs are the expected results after those functions are implemented.
+**Lab 2 onward:** implement the `TODO` functions in that unit's `labXX_*.py` first, restart the kernel, then run the matching notebook from the top. On the course site, Practice outputs are the expected results after those functions are implemented.
 
 ### Step 4: Experiment Freely
 

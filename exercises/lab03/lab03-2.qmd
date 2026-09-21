@@ -1,0 +1,400 @@
+---
+title: "Lab 03-2. Similarity Measures for Sparse and Interaction Data"
+jupyter: python3
+format:
+  html:
+    toc: true
+execute:
+  echo: true
+  warning: false
+---
+
+# Overview
+
+In this lab, we use **Groceries** and **MovieLens** to examine two questions:
+
+1. Why can SMC treat two sparse baskets as similar when they share no items?
+2. Why can cosine similarity and Pearson correlation rank users differently?
+
+::: {.callout-note}
+## Implement in `lab03_2.py` first
+
+This notebook calls functions from `lab03_2.py`. Find each
+`# ========== TODO ==========` block, remove `raise NotImplementedError`,
+and write your implementation. Restart the kernel after editing the `.py`
+file, then run this notebook from the top.
+
+On the course site, Practice cell outputs are the expected results after those functions are implemented. Your local notebook will not produce them until the TODOs are done.
+
+Check your functions with:
+
+```bash
+python -m doctest lab03_2.py -v
+```
+:::
+
+
+```{python}
+#| label: setup-similarity-measures
+#| include: false
+
+from pathlib import Path
+import sys
+
+_lab = Path("exercises/lab03")
+if not (_lab / "helper.py").exists():
+    _lab = Path(".")
+sys.path.insert(0, str(_lab.resolve()))
+
+import helper
+import numpy as np
+import pandas as pd
+
+from data.loader import (
+    load_groceries,
+    load_movielens_100k,
+)
+from helper import plot_distance_concentration
+from lab03_2 import (
+    cosine_similarity,
+    jaccard_similarity,
+    pearson_similarity,
+    simple_matching_similarity,
+)
+
+pd.set_option("display.max_colwidth", 100)
+```
+
+## 2.1 Sparse Binary Data: SMC vs. Jaccard
+
+A grocery transaction can be represented as a set of purchased items or,
+equivalently, as a sparse binary vector over the complete product catalog.
+
+For two binary vectors, the **Simple Matching Coefficient (SMC)** counts both
+shared presences and shared absences as matches.
+
+For sets $A$ and $B$, **Jaccard similarity** is
+
+$$
+J(A,B)
+=
+\frac{|A\cap B|}{|A\cup B|}.
+$$
+
+Jaccard ignores products absent from both baskets.
+
+```{python}
+baskets = load_groceries().copy()
+baskets["items"] = baskets["items"].map(frozenset)
+
+basket_view = baskets.head(6).copy()
+basket_view["size"] = basket_view["items"].map(len)
+basket_view["items"] = basket_view["items"].map(
+    lambda items: ", ".join(sorted(items))
+)
+
+basket_view
+```
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 1. SMC and Jaccard on Groceries**
+
+Implement `simple_matching_similarity()` and `jaccard_similarity()` in
+`lab03_2.py`.
+
+First compare the first basket with another basket that shares no purchased
+items. Then use Jaccard similarity to retrieve the five most similar baskets
+to the first transaction.
+
+```{python}
+universe = set().union(*baskets["items"])
+
+query_pos = 0
+query_items = baskets.iloc[query_pos]["items"]
+
+candidate_pos = next(
+    pos
+    for pos, items in enumerate(baskets["items"])
+    if pos != query_pos and len(query_items & items) == 0
+)
+candidate_items = baskets.iloc[candidate_pos]["items"]
+
+print("Number of products in the catalog:", len(universe))
+print("Query basket size:", len(query_items))
+print("Candidate basket size:", len(candidate_items))
+print("Shared purchased items:", len(query_items & candidate_items))
+print(
+    "SMC:",
+    round(
+        simple_matching_similarity(
+            query_items,
+            candidate_items,
+            universe,
+        ),
+        4,
+    ),
+)
+print(
+    "Jaccard:",
+    round(
+        jaccard_similarity(
+            query_items,
+            candidate_items,
+        ),
+        4,
+    ),
+)
+```
+
+```{python}
+jaccard_scores = np.array([
+    jaccard_similarity(query_items, items)
+    for items in baskets["items"]
+])
+jaccard_scores[query_pos] = -1.0
+
+order = np.argsort(jaccard_scores)[::-1][:5]
+
+result_columns = [
+    "transaction_id",
+    "items",
+]
+
+result = baskets.iloc[order][result_columns].copy()
+result["jaccard"] = jaccard_scores[order]
+result["items"] = result["items"].map(
+    lambda items: ", ".join(sorted(items))
+)
+
+print("Query basket")
+print(", ".join(sorted(query_items)))
+
+display(result)
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can SMC be misleading for sparse market-basket data?  
+When the catalog is large, two baskets share many 0-0 positions simply
+because neither transaction contains most products. SMC rewards those shared
+absences, while Jaccard focuses on products that appear in at least one of the
+two baskets.
+:::
+
+## 2.2 Rating Profiles: Cosine vs. Correlation
+
+MovieLens contains explicit ratings rather than simple presence or absence.
+A user can therefore be represented by a vector of ratings.
+
+Cosine similarity compares the direction of two vectors:
+
+$$
+\cos(x,y)
+=
+\frac{x\cdot y}{\|x\|\|y\|}.
+$$
+
+Pearson correlation compares the centered profiles:
+
+$$
+r(x,y)
+=
+\frac{
+\sum_i (x_i-\bar{x})(y_i-\bar{y})
+}{
+\sqrt{\sum_i (x_i-\bar{x})^2}
+\sqrt{\sum_i (y_i-\bar{y})^2}
+}.
+$$
+
+Thus, correlation ignores each user's overall rating level in addition to
+positive scaling.
+
+```{python}
+ratings = load_movielens_100k()
+
+ratings.head()
+```
+
+To keep comparisons compact and provide enough overlap, use the 60 users with
+the largest numbers of ratings.
+
+```{python}
+active_users = (
+    ratings["user_id"]
+    .value_counts()
+    .head(60)
+    .index
+)
+
+ratings_active = ratings[
+    ratings["user_id"].isin(active_users)
+]
+
+user_item = (
+    ratings_active
+    .pivot_table(
+        index="user_id",
+        columns="item_id",
+        values="rating",
+        aggfunc="mean",
+    )
+    .reindex(active_users)
+)
+
+print("User-item matrix:", user_item.shape)
+user_item.iloc[:5, :8]
+```
+
+Only movies rated by both users are used in a pairwise comparison. The TODO
+functions handle this by ignoring coordinates containing `NaN`.
+
+::: {.callout-important title="Q. Practice"}
+
+**Practice 2. Cosine Similarity vs. Pearson Correlation**
+
+Implement `cosine_similarity()` and `pearson_similarity()` in `lab03_2.py`.
+Use the first active user as a query and retrieve the five most similar users
+under each measure. Require at least 10 co-rated movies.
+
+```{python}
+def rank_similar_users(
+    matrix,
+    query_pos,
+    measure,
+    k=5,
+    min_common=10,
+):
+    query = matrix.iloc[query_pos].to_numpy(dtype=float)
+    rows = []
+
+    for pos in range(len(matrix)):
+        if pos == query_pos:
+            continue
+
+        other = matrix.iloc[pos].to_numpy(dtype=float)
+        common = np.isfinite(query) & np.isfinite(other)
+        n_common = int(common.sum())
+
+        if n_common < min_common:
+            continue
+
+        score = measure(query, other)
+        if not np.isfinite(score):
+            continue
+
+        rows.append({
+            "user_id": matrix.index[pos],
+            "common_movies": n_common,
+            "similarity": score,
+        })
+
+    return (
+        pd.DataFrame(rows)
+        .sort_values("similarity", ascending=False)
+        .head(k)
+        .reset_index(drop=True)
+    )
+
+
+query_pos = 0
+query_user = user_item.index[query_pos]
+
+print("Query user:", query_user)
+print(
+    "Query mean rating:",
+    round(user_item.iloc[query_pos].mean(skipna=True), 3),
+)
+
+cosine_top5 = rank_similar_users(
+    user_item,
+    query_pos,
+    cosine_similarity,
+)
+
+pearson_top5 = rank_similar_users(
+    user_item,
+    query_pos,
+    pearson_similarity,
+)
+
+print("Cosine Top-5")
+display(cosine_top5.round(4))
+
+print("Pearson Top-5")
+display(pearson_top5.round(4))
+```
+
+:::
+
+::: {.callout-tip title="Think"}
+Why can cosine similarity and Pearson correlation rank users differently?  
+Cosine compares the raw rating directions, so a user's general tendency to
+rate high or low still affects the angle. Pearson correlation centers each
+user's co-rated values first, so it focuses more directly on whether their
+relative preference patterns rise and fall together.
+:::
+
+
+# Appendix. Exploring the Curse of Dimensionality
+
+This appendix is not an additional Practice. It provides a controlled
+experiment for observing **distance concentration** in high-dimensional
+spaces.
+
+Generate random points from the same distribution while increasing the number
+of dimensions. For one query point, compare its nearest, mean, and farthest
+Euclidean distances to the other points.
+
+```{python}
+rng = np.random.default_rng(42)
+
+dimensions = [2, 10, 50, 100, 500, 1000]
+rows = []
+
+for dimension in dimensions:
+    X = rng.random((500, dimension))
+    query = X[0]
+
+    distances = np.sqrt(
+        np.sum(
+            (X[1:] - query) ** 2,
+            axis=1,
+        )
+    )
+
+    nearest = distances.min()
+    farthest = distances.max()
+
+    rows.append({
+        "dimension": dimension,
+        "nearest": nearest,
+        "mean": distances.mean(),
+        "farthest": farthest,
+        "relative_contrast": (
+            (farthest - nearest) / nearest
+        ),
+    })
+
+concentration = pd.DataFrame(rows)
+concentration.round(4)
+```
+
+```{python}
+#| fig-cap: "Distance concentration as dimensionality increases"
+
+plot_distance_concentration(
+    concentration
+)
+```
+
+::: {.callout-tip title="Think"}
+What happens to the relative difference between the nearest and farthest
+points as dimensionality increases in this experiment?  
+The relative contrast decreases. Although absolute Euclidean distances grow,
+the nearest and farthest points become less distinguishable relative to their
+overall distance scale. This is one aspect of the curse of dimensionality.
+:::
+

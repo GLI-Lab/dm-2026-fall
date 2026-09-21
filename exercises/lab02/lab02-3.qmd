@@ -11,11 +11,11 @@ execute:
 
 # Overview
 
-In this lab, we use **Iris** and **Moons** to construct similarity graphs from
-Euclidean distances.
+In this lab, we use **Iris** and **Moons** to examine three questions:
 
-We build $\epsilon$-graphs and kNN graphs, then assign edge weights using the
-heat kernel.
+1. How does an $\epsilon$-graph decide which pairs become edges?
+2. How does a kNN graph select neighbors, and why can a node's degree exceed $k$?
+3. How do heat-kernel weights decay as Euclidean distance grows?
 
 ::: {.callout-note}
 ## Implement in `lab02_3.py` first
@@ -58,9 +58,10 @@ import pandas as pd
 
 from sklearn.metrics import pairwise_distances
 
+from data.loader import load_iris
+
 from helper import (
     graph_summary,
-    load_iris_graph_data,
     load_moons_graph_data,
     plot_distance_matrix,
     plot_similarity_graph,
@@ -77,12 +78,15 @@ pd.set_option("display.max_colwidth", 100)
 ## 3.1 Euclidean Distance
 
 We first use Iris `petal length` and `petal width` from
-`data/record/iris.csv`.
+`data/record/iris.csv`. `load_iris()` writes that file if it is missing.
 
 ```{python}
-X_iris, species, iris = (
-    load_iris_graph_data()
-)
+iris = load_iris()
+X_iris = iris[[
+    "petal length (cm)",
+    "petal width (cm)",
+]].to_numpy(dtype=float)
+species = iris["species"].to_numpy()
 
 iris[[
     "petal length (cm)",

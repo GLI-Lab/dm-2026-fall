@@ -11,11 +11,11 @@ execute:
 
 # Overview
 
-Real-world data often contain missing values, duplicate records, and unusual
-values that should be examined before analysis.
+In this lab, we use **Titanic** to examine three questions:
 
-In this lab, we use the **Titanic dataset** to practice data cleaning,
-aggregation, and sampling.
+1. How should missing values, duplicate rows, and IQR outliers be handled?
+2. What does one row represent after aggregating passengers by class and sex?
+3. Why can stratified sampling keep small groups that simple random sampling misses?
 
 ::: {.callout-note}
 ## Implement in `lab02_1.py` first

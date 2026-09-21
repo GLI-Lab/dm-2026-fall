@@ -181,6 +181,12 @@ pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.
 
 ## README·qmd 작성 가이드
 
+- 각 LabXX-X의 Overview에 question으로 시작하여 어떤 주제로 실습을 진행하면 될지 미리 알려주도록 함
+  - In this lab, we use Iris and Titanic to examine four questions:
+  How do Euclidean, Manhattan, and Minkowski distances differ?
+  How does Mahalanobis distance use feature correlation?
+  How can feature scaling change nearest-neighbor rankings?
+  How can numerical and categorical attributes be compared together?
 - Practice는 `::: {.callout-important}` 그리고 Think는 `::: {.callout-tip}`로 두며, 시험에는 코드 구현이 아닌 Think·Practice와 관련있음
   - Think: `title="Think"`로 되어있는 질문과 답을 명시함
   - Practice: `title="Q. Practice"`로 되어있는 과제로, `labXX_*.py`에 구현하도록 함. `#| eval: false`를 두지 않아야 Practice가 실행되고 `_freeze`에 출력이 남음
