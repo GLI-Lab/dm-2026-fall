@@ -437,7 +437,7 @@ J(A,B)
 \frac{|A\cap B|}{|A\cup B|}.
 \]</span></p>
 <p>Jaccard ignores products absent from both baskets.</p>
-<div id="3d0b3d13" class="cell" data-execution_count="2">
+<div id="f8c812fb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>baskets <span class="op">=</span> load_groceries().copy()</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>baskets[<span class="st">"items"</span>] <span class="op">=</span> baskets[<span class="st">"items"</span>].<span class="bu">map</span>(<span class="bu">frozenset</span>)</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -517,7 +517,7 @@ J(A,B)
 <p><strong>Practice 1. SMC and Jaccard on Groceries</strong></p>
 <p>Implement <code>simple_matching_similarity()</code> and <code>jaccard_similarity()</code> in <code>lab03_2.py</code>.</p>
 <p>First compare the first basket with another basket that shares no purchased items. Then use Jaccard similarity to retrieve the five most similar baskets to the first transaction.</p>
-<div id="f64f020d" class="cell" data-execution_count="3">
+<div id="4fc10c18" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>universe <span class="op">=</span> <span class="bu">set</span>().union(<span class="op">*</span>baskets[<span class="st">"items"</span>])</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>query_pos <span class="op">=</span> <span class="dv">0</span></span>
@@ -564,7 +564,7 @@ SMC: 0.9641
 Jaccard: 0.0</code></pre>
 </div>
 </div>
-<div id="3290c8c9" class="cell" data-execution_count="4">
+<div id="dac8a486" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>jaccard_scores <span class="op">=</span> np.array([</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    jaccard_similarity(query_items, items)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> items <span class="kw">in</span> baskets[<span class="st">"items"</span>]</span>
@@ -680,7 +680,7 @@ r(x,y)
 }.
 \]</span></p>
 <p>Thus, correlation ignores each user’s overall rating level in addition to positive scaling.</p>
-<div id="bd4acff3" class="cell" data-execution_count="5">
+<div id="f1ebd65e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>ratings <span class="op">=</span> load_movielens_100k()</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ratings.head()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -747,7 +747,7 @@ r(x,y)
 </div>
 </div>
 <p>To keep comparisons compact and provide enough overlap, use the 60 users with the largest numbers of ratings.</p>
-<div id="ad582446" class="cell" data-execution_count="6">
+<div id="d21bda10" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>active_users <span class="op">=</span> (</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    ratings[<span class="st">"user_id"</span>]</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    .value_counts()</span>
@@ -879,7 +879,7 @@ r(x,y)
 <div class="callout-body-container callout-body">
 <p><strong>Practice 2. Cosine Similarity vs.&nbsp;Pearson Correlation</strong></p>
 <p>Implement <code>cosine_similarity()</code> and <code>pearson_similarity()</code> in <code>lab03_2.py</code>. Use the first active user as a query and retrieve the five most similar users under each measure. Require at least 10 co-rated movies.</p>
-<div id="cbfb27a5" class="cell" data-execution_count="7">
+<div id="f7992950" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> rank_similar_users(</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    matrix,</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    query_pos,</span>
@@ -1074,7 +1074,7 @@ Cosine compares the raw rating directions, so a user’s general tendency to rat
 <h1>Appendix. Exploring the Curse of Dimensionality</h1>
 <p>This appendix is not an additional Practice. It provides a controlled experiment for observing <strong>distance concentration</strong> in high-dimensional spaces.</p>
 <p>Generate random points from the same distribution while increasing the number of dimensions. For one query point, compare its nearest, mean, and farthest Euclidean distances to the other points.</p>
-<div id="90f2feaa" class="cell" data-execution_count="8">
+<div id="73a20a05" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>rng <span class="op">=</span> np.random.default_rng(<span class="dv">42</span>)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>dimensions <span class="op">=</span> [<span class="dv">2</span>, <span class="dv">10</span>, <span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">500</span>, <span class="dv">1000</span>]</span>
@@ -1176,7 +1176,7 @@ Cosine compares the raw rating directions, so a user’s general tendency to rat
 </div>
 </div>
 </div>
-<div id="81d3d31e" class="cell" data-execution_count="9">
+<div id="14bb8728" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>plot_distance_concentration(</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    concentration</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
