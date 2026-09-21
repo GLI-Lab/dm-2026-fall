@@ -1,4 +1,4 @@
-"""Lab 02 helpers: path setup, loaders, and figures.
+"""Lab 02 helpers: path setup, figures, and the generated Moons sample.
 
 Importing this module puts the repository root and this lab folder on
 sys.path so `data.loader` and `lab02_*.py` both work, whether Quarto
@@ -25,17 +25,6 @@ for path in (REPO_ROOT, LAB_DIR):
     text = str(path)
     if text not in sys.path:
         sys.path.insert(0, text)
-
-
-from data.loader import load_iris as load_iris_data
-
-
-def load_iris_graph_data():
-    frame = load_iris_data()
-    X = frame[["petal length (cm)", "petal width (cm)"]].to_numpy(
-        dtype=float
-    )
-    return X, frame["species"].to_numpy(), frame
 
 
 def load_moons_graph_data():
