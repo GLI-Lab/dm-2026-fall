@@ -191,5 +191,5 @@ pm2 start pixi --name "dm-2026-fall" -- run quarto preview --port 4001 --host 0.
   - Think: `title="Think"`로 되어있는 질문과 답을 명시함
   - Practice: `title="Q. Practice"`로 되어있는 과제로, `labXX_*.py`에 구현하도록 함. `#| eval: false`를 두지 않아야 Practice가 실행되고 `_freeze`에 출력이 남음
 - 데이터 원본은 `data/`에 두고 찾기·다운로드·가공은 `data.loader`에 둠. 각 lab helper.py에 넣지 않음
-- 모든 README와 qmd 파일에서 한글은 **개조식**으로 씀 (`~함`, `~둠`, `~않음`). 긴 서술체(`~합니다`)는 쓰지 않음
+- 모든 README와 qmd 파일에서 한글은 **개조식**으로 씀 (`~함`, `~둠`, `~않음`). 긴 서술체(`~합니다`)는 쓰지 않음. 대신, 설명을 줄이라는건 아니고, 필요한만큼 설명을 상세하게 작성해야함
 - emdash `—` 사용을 지양함 

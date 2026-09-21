@@ -164,12 +164,43 @@ def plot_scaling(data_dict):
     plt.show()
 
 
-def plot_distance_matrix(D, title, n_show=25):
-    block = np.asarray(D, dtype=float)[:n_show, :n_show]
+def _sample_indices_by_group(labels, per_group=12, random_state=0):
+    """Return indices grouped by label, sampling at most `per_group` per group."""
+    labels = np.asarray(labels)
+    rng = np.random.default_rng(random_state)
+    parts = []
+    for group in pd.unique(labels):
+        idx = np.flatnonzero(labels == group)
+        if len(idx) > per_group:
+            idx = np.sort(rng.choice(idx, size=per_group, replace=False))
+        parts.append(idx)
+    return np.concatenate(parts)
+
+
+def plot_distance_matrix(
+    D,
+    title,
+    labels=None,
+    per_group=12,
+):
+    """Heatmap of a pairwise matrix. If `labels` is given, sample and group rows."""
+    D = np.asarray(D, dtype=float)
+    if labels is None:
+        block = D
+        group_note = ""
+    else:
+        idx = _sample_indices_by_group(labels, per_group=per_group)
+        block = D[np.ix_(idx, idx)]
+        group_note = f" ({per_group} sampled per group)"
+
     fig, ax = plt.subplots(figsize=(6.2, 5.2))
     image = ax.imshow(block, aspect="auto")
     fig.colorbar(image, ax=ax, shrink=0.82)
-    ax.set(xlabel="Object", ylabel="Object", title=title)
+    ax.set(
+        xlabel="Object",
+        ylabel="Object",
+        title=title + group_note,
+    )
     plt.tight_layout()
     plt.show()
 
@@ -180,6 +211,9 @@ def plot_similarity_graph(
     weights=None,
     labels=None,
     title="Similarity Graph",
+    xlabel="Feature 1",
+    ylabel="Feature 2",
+    ax=None,
 ):
     X = np.asarray(X, dtype=float)
     A = np.asarray(adjacency, dtype=bool)
@@ -191,16 +225,41 @@ def plot_similarity_graph(
         G.add_edge(int(i), int(j), weight=weight)
 
     pos = {i: X[i] for i in range(len(X))}
-    fig, ax = plt.subplots(figsize=(7.2, 5.4))
+    created = ax is None
+    if created:
+        _, ax = plt.subplots(figsize=(7.2, 5.4))
+
     if G.number_of_edges() > 0:
         if weights is None:
-            widths = 0.7
-        else:
-            edge_values = np.array(
-                [G[u][v]["weight"] for u, v in G.edges()]
+            nx.draw_networkx_edges(
+                G,
+                pos,
+                width=0.7,
+                alpha=0.35,
+                ax=ax,
             )
-            widths = 0.3 + 2.0 * edge_values
-        nx.draw_networkx_edges(G, pos, width=widths, alpha=0.35, ax=ax)
+        else:
+            edges = list(G.edges())
+            edge_values = np.array(
+                [G[u][v]["weight"] for u, v in edges],
+                dtype=float,
+            )
+            order = np.argsort(edge_values)
+            edges = [edges[i] for i in order]
+            edge_values = edge_values[order]
+            widths = 0.4 + 7.0 * edge_values
+            nx.draw_networkx_edges(
+                G,
+                pos,
+                edgelist=edges,
+                width=widths,
+                edge_color=edge_values,
+                edge_cmap=plt.cm.Blues,
+                edge_vmin=0.0,
+                edge_vmax=1.0,
+                alpha=0.95,
+                ax=ax,
+            )
 
     if labels is None:
         ax.scatter(X[:, 0], X[:, 1], s=32, alpha=0.8)
@@ -215,20 +274,85 @@ def plot_similarity_graph(
                 alpha=0.8,
                 label=str(group),
             )
+
+    isolates = [i for i, deg in G.degree() if deg == 0]
+    if isolates:
+        ax.scatter(
+            X[isolates, 0],
+            X[isolates, 1],
+            s=90,
+            facecolors="none",
+            edgecolors="black",
+            linewidths=1.4,
+            zorder=4,
+            label="isolate (degree 0)",
+        )
+
+    if labels is not None or isolates:
         ax.legend(title="Group")
 
-    ax.set(xlabel="Feature 1", ylabel="Feature 2", title=title)
-    plt.tight_layout()
+    ax.set(xlabel=xlabel, ylabel=ylabel, title=title)
+    if created:
+        plt.tight_layout()
+        plt.show()
+
+
+def plot_graph_and_matrix(
+    X,
+    adjacency,
+    matrix,
+    labels=None,
+    graph_title="Similarity Graph",
+    matrix_title="Pairwise matrix",
+    xlabel="Feature 1",
+    ylabel="Feature 2",
+    weights=None,
+    per_group=12,
+):
+    """Graph in coordinate space (left) and a sampled pairwise matrix (right)."""
+    fig, (ax_g, ax_m) = plt.subplots(1, 2, figsize=(12.6, 5.4))
+
+    plot_similarity_graph(
+        X,
+        adjacency,
+        weights=weights,
+        labels=labels,
+        title=graph_title,
+        xlabel=xlabel,
+        ylabel=ylabel,
+        ax=ax_g,
+    )
+
+    matrix = np.asarray(matrix, dtype=float)
+    if labels is None:
+        idx = np.arange(len(matrix))
+        note = ""
+    else:
+        idx = _sample_indices_by_group(labels, per_group=per_group)
+        note = f" ({per_group} per group)"
+    block = matrix[np.ix_(idx, idx)]
+
+    image = ax_m.imshow(block, aspect="auto")
+    fig.colorbar(image, ax=ax_m, shrink=0.82)
+    ax_m.set(
+        xlabel="Object",
+        ylabel="Object",
+        title=matrix_title + note,
+    )
+    fig.tight_layout()
     plt.show()
 
 
 def graph_summary(adjacency):
     A = np.asarray(adjacency, dtype=bool)
     G = nx.from_numpy_array(A.astype(int))
+    degrees = np.array([deg for _, deg in G.degree()])
     return pd.Series({
         "nodes": G.number_of_nodes(),
         "edges": G.number_of_edges(),
         "components": nx.number_connected_components(G),
-        "isolates": len(list(nx.isolates(G))),
-        "mean_degree": np.mean([degree for _, degree in G.degree()]),
+        "isolates": int((degrees == 0).sum()),
+        "min_degree": int(degrees.min()) if len(degrees) else 0,
+        "max_degree": int(degrees.max()) if len(degrees) else 0,
+        "mean_degree": float(degrees.mean()) if len(degrees) else 0.0,
     })

@@ -64,7 +64,7 @@ from helper import (
     graph_summary,
     load_moons_graph_data,
     plot_distance_matrix,
-    plot_similarity_graph,
+    plot_graph_and_matrix,
 )
 from lab02_3 import (
     apply_edge_weights,
@@ -140,14 +140,17 @@ pd.DataFrame(
 ).round(3)
 ```
 
-Each entry `D_iris[i, j]` is $d(O_i,O_j)$.
+Each entry `D_iris[i, j]` is $d(O_i,O_j)$. The heatmap samples 12 objects per
+species so the three groups are visible; a 150 × 150 table would hide that
+block structure.
 
 ```{python}
-#| fig-cap: "Iris Euclidean distance matrix"
+#| fig-cap: "Iris Euclidean distance matrix, sampled by species"
 
 plot_distance_matrix(
     D_iris,
-    title="Iris Euclidean Distance Matrix",
+    title="Iris Euclidean Distance",
+    labels=species,
 )
 ```
 
@@ -243,13 +246,17 @@ graph_summary(
 :::
 
 ```{python}
-#| fig-cap: "Iris epsilon graph"
+#| fig-cap: "Iris epsilon graph and sampled adjacency matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_iris,
     A_epsilon,
+    A_epsilon.astype(float),
     labels=species,
-    title=f"Iris ε-Graph (ε = {epsilon})",
+    graph_title=f"Iris ε-Graph (ε = {epsilon})",
+    matrix_title="Adjacency (1 = edge)",
+    xlabel="petal length (cm)",
+    ylabel="petal width (cm)",
 )
 ```
 
@@ -335,13 +342,17 @@ graph_summary(
 :::
 
 ```{python}
-#| fig-cap: "Iris kNN graph"
+#| fig-cap: "Iris kNN graph and sampled adjacency matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_iris,
     A_knn,
+    A_knn.astype(float),
     labels=species,
-    title=f"Iris kNN Graph (K = {K})",
+    graph_title=f"Iris kNN Graph (K = {K})",
+    matrix_title="Adjacency (1 = edge)",
+    xlabel="petal length (cm)",
+    ylabel="petal width (cm)",
 )
 ```
 
@@ -353,9 +364,19 @@ the edge even when $A$ is not among $B$'s $K$ nearest. Extra incoming edges
 raise the degree above $K$.
 :::
 
+Compare the two Iris summaries. The $\epsilon$-graph can have
+`isolates > 0` and a large `max_degree` in the dense setosa cluster. The
+kNN graph has `isolates = 0` and `min_degree` at least $K$, while
+`max_degree` can still exceed $K$. Isolates are circled on the $\epsilon$-graph.
+
 ### Step 3. Heat-Kernel Weights
 
-For each pair,
+The ε-graph and kNN graph only decide **which pairs are connected**. They do
+not yet say how strong those edges are.
+
+Heat-kernel weights reuse the Euclidean matrix `D_iris`. They do not compute
+a new distance. They map each already-computed distance to a similarity in
+$(0,1]$:
 
 $$
 w_{ij}
@@ -367,22 +388,49 @@ w_{ij}
 \right).
 $$
 
-Here, $t$ controls how quickly similarity decreases with distance.
-
-Because `D_iris` contains **Euclidean distances**, the heat-kernel similarity
-matrix is computed directly from `D_iris`.
+Close pairs stay near 1, distant pairs go toward 0. The bandwidth $t$
+controls how fast that happens: smaller $t$ makes similarity decay faster.
+We set $t=\epsilon$, so a pair exactly at the ε-graph threshold has weight
+$e^{-1}\approx 0.37$ and nearer pairs are thicker and darker. Then
+`apply_edge_weights()` keeps $w_{ij}$ only on the ε or kNN edges and puts 0
+elsewhere.
 
 ```{python}
-t = 1.0
+t = epsilon
 
 W = np.exp(
     -(D_iris ** 2)
     / (t ** 2)
 )
+```
 
-pd.DataFrame(
-    W[:6, :6]
-).round(3)
+A small sample, two flowers from each species, shows the decay. Nearby
+setosa pairs stay close to 1; a setosa-virginica pair is much smaller.
+
+```{python}
+sample_idx = [0, 1, 50, 51, 100, 101]
+sample_names = [
+    f"{i} ({species[i]})"
+    for i in sample_idx
+]
+
+print("Euclidean distances")
+display(
+    pd.DataFrame(
+        D_iris[np.ix_(sample_idx, sample_idx)],
+        index=sample_names,
+        columns=sample_names,
+    ).round(3)
+)
+
+print("Heat-kernel similarities, t =", t)
+display(
+    pd.DataFrame(
+        W[np.ix_(sample_idx, sample_idx)],
+        index=sample_names,
+        columns=sample_names,
+    ).round(3)
+)
 ```
 
 ::: {.callout-important title="Q. Practice"}
@@ -413,26 +461,34 @@ pd.DataFrame(
 :::
 
 ```{python}
-#| fig-cap: "Iris epsilon graph with heat-kernel weights"
+#| fig-cap: "Iris weighted epsilon graph and sampled similarity matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_iris,
     A_epsilon,
-    weights=W_epsilon,
+    W_epsilon,
     labels=species,
-    title="Iris Weighted ε-Graph",
+    weights=W_epsilon,
+    graph_title="Iris Weighted ε-Graph",
+    matrix_title="Heat-kernel weights on ε-edges",
+    xlabel="petal length (cm)",
+    ylabel="petal width (cm)",
 )
 ```
 
 ```{python}
-#| fig-cap: "Iris kNN graph with heat-kernel weights"
+#| fig-cap: "Iris weighted kNN graph and sampled similarity matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_iris,
     A_knn,
-    weights=W_knn,
+    W_knn,
     labels=species,
-    title="Iris Weighted kNN Graph",
+    weights=W_knn,
+    graph_title="Iris Weighted kNN Graph",
+    matrix_title="Heat-kernel weights on kNN edges",
+    xlabel="petal length (cm)",
+    ylabel="petal width (cm)",
 )
 ```
 
@@ -465,11 +521,16 @@ pd.DataFrame(
 
 The labels `y_moons` are used only for visualization.
 
+The construction is the same three steps as Iris: Euclidean distances, then
+ε or kNN edges, then heat-kernel weights on those edges. Moons uses a
+smaller $\epsilon$ than Iris so sparse parts of the crescent break into
+isolates, while kNN still connects every point.
+
 ### $\epsilon$-Graph
 
 ```{python}
 
-epsilon_moons = 0.22
+epsilon_moons = 0.12
 
 A_moons_epsilon = epsilon_graph(
     D_moons,
@@ -482,13 +543,15 @@ graph_summary(
 ```
 
 ```{python}
-#| fig-cap: "Moons epsilon graph"
+#| fig-cap: "Moons epsilon graph and sampled adjacency matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_moons,
     A_moons_epsilon,
+    A_moons_epsilon.astype(float),
     labels=y_moons,
-    title=f"Moons ε-Graph (ε = {epsilon_moons})",
+    graph_title=f"Moons ε-Graph (ε = {epsilon_moons})",
+    matrix_title="Adjacency (1 = edge)",
 )
 ```
 
@@ -509,20 +572,24 @@ graph_summary(
 ```
 
 ```{python}
-#| fig-cap: "Moons kNN graph"
+#| fig-cap: "Moons kNN graph and sampled adjacency matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_moons,
     A_moons_knn,
+    A_moons_knn.astype(float),
     labels=y_moons,
-    title=f"Moons kNN Graph (K = {K_moons})",
+    graph_title=f"Moons kNN Graph (K = {K_moons})",
+    matrix_title="Adjacency (1 = edge)",
 )
 ```
 
 ### Heat-Kernel Weights
 
-Compute the heat-kernel similarity from the **Euclidean distance matrix**
-`D_moons`.
+`D_moons` was already used to choose the edges. Heat-kernel weights map those
+same Euclidean distances to similarities. They do not add new neighbors.
+With $t=\epsilon$, a pair at the ε-graph threshold gets weight $e^{-1}\approx 0.37$,
+and farther pairs (kept only by kNN) get even smaller weights.
 
 $$
 w_{ij}
@@ -555,26 +622,30 @@ W_moons_knn = apply_edge_weights(
 ```
 
 ```{python}
-#| fig-cap: "Weighted Moons epsilon graph"
+#| fig-cap: "Weighted Moons epsilon graph and sampled similarity matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_moons,
     A_moons_epsilon,
-    weights=W_moons_epsilon,
+    W_moons_epsilon,
     labels=y_moons,
-    title="Moons Weighted ε-Graph",
+    weights=W_moons_epsilon,
+    graph_title="Moons Weighted ε-Graph",
+    matrix_title="Heat-kernel weights on ε-edges",
 )
 ```
 
 ```{python}
-#| fig-cap: "Weighted Moons kNN graph"
+#| fig-cap: "Weighted Moons kNN graph and sampled similarity matrix"
 
-plot_similarity_graph(
+plot_graph_and_matrix(
     X_moons,
     A_moons_knn,
-    weights=W_moons_knn,
+    W_moons_knn,
     labels=y_moons,
-    title="Moons Weighted kNN Graph",
+    weights=W_moons_knn,
+    graph_title="Moons Weighted kNN Graph",
+    matrix_title="Heat-kernel weights on kNN edges",
 )
 ```
 
@@ -582,6 +653,14 @@ plot_similarity_graph(
 How do the $\epsilon$-graph and kNN graph differ in selecting
 neighbors?  
 The $\epsilon$-graph uses a distance threshold, so the number of neighbors
-varies. The kNN graph uses a neighbor count, so each node has $K$ outgoing
-neighbors.
+varies and sparse points can become isolates. The kNN graph uses a neighbor
+count, so each node has $K$ outgoing neighbors and isolates disappear.
+:::
+
+::: {.callout-tip title="Think"}
+When density varies across the data, which graph is usually easier to use
+in practice, and why?  
+A kNN graph. One global $\epsilon$ is too large in dense regions and too
+small in sparse regions, so the same radius cannot fit both. kNN asks for
+$K$ neighbors everywhere, so it does not need a single distance cutoff.
 :::
